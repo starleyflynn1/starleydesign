@@ -1,0 +1,120 @@
+/* ============================================================
+   TERMINAL THEME: BASE & LIGHT MODE (Retro Hardware)
+   ============================================================ */
+.theme-terminal {
+  /* --- Brand Identity --- */
+  --matrix-green: #065f46;   /* Darker "ink" green for light mode */
+  --amber-warning: #b45309;  /* Deep amber */
+  --terminal-bg: #e5e7eb;    /* Silver/Gray hardware plastic */
+  --slate-dark: #d1d5db;
+  --glitch-cyan: #0369a1;
+
+  /* --- Core Semantic Tokens (Light) --- */
+  --background: var(--terminal-bg);
+  --foreground: var(--matrix-green);
+  --card: #f3f4f6;
+  --card-foreground: var(--matrix-green);
+  --stage-base: var(--matrix-green);
+  --stage-depth: #d1d5db;
+  
+  --primary: var(--matrix-green);
+  --primary-foreground: var(--terminal-bg);
+  --velvet: var(--amber-warning);
+  --spotlight: var(--glitch-cyan);
+  --accent: var(--amber-warning);
+  --border: #9ca3af;
+  --ring: var(--matrix-green);
+
+  /* --- Global Theme Physics --- */
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  --radius: 2px;
+  transition: background-color 0.1s steps(2); /* Industrial, non-smooth transition */
+}
+
+/* ============================================================
+   TERMINAL THEME: DARK MODE (Phosphor Night)
+   ============================================================ */
+.dark.theme-terminal {
+  /* --- High-Contrast Identity --- */
+  --matrix-green: #00ff41;   /* Classic Phosphor */
+  --amber-warning: #ffb000;  /* Bright Amber */
+  --terminal-bg: #0a0c10;    /* The Void */
+  --slate-dark: #161b22;
+  --glitch-cyan: #00e5ff;
+
+  /* --- Core Semantic Tokens (Dark) --- */
+  --background: var(--terminal-bg);
+  --foreground: var(--matrix-green);
+  --card: #15171c;
+  --card-foreground: var(--matrix-green);
+  --stage-base: var(--matrix-green);
+  --stage-depth: #0d0e11;
+
+  --primary: var(--matrix-green);
+  --primary-foreground: var(--terminal-bg);
+  --velvet: var(--amber-warning);
+  --spotlight: var(--glitch-cyan);
+  --border: #30363d;
+}
+
+/* ============================================================
+   TERMINAL COMPONENT LOGIC
+   ============================================================ */
+
+/* --- The Phosphor Header --- */
+.theme-terminal .main-header-title {
+  font-family: inherit;
+  color: var(--foreground);
+  background: initial;
+  -webkit-text-fill-color: initial;
+  text-transform: lowercase; /* Console style */
+  
+  /* The "Scanline" effect */
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.05) 0px,
+    rgba(0, 0, 0, 0.05) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  
+  /* Glow - Subtle in Light, Bright in Dark */
+  text-shadow: 0 0 5px var(--border);
+}
+
+.dark.theme-terminal .main-header-title {
+  text-shadow: 0 0 12px rgba(0, 255, 65, 0.6);
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.2) 0px,
+    rgba(0, 0, 0, 0.2) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+}
+
+/* --- The Command Button --- */
+.theme-terminal button {
+  font-family: inherit;
+  border: 1px solid var(--foreground);
+  background: transparent;
+  color: var(--foreground);
+  padding: 0.5rem 1.25rem;
+  text-transform: lowercase;
+  position: relative;
+  transition: all 0.1s steps(2);
+}
+
+.theme-terminal button::before {
+  content: "> ";
+  opacity: 0.7;
+}
+
+.theme-terminal button:hover {
+  background: var(--foreground);
+  color: var(--background);
+  box-shadow: 0 0 15px var(--foreground);
+}
+
+/* --- Technical Card --- */
+.theme

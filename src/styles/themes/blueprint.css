@@ -1,0 +1,96 @@
+/* ============================================================
+   BLUEPRINT THEME: THE "TECHNICAL MANUAL" EDITION
+   ============================================================ */
+.theme-blueprint {
+  /* --- Brand Identity --- */
+  --blueprint-blue: #0047ab;
+  --safety-orange: #f97316; /* High-visibility engineering accent */
+  --cad-gray: #f1f5f9;
+  --ink-black: #0f172a;
+
+  /* --- Core Semantic Tokens (Light Mode) --- */
+  --background: #ffffff; 
+  --foreground: var(--ink-black);
+  --stage-base: var(--blueprint-blue);
+  --stage-depth: #e2e8f0; 
+  
+  --card: var(--cad-gray);
+  --card-foreground: var(--ink-black);
+  
+  --primary: var(--blueprint-blue);
+  --primary-foreground: #ffffff;
+  --velvet: var(--safety-orange);
+  --spotlight: var(--blueprint-blue);
+  --accent: var(--safety-orange);
+  --border: #cbd5e1;
+
+  /* --- Global Physics --- */
+  font-family: "IBM Plex Mono", monospace;
+  --radius: 0px; 
+
+  /* Subtle Top-Right Grid (Like a technical drawing header) */
+  background-image: 
+    radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* --- THE HEADER: The "Spec Sheet" Look --- */
+.theme-blueprint .main-header-title {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  color: var(--blueprint-blue);
+  background: none;
+  -webkit-text-fill-color: initial;
+  
+  /* Mimic a technical stamp */
+  border-left: 8px solid var(--blueprint-blue);
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* --- THE SUBTITLE: The "Serial Number" Style --- */
+.theme-blueprint .subtitle-text {
+  font-size: 0.85rem;
+  color: var(--safety-orange);
+  font-weight: 600;
+  border: 1px solid var(--safety-orange);
+  padding: 2px 6px;
+  display: inline-block;
+}
+
+/* --- THE BUTTONS: The "Schematic" Toggle --- */
+.theme-blueprint button {
+  background: transparent;
+  color: var(--blueprint-blue);
+  border: 2px solid var(--blueprint-blue);
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.6rem 1.2rem;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.theme-blueprint button:hover {
+  background: var(--blueprint-blue);
+  color: #ffffff;
+}
+
+/* --- DARK MODE: The "Night Vision" Cleanroom --- */
+.dark.theme-blueprint {
+  --background: #020617;
+  --foreground: #f8fafc;
+  --blueprint-blue: #38bdf8; /* Brighter Sky Blue for dark contrast */
+  --safety-orange: #fb923c;
+  
+  --card: #0f172a;
+  --border: #1e293b;
+  --stage-base: var(--blueprint-blue);
+}
+
+.dark.theme-blueprint .main-header-title {
+  border-left-color: var(--blueprint-blue);
+  color: var(--blueprint-blue);
+  /* Give it a subtle glow like a backlit instrumentation panel */
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}

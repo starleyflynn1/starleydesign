@@ -1,0 +1,197 @@
+/* ============================================================
+   ARCHIVE THEME: LIGHT MODE
+   ============================================================ */
+.theme-archive {
+  /* --- Brand Identity --- */
+  --ink: #1c1917;
+  --paper: #f5f1e8;
+  --rust: #7c2d12;
+  --warm-tan: #8b7355;
+
+  /* --- Contextual Brand Tokens --- */
+  --stage-base: var(--ink);
+  --marquee-surface: var(--paper);
+  --stage-depth: #292524;
+  --velvet: var(--rust);
+  --spotlight: var(--warm-tan);
+
+  /* --- Core Semantic Tokens --- */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: #f5f5f4;
+  --card-foreground: var(--ink);
+  --primary: var(--stage-base);
+  --primary-foreground: var(--marquee-surface);
+  --secondary: #f5f5f4;
+  --secondary-foreground: var(--ink);
+  --muted: #f5f5f4;
+  --muted-foreground: #78716c;
+  --accent: var(--velvet);
+  --accent-foreground: var(--paper);
+  --border: rgba(28, 25, 23, 0.15);
+  --ring: var(--spotlight);
+
+  /* --- Global Theme Physics --- */
+  font-family: "Playfair Display", serif;
+  --radius: 0px; 
+}
+
+/* --- Typography Hierarchy --- */
+.theme-archive h1, 
+.theme-archive h2, 
+.theme-archive h3,
+.theme-archive .nav-link {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+}
+
+/* --- The Archive Button --- */
+.theme-archive button {
+  font-family: 'Playfair Display', serif;
+  text-transform: uppercase;
+  border: 4px double var(--stage-base);
+  background: transparent;
+  color: var(--stage-base);
+  padding: 0.75rem 1.5rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-archive button:hover {
+  background: var(--stage-base);
+  color: var(--marquee-surface);
+  transform: translateY(-2px);
+}
+
+/* --- Decorative Flourish (The Fleuron) --- */
+.theme-archive hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+  overflow: visible;
+  text-align: center;
+}
+
+.theme-archive hr::after {
+  content: "❦";
+  display: inline-block;
+  position: relative;
+  top: -0.7em;
+  padding: 0 1rem;
+  background: var(--marquee-surface);
+  color: var(--stage-base);
+  font-size: 1.2rem;
+}
+
+/* --- Main Header (Accessible 75px) --- */
+.theme-archive .main-header-title {
+  font-size: clamp(2.5rem, 8vw, 4.6875rem);
+  text-transform: uppercase;
+  margin-bottom: 0.2em;
+  letter-spacing: -0.02em;
+  
+  /* Resetting gradient clipping for the printed look */
+  background: initial;
+  background-clip: initial;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: var(--foreground);
+  color: var(--foreground);
+  
+  opacity: 0.9;
+  border-bottom: 2px solid var(--border);
+  transition: all 0.5s ease-in-out;
+}
+
+/* --- Editorial Drop Cap --- */
+.theme-archive .director-bio-text p:first-of-type::first-letter {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  float: left;
+  line-height: 1;
+  margin-top: 0.1em;
+  margin-right: 0.35rem;
+  initial-letter: 3;
+  font-size: 5rem;
+  color: var(--accent);
+  text-shadow: 1px 1px 0px rgba(0,0,0,0.1);
+}
+
+/* ============================================================
+   ARCHIVE THEME: DARK MODE OVERRIDES
+   ============================================================ */
+.dark.theme-archive {
+  /* 1. Fundamental Surfaces */
+  --background: #1c1917; 
+  --foreground: #f5f1e8;
+  
+  /* 2. Theme Tokens */
+  --stage-base: #d6d3d1;
+  --marquee-surface: #1c1917;
+  --border: rgba(245, 241, 232, 0.15);
+  
+  /* 3. Reading Lamp Accents */
+  --gold-glow: #d4a574;
+  --deep-rust: #fca5a5;
+  
+  --velvet: var(--deep-rust);
+  --spotlight: var(--gold-glow);
+  
+  /* 4. Semantic Update */
+  --primary: var(--stage-base);
+  --accent: var(--velvet);
+}
+
+.dark.theme-archive .main-header-title {
+  background:  var(--spotlight);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  border-bottom: none;
+  opacity: 1;
+}
+/* Targeting the ⌘ K trigger specifically */
+.dark.theme-archive .usher-trigger-button, 
+.dark.theme-archive kbd {
+  /* Use your warm gold glow for the text and border */
+  color: var(--spotlight); 
+  border: 1px solid rgba(212, 165, 116, 0.4); 
+  background: rgba(212, 165, 116, 0.05); /* Very subtle hint of gold */
+  
+  /* Ensure the font weight is bumped for small text readability */
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  
+  /* Remove any opacity that might be making it 'ghost' out */
+  opacity: 1;
+  
+  transition: all 0.2s ease;
+}
+
+.dark.theme-archive .usher-trigger-button:hover {
+  background: var(--spotlight);
+  color: var(--marquee-surface); /* Dark ink text on gold background */
+  box-shadow: 0 0 15px rgba(212, 165, 116, 0.3);
+}
+/* Targeting ONLY the first paragraph in the bio */
+.director-bio-text p:first-of-type::first-letter {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  
+  /* The core physics of a drop cap */
+  float: left;
+  line-height: 1; /* Key for vertical alignment */
+  margin-top: 0.1em; /* Micro-adjustment for Playfair cap height */
+  margin-right: 0.35rem; /* Space between letter and text block */
+  
+  /* Sizing: Using `initial-letter` for modern browsers (it's the new standard) */
+  initial-letter: 3; /* The letter will drop exactly 3 lines */
+  
+  /* Legacy fallback using font-size/line-height if `initial-letter` isn't supported */
+  font-size: 5rem;
+  
+  /* Applying your theme color (Stage Velvet on Archive Background) */
+  color: var(--accent-primary); 
+  
+  /* Subtle "Letterpress" effect for authenticity */
+  text-shadow: 1px 1px 0px rgba(0,0,0,0.1); 
+}

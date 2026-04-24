@@ -1,0 +1,104 @@
+/* ============================================================
+   COASTAL THEME: CONSOLIDATED (PNW Organic)
+   ============================================================ */
+.theme-coastal {
+  /* --- Brand Identity --- */
+  --mist-white: #f8fafc;
+  --driftwood: #64748b;
+  --sage-green: #475569; 
+  --sea-glass: #0d9488;
+  --morning-sand: #f1f5f9;
+
+  /* --- Core Semantic Tokens (Light) --- */
+  --background: var(--mist-white);
+  --foreground: var(--sage-green);
+  --stage-base: var(--sage-green);
+  --marquee-surface: var(--mist-white);
+  --stage-depth: var(--morning-sand);
+  
+  --primary: var(--sea-glass);
+  --primary-foreground: #ffffff;
+  --velvet: var(--sea-glass);
+  --spotlight: #94a3b8;
+  --card: rgba(255, 255, 255, 0.7);
+  --border: rgba(71, 85, 105, 0.1);
+
+  /* --- Global Physics --- */
+  font-family: 'Outfit', sans-serif;
+  --radius: 2rem; /* Soft, organic curves */
+  --spacing-md: 2rem;
+  transition: all 0.5s ease;
+}
+
+/* ============================================================
+   COASTAL THEME: DARK MODE (Deep Water Dusk)
+   ============================================================ */
+.dark.theme-coastal {
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+  --stage-base: #1e293b;
+  --marquee-surface: #0f172a;
+  --stage-depth: #1e293b;
+  
+  --card: rgba(30, 41, 59, 0.7);
+  --velvet: #2dd4bf; /* Brighter teal for contrast */
+  --border: rgba(255, 255, 255, 0.08);
+}
+
+/* --- THE HEADER: Soft Gradient & Natural Tracking --- */
+.theme-coastal .main-header-title {
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  background: linear-gradient(
+    135deg, 
+    var(--sea-glass) 0%, 
+    #5eead4 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+/* --- THE BUTTONS: The "Sea Pebble" Look --- */
+.theme-coastal button {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  border-radius: var(--radius);
+  background: var(--sea-glass);
+  color: #ffffff;
+  border: none;
+  padding: 0.8rem 2.2rem;
+  /* Soft, diffused shadow like light through mist */
+  box-shadow: 0 8px 20px -6px rgba(13, 148, 136, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-coastal button:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.05);
+  box-shadow: 0 12px 25px -5px rgba(13, 148, 136, 0.4);
+}
+
+/* --- THE CMD K TRIGGER (Global Usher) --- */
+.theme-coastal .usher-trigger-button {
+  background: var(--morning-sand);
+  color: var(--sage-green);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.dark.theme-coastal .usher-trigger-button {
+  background: var(--stage-base);
+  color: var(--foreground);
+}
+
+/* --- THE CARD: Mist/Glassmorphism --- */
+.theme-coastal .card {
+  border: 1px solid var(--border);
+  background: var(--card);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
+}

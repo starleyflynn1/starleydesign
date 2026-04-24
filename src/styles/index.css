@@ -1,0 +1,8 @@
+@import './fonts.css';
+@import './tailwind.css';
+@import './theme.css';
+@import './themes/blueprint.css';
+@import './themes/coastal.css';
+@import './themes/neon.css';
+@import './themes/terminal.css';
+@import './themes/archive.css';
