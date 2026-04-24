@@ -120,7 +120,7 @@ function Carousel({
     >
       <div
         onKeyDownCapture={handleKeyDown}
-        className={cn("relative", className)}
+        className={cn("ui-carousel-root", className)}
         role="region"
         aria-roledescription="carousel"
         data-slot="carousel"
@@ -138,12 +138,12 @@ function CarouselContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       ref={carouselRef}
-      className="overflow-hidden"
+      className="ui-carousel-content-viewport"
       data-slot="carousel-content"
     >
       <div
         className={cn(
-          "flex",
+          "ui-carousel-content-track",
           orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
           className,
         )}
@@ -162,7 +162,7 @@ function CarouselItem({ className, ...props }: React.ComponentProps<"div">) {
       aria-roledescription="slide"
       data-slot="carousel-item"
       className={cn(
-        "min-w-0 shrink-0 grow-0 basis-full",
+        "ui-carousel-item",
         orientation === "horizontal" ? "pl-4" : "pt-4",
         className,
       )}
@@ -185,10 +185,10 @@ function CarouselPrevious({
       variant={variant}
       size={size}
       className={cn(
-        "absolute size-8 rounded-full",
+        "ui-carousel-nav-btn",
         orientation === "horizontal"
-          ? "top-1/2 -left-12 -translate-y-1/2"
-          : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
+          ? "ui-carousel-nav-prev-horizontal"
+          : "ui-carousel-nav-prev-vertical",
         className,
       )}
       disabled={!canScrollPrev}
@@ -215,10 +215,10 @@ function CarouselNext({
       variant={variant}
       size={size}
       className={cn(
-        "absolute size-8 rounded-full",
+        "ui-carousel-nav-btn",
         orientation === "horizontal"
-          ? "top-1/2 -right-12 -translate-y-1/2"
-          : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
+          ? "ui-carousel-nav-next-horizontal"
+          : "ui-carousel-nav-next-vertical",
         className,
       )}
       disabled={!canScrollNext}

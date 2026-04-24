@@ -1,5 +1,5 @@
 /* ============================================================
-   NEON THEME: THE "DESIGN TECHNOLOGIST" EDITION
+   NEON THEME: LIGHT TOKENS
    ============================================================ */
 .theme-neon {
   /* --- Brand Identity --- */
@@ -26,7 +26,7 @@
 }
 
 /* ============================================================
-   NEON THEME: DARK MODE (Cyber-Luxury)
+   NEON THEME: DARK TOKENS
    ============================================================ */
 .dark.theme-neon {
   --background: #020203; /* Deep OLED black */
@@ -40,7 +40,10 @@
   background: radial-gradient(circle at 0% 0%, #0f0a14 0%, #020203 100%);
 }
 
-/* --- THE HEADER: Moving Gradient with Wide Tracking --- */
+/* ============================================================
+   NEON THEME: COMPONENT OVERRIDES
+   ============================================================ */
+/* --- Header --- */
 .theme-neon .main-header-title {
   font-weight: 700;
   text-transform: uppercase;
@@ -59,11 +62,37 @@
   filter: drop-shadow(0 0 10px rgba(219, 39, 119, 0.2));
 }
 
+.theme-neon .theater-header {
+  border-bottom-color: var(--border);
+  background: var(--background);
+}
+
+.theme-neon .theater-nav-link {
+  color: var(--foreground);
+}
+
+.theme-neon .theater-icon-btn,
+.theme-neon .theater-mobile-search-btn,
+.theme-neon .theater-mobile-menu-btn,
+.theme-neon .style-picker-trigger {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--foreground);
+}
+
+.theme-neon .theater-icon-btn:hover,
+.theme-neon .theater-mobile-search-btn:hover,
+.theme-neon .theater-mobile-menu-btn:hover,
+.theme-neon .style-picker-trigger:hover {
+  border-color: var(--primary);
+  box-shadow: 0 0 12px rgba(255, 0, 127, 0.3);
+}
+
 @keyframes shine {
   to { background-position: 200% center; }
 }
 
-/* --- THE BUTTONS: The "Emissive" Glass --- */
+/* --- Buttons --- */
 .theme-neon button {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 500;
@@ -85,8 +114,9 @@
   transform: translateY(-2px);
 }
 
-/* --- THE CMD K TRIGGER (Global Usher) --- */
-.theme-neon .usher-trigger-button {
+/* --- Keyboard Trigger / Kbd --- */
+.theme-neon .hero-shortcut,
+.theme-neon kbd {
   background: linear-gradient(135deg, var(--primary), var(--secondary));
   color: #ffffff;
   border: none;
@@ -94,7 +124,7 @@
   box-shadow: 0 4px 15px rgba(0, 242, 255, 0.3);
 }
 
-/* --- THE CARD: Frosted Glass --- */
+/* --- Card --- */
 .theme-neon .card {
   border: 1px solid var(--border);
   background: var(--card);

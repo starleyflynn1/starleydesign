@@ -46,7 +46,7 @@ export function PerformanceCalendar({ performances, onSelectPerformance }: Perfo
 
   const days = [];
   for (let i = 0; i < firstDayOfMonth; i++) {
-    days.push(<div key={`empty-${i}`} className="aspect-square"></div>);
+    days.push(<div key={`empty-${i}`} className="calendar-empty-day"></div>);
   }
 
   for (let day = 1; day <= daysInMonth; day++) {
@@ -64,19 +64,19 @@ export function PerformanceCalendar({ performances, onSelectPerformance }: Perfo
         key={day}
         onClick={() => hasShow && !isPast && setSelectedDate(date)}
         disabled={isPast || !hasShow}
-        className={`aspect-square rounded-lg flex items-center justify-center relative transition-all ${
+        className={`calendar-day-btn ${
           isPast
-            ? 'text-muted-foreground/30 cursor-not-allowed'
+            ? 'calendar-day-past'
             : isSelected
-            ? 'bg-spotlight text-stage-base ring-2 ring-spotlight'
+            ? 'calendar-day-selected'
             : hasShow
-            ? 'hover:bg-spotlight/20 border border-spotlight/30'
-            : 'text-muted-foreground cursor-not-allowed'
-        } ${isToday && !isSelected ? 'ring-1 ring-accent-primary' : ''}`}
+            ? 'calendar-day-available'
+            : 'calendar-day-unavailable'
+        } ${isToday && !isSelected ? 'calendar-day-today' : ''}`}
       >
-        <span className="text-sm">{day}</span>
+        <span className="calendar-day-number">{day}</span>
         {hasShow && !isPast && (
-          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent-primary"></div>
+          <div className="calendar-dot"></div>
         )}
       </button>
     );
@@ -100,22 +100,22 @@ export function PerformanceCalendar({ performances, onSelectPerformance }: Perfo
   const selectedPerformance = selectedDate ? getPerformancesForDate(selectedDate) : null;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-xl" style={{ fontFamily: 'var(--font-display)' }}>
+    <div className="calendar-root">
+      <div className="calendar-head">
+        <h3 className="calendar-title">
           {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
         </h3>
-        <div className="flex gap-2">
+        <div className="calendar-nav">
           <button
             onClick={previousMonth}
-            className="p-2 hover:bg-spotlight/10 rounded-lg transition-colors"
+            className="calendar-nav-btn"
             aria-label="Previous month"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             onClick={nextMonth}
-            className="p-2 hover:bg-spotlight/10 rounded-lg transition-colors"
+            className="calendar-nav-btn"
             aria-label="Next month"
           >
             <ChevronRight className="w-5 h-5" />
@@ -123,9 +123,9 @@ export function PerformanceCalendar({ performances, onSelectPerformance }: Perfo
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-2">
+      <div className="calendar-week-grid">
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-          <div key={day} className="text-center text-sm text-muted-foreground py-2">
+          <div key={day} className="calendar-weekday">
             {day}
           </div>
         ))}
@@ -133,12 +133,12 @@ export function PerformanceCalendar({ performances, onSelectPerformance }: Perfo
       </div>
 
       {selectedPerformance && (
-        <div className="p-6 bg-card rounded-lg border border-spotlight/30">
-          <div className="text-sm text-muted-foreground mb-4">
+        <div className="calendar-perf-panel">
+          <div className="calendar-perf-date">
             {selectedDate?.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </div>
 
-          <div className="space-y-3">
+          <div className="calendar-times">
             {selectedPerformance.times.map((performance) => (
               <button
                 key={performance.time}
@@ -146,33 +146,33 @@ export function PerformanceCalendar({ performances, onSelectPerformance }: Perfo
                   onSelectPerformance?.(selectedDate!, performance.time, performance.type)
                 }
                 disabled={performance.available === 0}
-                className={`w-full p-4 rounded-lg border transition-all text-left ${
+                className={`calendar-time-btn ${
                   performance.available === 0
-                    ? 'border-border bg-card/50 cursor-not-allowed opacity-50'
-                    : 'border-spotlight/30 hover:bg-spotlight/10 hover:border-spotlight'
+                    ? 'calendar-time-disabled'
+                    : 'calendar-time-enabled'
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+                <div className="calendar-time-row">
+                  <div className="calendar-time-meta">
                     {performance.type === 'matinee' ? (
-                      <Sun className="w-5 h-5 text-spotlight" />
+                      <Sun className="icon-md-spotlight" />
                     ) : (
-                      <Moon className="w-5 h-5 text-spotlight" />
+                      <Moon className="icon-md-spotlight" />
                     )}
                     <div>
-                      <div className="text-sm capitalize">{performance.type}</div>
-                      <div className="text-lg">{performance.time}</div>
+                      <div className="calendar-time-type">{performance.type}</div>
+                      <div className="calendar-time-value">{performance.time}</div>
                     </div>
                   </div>
 
-                  <div className="text-right">
+                  <div className="calendar-time-availability">
                     {performance.available > 0 ? (
                       <>
-                        <div className="text-sm text-muted-foreground">{performance.available} seats</div>
-                        <div className="text-xs text-seat-available">Available</div>
+                        <div className="calendar-seats">{performance.available} seats</div>
+                        <div className="calendar-available">Available</div>
                       </>
                     ) : (
-                      <div className="text-xs text-accent-primary">Sold Out</div>
+                      <div className="calendar-soldout">Sold Out</div>
                     )}
                   </div>
                 </div>

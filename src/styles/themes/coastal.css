@@ -1,5 +1,5 @@
 /* ============================================================
-   COASTAL THEME: CONSOLIDATED (PNW Organic)
+   COASTAL THEME: LIGHT TOKENS
    ============================================================ */
 .theme-coastal {
   /* --- Brand Identity --- */
@@ -31,7 +31,7 @@
 }
 
 /* ============================================================
-   COASTAL THEME: DARK MODE (Deep Water Dusk)
+   COASTAL THEME: DARK TOKENS
    ============================================================ */
 .dark.theme-coastal {
   --background: #0f172a;
@@ -45,7 +45,10 @@
   --border: rgba(255, 255, 255, 0.08);
 }
 
-/* --- THE HEADER: Soft Gradient & Natural Tracking --- */
+/* ============================================================
+   COASTAL THEME: COMPONENT OVERRIDES
+   ============================================================ */
+/* --- Header --- */
 .theme-coastal .main-header-title {
   font-weight: 700;
   letter-spacing: -0.03em;
@@ -61,7 +64,33 @@
   transition: opacity 0.3s ease;
 }
 
-/* --- THE BUTTONS: The "Sea Pebble" Look --- */
+.theme-coastal .theater-header {
+  border-bottom-color: var(--border);
+  background: var(--background);
+}
+
+.theme-coastal .theater-nav-link {
+  color: var(--foreground);
+}
+
+.theme-coastal .theater-icon-btn,
+.theme-coastal .theater-mobile-search-btn,
+.theme-coastal .theater-mobile-menu-btn,
+.theme-coastal .style-picker-trigger {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--foreground);
+}
+
+.theme-coastal .theater-icon-btn:hover,
+.theme-coastal .theater-mobile-search-btn:hover,
+.theme-coastal .theater-mobile-menu-btn:hover,
+.theme-coastal .style-picker-trigger:hover {
+  background: var(--stage-base);
+  color: var(--marquee-surface);
+}
+
+/* --- Buttons --- */
 .theme-coastal button {
   font-family: 'Outfit', sans-serif;
   font-weight: 500;
@@ -81,20 +110,22 @@
   box-shadow: 0 12px 25px -5px rgba(13, 148, 136, 0.4);
 }
 
-/* --- THE CMD K TRIGGER (Global Usher) --- */
-.theme-coastal .usher-trigger-button {
+/* --- Keyboard Trigger / Kbd --- */
+.theme-coastal .hero-shortcut,
+.theme-coastal kbd {
   background: var(--morning-sand);
   color: var(--sage-green);
   border: 1px solid var(--border);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.dark.theme-coastal .usher-trigger-button {
+.dark.theme-coastal .hero-shortcut,
+.dark.theme-coastal kbd {
   background: var(--stage-base);
   color: var(--foreground);
 }
 
-/* --- THE CARD: Mist/Glassmorphism --- */
+/* --- Card --- */
 .theme-coastal .card {
   border: 1px solid var(--border);
   background: var(--card);

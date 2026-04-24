@@ -17,14 +17,15 @@ interface SeatingChartProps {
 }
 
 const seatColors = {
-  available: 'bg-seat-available hover:bg-seat-available/80 cursor-pointer',
-  taken: 'bg-seat-taken cursor-not-allowed opacity-50',
-  vip: 'bg-seat-vip hover:bg-seat-vip/80 cursor-pointer ring-2 ring-spotlight',
-  accessible: 'bg-seat-accessible hover:bg-seat-accessible/80 cursor-pointer',
-  selected: 'bg-accent-primary ring-2 ring-spotlight cursor-pointer',
+  available: 'seating-seat-available',
+  taken: 'seating-seat-taken',
+  vip: 'seating-seat-vip',
+  accessible: 'seating-seat-accessible',
+  selected: 'seating-seat-selected',
 };
 
 export function SeatingChart({ section, onSeatSelect }: SeatingChartProps) {
+  void section;
   const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
 
   const generateSeats = (): Seat[] => {
@@ -82,18 +83,18 @@ export function SeatingChart({ section, onSeatSelect }: SeatingChartProps) {
   const rows = Array.from(new Set(seats.map((s) => s.row)));
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <div className="inline-block px-8 py-2 bg-gradient-to-b from-spotlight/30 to-transparent rounded-t-lg border-t-2 border-spotlight/50">
-          <span className="text-sm uppercase tracking-wider text-spotlight">Stage</span>
+    <div className="seating-root">
+      <div className="seating-stage-wrap">
+        <div className="seating-stage">
+          <span className="seating-stage-label">Stage</span>
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="seating-grid">
         {rows.map((row) => (
-          <div key={row} className="flex items-center justify-center gap-2">
-            <div className="w-8 text-center text-sm text-spotlight/70">{row}</div>
-            <div className="flex gap-2">
+          <div key={row} className="seating-row">
+            <div className="seating-row-label">{row}</div>
+            <div className="seating-row-seats">
               {seats
                 .filter((s) => s.row === row)
                 .map((seat) => {
@@ -105,60 +106,60 @@ export function SeatingChart({ section, onSeatSelect }: SeatingChartProps) {
                       key={seat.id}
                       onClick={() => handleSeatClick(seat)}
                       disabled={seat.status === 'taken'}
-                      className={`relative w-8 h-8 rounded-md transition-all ${seatColors[displayStatus]}`}
+                      className={`seating-seat-btn ${seatColors[displayStatus]}`}
                       title={`${seat.row}${seat.number} - $${seat.price} - ${displayStatus}`}
                     >
                       {isAccessible && (
-                        <Accessibility className="w-4 h-4 absolute inset-0 m-auto text-white" />
+                        <Accessibility className="seating-accessible-icon" />
                       )}
                     </button>
                   );
                 })}
             </div>
-            <div className="w-8 text-center text-sm text-spotlight/70">{row}</div>
+            <div className="seating-row-label">{row}</div>
           </div>
         ))}
       </div>
 
-      <div className="flex items-center justify-center gap-6 pt-4 border-t border-spotlight/20">
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-seat-available"></div>
-          <span className="text-sm">Available</span>
+      <div className="seating-legend">
+        <div className="seating-legend-item">
+          <div className="seating-legend-dot seating-seat-available"></div>
+          <span className="seating-legend-label">Available</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-seat-vip ring-2 ring-spotlight"></div>
-          <span className="text-sm">VIP</span>
+        <div className="seating-legend-item">
+          <div className="seating-legend-dot seating-seat-vip"></div>
+          <span className="seating-legend-label">VIP</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-seat-accessible"></div>
-          <span className="text-sm">Accessible</span>
+        <div className="seating-legend-item">
+          <div className="seating-legend-dot seating-seat-accessible"></div>
+          <span className="seating-legend-label">Accessible</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-seat-taken opacity-50"></div>
-          <span className="text-sm">Taken</span>
+        <div className="seating-legend-item">
+          <div className="seating-legend-dot seating-seat-taken"></div>
+          <span className="seating-legend-label">Taken</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-accent-primary ring-2 ring-spotlight"></div>
-          <span className="text-sm">Selected</span>
+        <div className="seating-legend-item">
+          <div className="seating-legend-dot seating-seat-selected"></div>
+          <span className="seating-legend-label">Selected</span>
         </div>
       </div>
 
       {selectedSeats.length > 0 && (
-        <div className="p-4 bg-spotlight/10 rounded-lg border border-spotlight/30">
-          <div className="flex items-center justify-between">
+        <div className="seating-summary">
+          <div className="seating-summary-row">
             <div>
-              <div className="text-sm text-muted-foreground">Selected Seats</div>
-              <div className="flex gap-2 mt-1">
+              <div className="seating-summary-label">Selected Seats</div>
+              <div className="seating-summary-tags">
                 {selectedSeats.map((seat) => (
-                  <span key={seat.id} className="px-2 py-1 bg-stage-depth rounded text-sm">
+                  <span key={seat.id} className="seating-seat-tag">
                     {seat.id}
                   </span>
                 ))}
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-sm text-muted-foreground">Total</div>
-              <div className="text-xl text-spotlight">
+            <div className="seating-total-wrap">
+              <div className="seating-summary-label">Total</div>
+              <div className="seating-total-value">
                 ${selectedSeats.reduce((sum, seat) => sum + (seat.price || 0), 0)}
               </div>
             </div>

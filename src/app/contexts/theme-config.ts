@@ -20,6 +20,7 @@ export interface ThemeConfig {
   name: ThemeName;
   displayName: string;
   description: string;
+  defaultMode: Mode;
   radius: {
     button: string;
     card: string;
@@ -36,6 +37,7 @@ export const themeConfigs: Record<ThemeName, ThemeConfig> = {
     name: 'stage',
     displayName: 'Stage',
     description: 'Red/Gold/Velvet - Classic theater elegance',
+    defaultMode: 'dark',
     radius: {
       button: 'rounded-lg',
       card: 'rounded-2xl',
@@ -50,6 +52,7 @@ export const themeConfigs: Record<ThemeName, ThemeConfig> = {
     name: 'blueprint',
     displayName: 'Blueprint',
     description: 'Blue/Grid/Mono - Architectural precision',
+    defaultMode: 'light',
     radius: {
       button: 'rounded-sm',
       card: 'rounded-lg',
@@ -64,6 +67,7 @@ export const themeConfigs: Record<ThemeName, ThemeConfig> = {
     name: 'coastal',
     displayName: 'Coastal',
     description: 'Sage/Slate/Soft - Organic and calming',
+    defaultMode: 'light',
     radius: {
       button: 'rounded-2xl',
       card: 'rounded-3xl',
@@ -78,6 +82,7 @@ export const themeConfigs: Record<ThemeName, ThemeConfig> = {
     name: 'neon',
     displayName: 'Neon',
     description: 'Cyber-cyan/Magenta - Cyberpunk aesthetics',
+    defaultMode: 'dark',
     radius: {
       button: 'rounded-none',
       card: 'rounded-none',
@@ -92,6 +97,7 @@ export const themeConfigs: Record<ThemeName, ThemeConfig> = {
     name: 'terminal',
     displayName: 'Terminal',
     description: 'Matrix-green/Mono - Developer console',
+    defaultMode: 'light',
     radius: {
       button: 'rounded-md',
       card: 'rounded-lg',
@@ -106,6 +112,7 @@ export const themeConfigs: Record<ThemeName, ThemeConfig> = {
     name: 'archive',
     displayName: 'Archive',
     description: 'Ink-black/Aged-parchment - Vintage library',
+    defaultMode: 'light',
     radius: {
       button: 'rounded-xl',
       card: 'rounded-2xl',

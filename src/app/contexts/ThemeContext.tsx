@@ -1,3 +1,4 @@
+import React from 'react';
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { ThemeName, Mode, themeConfigs, ThemeConfig } from './theme-config';
 
@@ -27,9 +28,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mode, setModeState] = useState<Mode>(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem(MODE_STORAGE_KEY);
-      return (stored as Mode) || 'light';
+      if (stored) return stored as Mode;
+
+      const storedTheme = (localStorage.getItem(THEME_STORAGE_KEY) as ThemeName) || 'stage';
+      return themeConfigs[storedTheme].defaultMode;
     }
-    return 'light';
+    return themeConfigs.stage.defaultMode;
   });
 
   useEffect(() => {
@@ -53,6 +57,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const setTheme = (theme: ThemeName) => {
     setCurrentTheme(theme);
+    setModeState(themeConfigs[theme].defaultMode);
   };
 
   const setMode = (newMode: Mode) => {

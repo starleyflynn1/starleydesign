@@ -76,13 +76,13 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh]">
+        <div className="usher-overlay-wrap">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="absolute inset-0 bg-stage-base/90 backdrop-blur-sm"
+            className="usher-backdrop"
             onClick={onClose}
           />
 
@@ -91,15 +91,15 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
             transition={{ type: 'spring', duration: 0.4 }}
-            className="relative w-full max-w-2xl mx-4 bg-stage-depth rounded-xl shadow-2xl overflow-hidden"
+            className="usher-panel"
             style={{
               boxShadow: '0 0 40px rgba(212, 175, 55, 0.3), 0 20px 50px rgba(0, 0, 0, 0.5)',
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="border-b border-spotlight/20 p-4">
-              <div className="flex items-center gap-3">
-                <Search className="w-5 h-5 text-spotlight" />
+            <div className="usher-search-wrap">
+              <div className="usher-search-row">
+                <Search className="icon-md-spotlight" />
                 <input
                   ref={inputRef}
                   type="text"
@@ -107,26 +107,25 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
-                  style={{ fontFamily: 'var(--font-display)' }}
+                  className="usher-input"
                 />
                 <button
                   onClick={onClose}
-                  className="p-1 hover:bg-spotlight/10 rounded-md transition-colors"
+                  className="usher-close-btn"
                   aria-label="Close"
                 >
-                  <X className="w-4 h-4 text-muted-foreground" />
+                  <X className="icon-sm text-muted-foreground" />
                 </button>
               </div>
             </div>
 
-            <div className="max-h-[60vh] overflow-y-auto">
+            <div className="usher-results">
               {filteredActions.length === 0 ? (
-                <div className="p-8 text-center text-muted-foreground">
+                <div className="usher-no-results">
                   No results found for "{query}"
                 </div>
               ) : (
-                <div className="py-2">
+                <div className="usher-group-list">
                   {Object.entries(
                     filteredActions.reduce((acc, action) => {
                       if (!acc[action.category]) acc[action.category] = [];
@@ -135,10 +134,10 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
                     }, {} as Record<string, Action[]>)
                   ).map(([category, actions]) => (
                     <div key={category}>
-                      <div className="px-4 py-2 text-xs text-spotlight/70 uppercase tracking-wider">
+                      <div className="usher-group-label">
                         {category}
                       </div>
-                      {actions.map((action, index) => {
+                      {actions.map((action) => {
                         const globalIndex = filteredActions.indexOf(action);
                         const isSelected = globalIndex === selectedIndex;
                         const Icon = action.icon;
@@ -151,10 +150,10 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
                               onClose();
                             }}
                             onMouseEnter={() => setSelectedIndex(globalIndex)}
-                            className={`w-full flex items-center gap-3 px-4 py-3 transition-all ${
+                            className={`usher-action-btn ${
                               isSelected
-                                ? 'bg-gradient-to-r from-spotlight/20 to-transparent border-l-2 border-spotlight shadow-lg'
-                                : 'hover:bg-spotlight/5'
+                                ? 'usher-action-selected'
+                                : 'usher-action-hover'
                             }`}
                             style={
                               isSelected
@@ -166,12 +165,12 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
                           >
                             <Icon
                               className={`w-5 h-5 ${
-                                isSelected ? 'text-spotlight' : 'text-muted-foreground'
+                                isSelected ? 'icon-md-spotlight' : 'icon-md-muted'
                               }`}
                             />
-                            <span className="flex-1 text-left">{action.title}</span>
+                            <span className="usher-action-title">{action.title}</span>
                             {action.badge && (
-                              <span className="px-2 py-1 text-xs bg-accent-primary/20 text-accent-primary rounded-md border border-accent-primary/30">
+                              <span className="usher-badge">
                                 {action.badge}
                               </span>
                             )}
@@ -184,20 +183,20 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
               )}
             </div>
 
-            <div className="border-t border-spotlight/20 px-4 py-3 flex items-center justify-between text-xs text-muted-foreground">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1">
-                  <kbd className="px-2 py-1 bg-intermission-gray rounded text-spotlight">↑</kbd>
-                  <kbd className="px-2 py-1 bg-intermission-gray rounded text-spotlight">↓</kbd>
+            <div className="usher-footer">
+              <div className="usher-footer-keys">
+                <div className="usher-footer-keygroup">
+                  <kbd className="usher-kbd">↑</kbd>
+                  <kbd className="usher-kbd">↓</kbd>
                   <span>Navigate</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <kbd className="px-2 py-1 bg-intermission-gray rounded text-spotlight">↵</kbd>
+                <div className="usher-footer-keygroup">
+                  <kbd className="usher-kbd">↵</kbd>
                   <span>Select</span>
                 </div>
               </div>
-              <div className="flex items-center gap-1">
-                <kbd className="px-2 py-1 bg-intermission-gray rounded text-spotlight">ESC</kbd>
+              <div className="usher-footer-keygroup">
+                <kbd className="usher-kbd">ESC</kbd>
                 <span>Close</span>
               </div>
             </div>

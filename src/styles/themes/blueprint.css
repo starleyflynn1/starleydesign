@@ -1,5 +1,5 @@
 /* ============================================================
-   BLUEPRINT THEME: THE "TECHNICAL MANUAL" EDITION
+   BLUEPRINT THEME: LIGHT TOKENS
    ============================================================ */
 .theme-blueprint {
   /* --- Brand Identity --- */
@@ -34,7 +34,10 @@
   background-size: 24px 24px;
 }
 
-/* --- THE HEADER: The "Spec Sheet" Look --- */
+/* ============================================================
+   BLUEPRINT THEME: COMPONENT OVERRIDES
+   ============================================================ */
+/* --- Header --- */
 .theme-blueprint .main-header-title {
   font-weight: 700;
   text-transform: uppercase;
@@ -49,7 +52,33 @@
   margin-bottom: 1rem;
 }
 
-/* --- THE SUBTITLE: The "Serial Number" Style --- */
+.theme-blueprint .theater-header {
+  border-bottom-color: var(--border);
+  background: var(--background);
+}
+
+.theme-blueprint .theater-nav-link {
+  color: var(--foreground);
+}
+
+.theme-blueprint .theater-icon-btn,
+.theme-blueprint .theater-mobile-search-btn,
+.theme-blueprint .theater-mobile-menu-btn,
+.theme-blueprint .style-picker-trigger {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--foreground);
+}
+
+.theme-blueprint .theater-icon-btn:hover,
+.theme-blueprint .theater-mobile-search-btn:hover,
+.theme-blueprint .theater-mobile-menu-btn:hover,
+.theme-blueprint .style-picker-trigger:hover {
+  background: var(--stage-base);
+  color: var(--primary-foreground);
+}
+
+/* --- Subtitle --- */
 .theme-blueprint .subtitle-text {
   font-size: 0.85rem;
   color: var(--safety-orange);
@@ -59,7 +88,7 @@
   display: inline-block;
 }
 
-/* --- THE BUTTONS: The "Schematic" Toggle --- */
+/* --- Buttons --- */
 .theme-blueprint button {
   background: transparent;
   color: var(--blueprint-blue);
@@ -76,7 +105,9 @@
   color: #ffffff;
 }
 
-/* --- DARK MODE: The "Night Vision" Cleanroom --- */
+/* ============================================================
+   BLUEPRINT THEME: DARK TOKENS
+   ============================================================ */
 .dark.theme-blueprint {
   --background: #020617;
   --foreground: #f8fafc;
@@ -88,6 +119,9 @@
   --stage-base: var(--blueprint-blue);
 }
 
+/* ============================================================
+   BLUEPRINT THEME: DARK COMPONENT OVERRIDES
+   ============================================================ */
 .dark.theme-blueprint .main-header-title {
   border-left-color: var(--blueprint-blue);
   color: var(--blueprint-blue);

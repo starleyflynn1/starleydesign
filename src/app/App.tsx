@@ -1,17 +1,29 @@
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { GlobalUsher } from './components/GlobalUsher';
 import { TheaterHeader } from './components/TheaterHeader';
-import { ShowCard } from './components/ShowCard';
-import { SeatingChart } from './components/SeatingChart';
-import { BookingProgress } from './components/BookingProgress';
-import { PerformanceCalendar } from './components/PerformanceCalendar';
-import { Theater, Sparkles } from 'lucide-react';
+import { Theater } from 'lucide-react';
+import { StagePage } from './pages/StagePage';
+import { ScriptPage } from './pages/ScriptPage';
+import { DirectorPage } from './pages/DirectorPage';
+import { BackstagePage } from './pages/BackstagePage';
 
 export default function App() {
   const [isUsherOpen, setIsUsherOpen] = useState(false);
   const [currentView, setCurrentView] = useState<'home' | 'booking' | 'seating' | 'calendar'>('home');
   const [bookingStep, setBookingStep] = useState(1);
+  const resumeUrl = '/Starley-F-Resume.pdf';
+
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
+  const normalizedPath = pathname.replace(/\/+$/, '') || '/';
+  const currentPage = normalizedPath === '/script'
+    ? 'script'
+    : normalizedPath === '/director'
+    ? 'director'
+    : normalizedPath === '/backstage'
+    ? 'backstage'
+    : 'home';
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -23,6 +35,15 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.location.pathname !== '/') return;
+    if (window.location.hash) return;
+
+    // Default entry section for the main page.
+    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#stage`);
   }, []);
 
   const shows = [
@@ -94,7 +115,7 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-background">
+      <div className="app-root">
         <TheaterHeader onSearchClick={() => setIsUsherOpen(true)} />
 
       <GlobalUsher
@@ -105,193 +126,39 @@ export default function App() {
         }}
       />
 
-      <main className="container mx-auto px-4 py-8 space-y-12">
-        <section className="text-center py-12 space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-velvet/10 border border-velvet/30 rounded-full text-sm text-velvet mb-4">
-            <Sparkles className="w-4 h-4" />
-            <span>Theater Design System</span>
-          </div>
-          <h2
-            className="main-header-title"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            The Designed Stage
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Where Performance Theater Meets the Technical Stack</p>
-          <p className="text-m text-muted-foreground max-w-2xl mx-auto"><span className=""><span className="">A technical showcase of a Design System engineered for complex state management and high-fidelity interaction—featuring a command-driven "Global Usher," accessible spacial mapping, and seamless booking flows.</span></span></p>
+      {currentPage === 'home' && (
+        <StagePage
+          shows={shows}
+          bookingSteps={bookingSteps}
+          performances={performances}
+          currentView={currentView}
+          bookingStep={bookingStep}
+          setCurrentView={setCurrentView}
+          setBookingStep={setBookingStep}
+        />
+      )}
 
-          <div className="flex items-center justify-center gap-4 pt-4">
-            <kbd className="px-3 py-2 bg-card border border-spotlight/30 rounded-lg text-sm">
-              <span className="text-spotlight">⌘ K</span> to open Global Usher
-            </kbd>
-          </div>
-        </section>
+      {currentPage === 'script' && <ScriptPage resumeUrl={resumeUrl} />}
+      {currentPage === 'director' && <DirectorPage />}
+      {currentPage === 'backstage' && <BackstagePage />}
 
-        <section id="now-playing" className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-2xl" style={{ fontFamily: 'var(--font-display)' }}>
-              Now Playing
-            </h3>
-            <button className="text-sm text-spotlight hover:underline">View All</button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {shows.map((show) => (
-              <ShowCard
-                key={show.title}
-                {...show}
-                onClick={() => setCurrentView('calendar')}
-              />
-            ))}
-          </div>
-        </section>
-
-        <section className="bg-card rounded-2xl p-8 border border-spotlight/20">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-2xl" style={{ fontFamily: 'var(--font-display)' }}>
-              Design System Components
-            </h3>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setCurrentView('calendar')}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  currentView === 'calendar'
-                    ? 'bg-spotlight text-stage-black'
-                    : 'bg-secondary hover:bg-secondary/80'
-                }`}
-              >
-                Calendar
-              </button>
-              <button
-                onClick={() => setCurrentView('booking')}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  currentView === 'booking'
-                    ? 'bg-spotlight text-stage-black'
-                    : 'bg-secondary hover:bg-secondary/80'
-                }`}
-              >
-                Booking Flow
-              </button>
-              <button
-                onClick={() => setCurrentView('seating')}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  currentView === 'seating'
-                    ? 'bg-spotlight text-stage-black'
-                    : 'bg-secondary hover:bg-secondary/80'
-                }`}
-              >
-                Seating Chart
-              </button>
-            </div>
-          </div>
-
-          {currentView === 'calendar' && (
-            <PerformanceCalendar
-              performances={performances}
-              onSelectPerformance={(date, time, type) => {
-                console.log('Selected performance:', { date, time, type });
-                setCurrentView('seating');
-              }}
-            />
-          )}
-
-          {currentView === 'booking' && (
-            <div className="space-y-8">
-              <BookingProgress currentStep={bookingStep} steps={bookingSteps} />
-              <div className="flex items-center justify-center gap-4">
-                <button
-                  onClick={() => setBookingStep(Math.max(1, bookingStep - 1))}
-                  disabled={bookingStep === 1}
-                  className="px-6 py-2 border border-border rounded-lg hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Previous
-                </button>
-                <button
-                  onClick={() => setBookingStep(Math.min(4, bookingStep + 1))}
-                  disabled={bookingStep === 4}
-                  className="px-6 py-2 bg-velvet hover:bg-velvet/80 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Next Step
-                </button>
-              </div>
-            </div>
-          )}
-
-          {currentView === 'seating' && (
-            <SeatingChart
-              section="Orchestra"
-              onSeatSelect={(seats) => {
-                console.log('Selected seats:', seats);
-              }}
-            />
-          )}
-        </section>
-
-        <section className="bg-gradient-to-r from-velvet/10 via-transparent to-spotlight/10 rounded-2xl p-8 border border-spotlight/20">
-          <div className="max-w-3xl mx-auto text-center space-y-4">
-            <Theater className="w-16 h-16 mx-auto text-spotlight" />
-            <h3 className="text-3xl" style={{ fontFamily: 'var(--font-display)' }}>
-              Theater Design System Features
-            </h3>
-            <div className="grid md:grid-cols-2 gap-6 text-left pt-6">
-              <div className="space-y-2">
-                <h4 className="text-spotlight">Global Usher (⌘K)</h4>
-                <p className="text-sm text-muted-foreground">
-                  Keyboard-first command palette with spotlight animations and theater-themed states
-                </p>
-              </div>
-              <div className="space-y-2">
-                <h4 className="text-spotlight">Seating Charts</h4>
-                <p className="text-sm text-muted-foreground">
-                  Interactive seat selection with VIP, accessible, and real-time availability states
-                </p>
-              </div>
-              <div className="space-y-2">
-                <h4 className="text-spotlight">Booking Progress</h4>
-                <p className="text-sm text-muted-foreground">
-                  4-step checkout flow with visual progress indicators and gold spotlight accents
-                </p>
-              </div>
-              <div className="space-y-2">
-                <h4 className="text-spotlight">Performance Calendar</h4>
-                <p className="text-sm text-muted-foreground">
-                  Custom date picker with matinee vs. evening shows and live availability
-                </p>
-              </div>
-              <div className="space-y-2">
-                <h4 className="text-spotlight">Dark Mode Toggle</h4>
-                <p className="text-sm text-muted-foreground">
-                  Low-glare UI optimized for checking on phones in dim theaters
-                </p>
-              </div>
-              <div className="space-y-2">
-                <h4 className="text-spotlight">Show Cards</h4>
-                <p className="text-sm text-muted-foreground">
-                  Rich media cards with badges, ratings, and theater-specific metadata
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer className="border-t border-border bg-card/50 mt-16">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <Theater className="w-6 h-6 text-velvet" />
-              <span className="text-sm text-muted-foreground">
+      <footer className="app-footer">
+        <div className="app-footer-inner">
+          <div className="app-footer-row">
+            <div className="footer-brand">
+              <Theater className="icon-md-velvet" />
+              <span className="footer-copy">
                 © 2026 The Designed Stage. Theater Design System by Starley Flynn.
               </span>
             </div>
-            <div className="flex gap-6 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-spotlight transition-colors">
+            <div className="footer-links">
+              <a href="#" className="footer-link">
                 Technical Specs
               </a>
-              <a href="#" className="hover:text-spotlight transition-colors">
+              <a href="#" className="footer-link">
                 Backstage
               </a>
-              <a href="#" className="hover:text-spotlight transition-colors">
+              <a href="#" className="footer-link">
                 Accessibility
               </a>
             </div>

@@ -1,5 +1,5 @@
 /* ============================================================
-   ARCHIVE THEME: LIGHT MODE
+   ARCHIVE THEME: LIGHT TOKENS
    ============================================================ */
 .theme-archive {
   /* --- Brand Identity --- */
@@ -40,7 +40,7 @@
 .theme-archive h1, 
 .theme-archive h2, 
 .theme-archive h3,
-.theme-archive .nav-link {
+.theme-archive .theater-nav-link {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-weight: 700;
@@ -102,6 +102,32 @@
   transition: all 0.5s ease-in-out;
 }
 
+.theme-archive .theater-header {
+  border-bottom-color: var(--border);
+  background: var(--background);
+}
+
+.theme-archive .theater-nav-link {
+  color: var(--foreground);
+}
+
+.theme-archive .theater-icon-btn,
+.theme-archive .theater-mobile-search-btn,
+.theme-archive .theater-mobile-menu-btn,
+.theme-archive .style-picker-trigger {
+  border: 2px double var(--stage-base);
+  background: transparent;
+  color: var(--stage-base);
+}
+
+.theme-archive .theater-icon-btn:hover,
+.theme-archive .theater-mobile-search-btn:hover,
+.theme-archive .theater-mobile-menu-btn:hover,
+.theme-archive .style-picker-trigger:hover {
+  background: var(--stage-base);
+  color: var(--marquee-surface);
+}
+
 /* --- Editorial Drop Cap --- */
 .theme-archive .director-bio-text p:first-of-type::first-letter {
   font-family: 'Playfair Display', serif;
@@ -117,7 +143,7 @@
 }
 
 /* ============================================================
-   ARCHIVE THEME: DARK MODE OVERRIDES
+   ARCHIVE THEME: DARK TOKENS
    ============================================================ */
 .dark.theme-archive {
   /* 1. Fundamental Surfaces */
@@ -141,6 +167,9 @@
   --accent: var(--velvet);
 }
 
+/* ============================================================
+   ARCHIVE THEME: DARK COMPONENT OVERRIDES
+   ============================================================ */
 .dark.theme-archive .main-header-title {
   background:  var(--spotlight);
   -webkit-background-clip: text;
@@ -149,8 +178,8 @@
   border-bottom: none;
   opacity: 1;
 }
-/* Targeting the ⌘ K trigger specifically */
-.dark.theme-archive .usher-trigger-button, 
+/* Targeting the keyboard trigger styling used in app UI */
+.dark.theme-archive .hero-shortcut,
 .dark.theme-archive kbd {
   /* Use your warm gold glow for the text and border */
   color: var(--spotlight); 
@@ -167,31 +196,9 @@
   transition: all 0.2s ease;
 }
 
-.dark.theme-archive .usher-trigger-button:hover {
+.dark.theme-archive .hero-shortcut:hover,
+.dark.theme-archive kbd:hover {
   background: var(--spotlight);
   color: var(--marquee-surface); /* Dark ink text on gold background */
   box-shadow: 0 0 15px rgba(212, 165, 116, 0.3);
-}
-/* Targeting ONLY the first paragraph in the bio */
-.director-bio-text p:first-of-type::first-letter {
-  font-family: 'Playfair Display', serif;
-  font-weight: 700;
-  
-  /* The core physics of a drop cap */
-  float: left;
-  line-height: 1; /* Key for vertical alignment */
-  margin-top: 0.1em; /* Micro-adjustment for Playfair cap height */
-  margin-right: 0.35rem; /* Space between letter and text block */
-  
-  /* Sizing: Using `initial-letter` for modern browsers (it's the new standard) */
-  initial-letter: 3; /* The letter will drop exactly 3 lines */
-  
-  /* Legacy fallback using font-size/line-height if `initial-letter` isn't supported */
-  font-size: 5rem;
-  
-  /* Applying your theme color (Stage Velvet on Archive Background) */
-  color: var(--accent-primary); 
-  
-  /* Subtle "Letterpress" effect for authenticity */
-  text-shadow: 1px 1px 0px rgba(0,0,0,0.1); 
 }

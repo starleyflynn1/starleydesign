@@ -1,32 +1,35 @@
-import { Calendar, Clock, MapPin, Star } from 'lucide-react';
+import React from 'react';
+import { Calendar, Star } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface ShowCardProps {
   title: string;
   image: string;
   date: string;
-  time: string;
-  venue: string;
-  price: string;
+  scope: string;
+  stack: string;
+  impact: string;
+  role: string;
   badge?: 'Selling Fast' | 'Last Seats' | 'New' | 'Starting Soon';
   rating?: number;
   onClick?: () => void;
 }
 
 const badgeStyles = {
-  'Selling Fast': 'bg-accent-primary/20 text-accent-primary border-accent-primary/30',
-  'Last Seats': 'bg-accent-primary/30 text-accent-primary border-accent-primary/50',
-  'New': 'bg-spotlight/20 text-spotlight border-spotlight/30',
-  'Starting Soon': 'bg-seat-available/20 text-seat-available border-seat-available/30',
+  'Selling Fast': 'show-badge-selling-fast',
+  'Last Seats': 'show-badge-last-seats',
+  'New': 'show-badge-new',
+  'Starting Soon': 'show-badge-starting-soon',
 };
 
 export function ShowCard({
   title,
   image,
   date,
-  time,
-  venue,
-  price,
+  scope,
+  stack,
+  impact,
+  role,
   badge,
   rating,
   onClick,
@@ -34,60 +37,62 @@ export function ShowCard({
   return (
     <div
       onClick={onClick}
-      className="group relative overflow-hidden rounded-xl bg-card hover:bg-card/80 border border-border transition-all cursor-pointer hover:shadow-xl hover:shadow-spotlight/10 hover:-translate-y-1"
+      className="show-card group"
     >
-      <div className="aspect-[2/3] overflow-hidden relative">
+      <div className="show-card-media">
         <ImageWithFallback
           src={image}
           alt={title}
-          className="w-full h-full object-cover transition-transform group-hover:scale-105"
+          className="show-card-image"
         />
 
         {badge && (
-          <div className="absolute top-3 right-3">
-            <span className={`px-3 py-1 text-xs rounded-full border backdrop-blur-md ${badgeStyles[badge]}`}>
+          <div className="show-card-badge-wrap">
+            <span className={`show-card-badge ${badgeStyles[badge]}`}>
               {badge}
             </span>
           </div>
         )}
 
         {rating && (
-          <div className="absolute top-3 left-3 flex items-center gap-1 px-2 py-1 bg-stage-base/80 backdrop-blur-md rounded-full">
-            <Star className="w-3 h-3 fill-spotlight text-spotlight" />
-            <span className="text-xs text-marquee-surface">{rating.toFixed(1)}</span>
+          <div className="show-card-rating">
+            <Star className="show-card-rating-icon" />
+            <span className="show-card-rating-text">{rating.toFixed(1)}</span>
           </div>
         )}
 
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-stage-base/90 to-transparent"></div>
+        <div className="show-card-media-gradient"></div>
       </div>
 
-      <div className="p-4 space-y-3">
-        <h3 className="text-lg line-clamp-2" style={{ fontFamily: 'var(--font-display)' }}>
+      <div className="show-card-body">
+        <h3 className="show-card-title">
           {title}
         </h3>
 
-        <div className="space-y-2 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-spotlight" />
+        <div className="show-card-meta">
+          <div className="show-card-meta-row">
+            <Calendar className="show-card-icon-sm" />
             <span>{date}</span>
           </div>
-
-
-          <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-spotlight" />
-            <span>{venue}</span>
+          <div className="show-card-meta-row">
+            <span>{scope}</span>
+          </div>
+          <div className="show-card-meta-row">
+            <span>{stack}</span>
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-3 border-t border-border">
-          <div>
-            <div className="text-xs text-muted-foreground">Starting from</div>
-            <div className="text-xl text-spotlight">{price}</div>
+        <div className="show-card-footer">
+          <div className="show-card-impact">
+            <div className="show-card-price-label">{role}</div>
+            <div className="show-card-price">{impact}</div>
           </div>
 
-          <button className="px-4 py-2 bg-accent-primary hover:bg-accent-primary/80 text-white rounded-lg transition-colors">
-            View Script
-          </button>
+          <div className="show-card-action-row">
+            <button className="show-card-btn">
+              View Script
+            </button>
+          </div>
         </div>
       </div>
     </div>
