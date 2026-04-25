@@ -88,6 +88,7 @@
   box-shadow: 0 0 12px rgba(255, 0, 127, 0.3);
 }
 
+
 @keyframes shine {
   to { background-position: 200% center; }
 }

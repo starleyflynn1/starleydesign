@@ -128,6 +128,18 @@
   color: var(--marquee-surface);
 }
 
+.theme-archive .show-card-meta-primary {
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.theme-archive .show-card-meta-primary .show-card-meta-value {
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* --- Editorial Drop Cap --- */
 .theme-archive .director-bio-text p:first-of-type::first-letter {
   font-family: 'Playfair Display', serif;
@@ -201,4 +213,46 @@
   background: var(--spotlight);
   color: var(--marquee-surface); /* Dark ink text on gold background */
   box-shadow: 0 0 15px rgba(212, 165, 116, 0.3);
+}
+
+.dark.theme-archive .show-card {
+  border-color: color-mix(in oklab, var(--foreground) 28%, transparent);
+  background: color-mix(in oklab, var(--background) 70%, black 30%);
+}
+
+.dark.theme-archive .show-card-title {
+  color: var(--foreground);
+  text-shadow: none;
+}
+
+.dark.theme-archive .show-card-meta,
+.dark.theme-archive .show-card-meta-value,
+.dark.theme-archive .show-card-stack,
+.dark.theme-archive .show-card-price-label {
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+.dark.theme-archive .show-card-meta-divider {
+  background: color-mix(in oklab, var(--foreground) 60%, transparent);
+}
+
+.dark.theme-archive .show-card-price {
+  color: color-mix(in oklab, var(--spotlight) 85%, white 15%);
+}
+
+.dark.theme-archive .show-card-btn {
+  border: 1px solid color-mix(in oklab, var(--spotlight) 70%, transparent);
+  background: color-mix(in oklab, var(--spotlight) 25%, transparent);
+  color: var(--spotlight);
+}
+
+.dark.theme-archive .show-card-btn:hover {
+  background: var(--spotlight);
+  color: var(--marquee-surface);
+}
+
+.dark.theme-archive .show-card-btn:focus-visible {
+  outline: 2px solid var(--spotlight);
+  outline-offset: 2px;
 }

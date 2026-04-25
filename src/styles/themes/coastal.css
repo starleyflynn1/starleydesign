@@ -90,6 +90,18 @@
   color: var(--marquee-surface);
 }
 
+.theme-coastal .show-card-meta-primary {
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.theme-coastal .show-card-meta-primary .show-card-meta-value {
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* --- Buttons --- */
 .theme-coastal button {
   font-family: 'Outfit', sans-serif;

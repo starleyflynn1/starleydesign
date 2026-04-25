@@ -70,7 +70,6 @@ export function StagePage({
           <h3 className="section-title">
             Now Playing
           </h3>
-          <button className="link-button">View All</button>
         </div>
 
         <div className="shows-grid">

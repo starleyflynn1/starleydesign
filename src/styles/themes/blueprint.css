@@ -78,6 +78,19 @@
   color: var(--primary-foreground);
 }
 
+
+.theme-blueprint .show-card-meta {
+  font-size: 0.8rem;
+}
+
+.theme-blueprint .show-card-meta-row,
+.theme-blueprint .show-card-meta-value,
+.theme-blueprint .show-card-stack {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* --- Subtitle --- */
 .theme-blueprint .subtitle-text {
   font-size: 0.85rem;

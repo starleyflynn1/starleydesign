@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Theater, Moon, Sun, Menu, X, Search } from 'lucide-react';
+import { Theater, Moon, Sun, Menu, X, Search, Play, Pause } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { StylePicker } from './StylePicker';
 
@@ -8,7 +8,7 @@ interface TheaterHeaderProps {
 }
 
 export function TheaterHeader({ onSearchClick }: TheaterHeaderProps) {
-  const { mode, toggleMode } = useTheme();
+  const { mode, toggleMode, motionEnabled, toggleMotion } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
@@ -59,6 +59,16 @@ export function TheaterHeader({ onSearchClick }: TheaterHeaderProps) {
               >
                 {mode === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
               </button>
+              <button
+                onClick={toggleMotion}
+                className="theater-icon-btn"
+                aria-label={motionEnabled ? 'Reduce motion' : 'Enable animations'}
+                aria-pressed={motionEnabled}
+                title={motionEnabled ? 'Reduce motion' : 'Enable animations'}
+                type="button"
+              >
+                {motionEnabled ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
+              </button>
             </div>
             <button
               onClick={onSearchClick}
@@ -86,6 +96,16 @@ export function TheaterHeader({ onSearchClick }: TheaterHeaderProps) {
             aria-label="Toggle dark mode"
           >
             {mode === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
+          <button
+            onClick={toggleMotion}
+            className="theater-icon-btn"
+            aria-label={motionEnabled ? 'Reduce motion' : 'Enable animations'}
+            aria-pressed={motionEnabled}
+            title={motionEnabled ? 'Reduce motion' : 'Enable animations'}
+            type="button"
+          >
+            {motionEnabled ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
           </button>
         </div>
 

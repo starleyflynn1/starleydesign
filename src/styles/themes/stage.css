@@ -108,3 +108,15 @@
   --sidebar-border: rgba(212, 175, 55, 0.2);
   --sidebar-ring: var(--spotlight);
 }
+
+.theme-stage .show-card-meta-primary {
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.theme-stage .show-card-meta-primary .show-card-meta-value {
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

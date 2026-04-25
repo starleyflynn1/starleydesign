@@ -45,6 +45,7 @@ export function ShowCard({
           alt={title}
           className="show-card-image"
         />
+        <div className="show-card-media-tint"></div>
 
         {badge && (
           <div className="show-card-badge-wrap">
@@ -70,15 +71,14 @@ export function ShowCard({
         </h3>
 
         <div className="show-card-meta">
-          <div className="show-card-meta-row">
+          <div className="show-card-meta-row show-card-meta-primary">
             <Calendar className="show-card-icon-sm" />
-            <span>{date}</span>
+            <span className="show-card-meta-value">{date}</span>
+            <span className="show-card-meta-divider" aria-hidden="true"></span>
+            <span className="show-card-meta-value">{scope}</span>
           </div>
           <div className="show-card-meta-row">
-            <span>{scope}</span>
-          </div>
-          <div className="show-card-meta-row">
-            <span>{stack}</span>
+            <span className="show-card-stack">{stack}</span>
           </div>
         </div>
 

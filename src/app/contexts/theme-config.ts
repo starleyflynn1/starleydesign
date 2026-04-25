@@ -1,10 +1,10 @@
 export const THEMES = {
+  archive: 'archive',
   stage: 'stage',
   blueprint: 'blueprint',
   coastal: 'coastal',
   neon: 'neon',
   terminal: 'terminal',
-  archive: 'archive',
 } as const;
 
 export type ThemeName = keyof typeof THEMES;

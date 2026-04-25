@@ -17,8 +17,10 @@ export function StylePicker() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
+          type="button"
           className="style-picker-trigger"
           aria-label="Select theme"
+          aria-haspopup="menu"
         >
           <Palette className="w-5 h-5" />
         </button>
@@ -33,7 +35,7 @@ export function StylePicker() {
           return (
             <DropdownMenuItem
               key={themeName}
-              onClick={() => setTheme(themeName)}
+              onSelect={() => setTheme(themeName)}
               className="style-picker-item"
             >
               <div className="style-picker-item-row">
