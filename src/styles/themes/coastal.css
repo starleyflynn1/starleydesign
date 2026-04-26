@@ -6,7 +6,7 @@
   --mist-white: #f8fafc;
   --driftwood: #64748b;
   --sage-green: #475569; 
-  --sea-glass: #0d9488;
+  --sea-glass: #0b6f68;
   --morning-sand: #f1f5f9;
 
   /* --- Core Semantic Tokens (Light) --- */
@@ -19,6 +19,7 @@
   --primary: var(--sea-glass);
   --primary-foreground: #ffffff;
   --velvet: var(--sea-glass);
+  --seat-available: #5e8a4f;
   --spotlight: #94a3b8;
   --card: rgba(255, 255, 255, 0.7);
   --border: rgba(71, 85, 105, 0.1);
@@ -41,7 +42,8 @@
   --stage-depth: #1e293b;
   
   --card: rgba(30, 41, 59, 0.7);
-  --velvet: #2dd4bf; /* Brighter teal for contrast */
+  --velvet: #229e8f;
+  --seat-available: #7aa25f;
   --border: rgba(255, 255, 255, 0.08);
 }
 
@@ -144,4 +146,108 @@
   backdrop-filter: blur(12px);
   border-radius: var(--radius);
   box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
+}
+
+/* --- Global Usher readability in Coastal --- */
+.theme-coastal .usher-panel {
+  background: color-mix(in oklab, var(--card) 92%, white 8%);
+  border-color: color-mix(in oklab, var(--sea-glass) 20%, var(--border) 80%);
+}
+
+.theme-coastal:not(.dark) .usher-panel .usher-action-btn {
+  border-radius: 0.625rem !important;
+  padding: 0.75rem 1rem !important;
+  background: #ffffff !important;
+  color: #134e4a !important;
+  border: 1px solid color-mix(in oklab, var(--sea-glass) 20%, var(--border) 80%) !important;
+}
+
+.theme-coastal:not(.dark) .usher-action-title,
+.theme-coastal:not(.dark) .usher-input {
+  color: #134e4a !important;
+}
+
+.theme-coastal:not(.dark) .icon-md-muted {
+  color: #0f766e;
+}
+
+.theme-coastal .usher-group-label {
+  color: color-mix(in oklab, var(--sea-glass) 62%, var(--foreground) 38%);
+}
+
+.theme-coastal:not(.dark) .usher-action-selected {
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--sea-glass) 20%, transparent),
+    transparent
+  );
+  border-left-color: color-mix(in oklab, var(--sea-glass) 78%, var(--foreground) 22%);
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--sea-glass) 18%, white 82%),
+    color-mix(in oklab, white 96%, var(--sea-glass) 4%)
+  ) !important;
+}
+
+.theme-coastal:not(.dark) .usher-action-hover:hover {
+  background: color-mix(in oklab, var(--sea-glass) 22%, white 78%) !important;
+  border-color: color-mix(in oklab, var(--sea-glass) 34%, var(--border) 66%) !important;
+}
+
+.theme-coastal:not(.dark) .usher-badge {
+  background: color-mix(in oklab, var(--sea-glass) 12%, white 88%);
+  color: color-mix(in oklab, var(--sea-glass) 92%, #0b1324 8%);
+  border-color: color-mix(in oklab, var(--sea-glass) 45%, transparent);
+}
+
+.theme-coastal:not(.dark) .usher-close-btn {
+  background: transparent !important;
+  color: #0f766e !important;
+}
+
+.theme-coastal:not(.dark) .usher-close-btn:hover {
+  background: color-mix(in oklab, var(--sea-glass) 14%, white 86%) !important;
+  color: #0f766e !important;
+}
+
+.dark.theme-coastal .usher-panel {
+  background: color-mix(in oklab, var(--background) 70%, #0b1120 30%);
+  border-color: color-mix(in oklab, var(--sea-glass) 34%, var(--border) 66%);
+}
+
+.dark.theme-coastal .usher-input,
+.dark.theme-coastal .usher-action-title {
+  color: color-mix(in oklab, #ffffff 94%, var(--foreground) 6%) !important;
+}
+
+.dark.theme-coastal .usher-panel .usher-action-btn {
+  border-radius: 0.625rem !important;
+  padding: 0.75rem 1rem !important;
+  background: color-mix(in oklab, var(--background) 82%, #0f172a 18%) !important;
+  color: #eef8ff !important;
+  border: 1px solid color-mix(in oklab, var(--sea-glass) 36%, var(--border) 64%) !important;
+}
+
+.dark.theme-coastal .usher-group-label {
+  color: color-mix(in oklab, #c7f9f1 68%, var(--foreground) 32%);
+}
+
+.dark.theme-coastal .usher-action-hover:hover {
+  background: color-mix(in oklab, var(--sea-glass) 34%, var(--background) 66%) !important;
+  border-color: color-mix(in oklab, #67e8f9 40%, var(--sea-glass) 60%) !important;
+}
+
+.dark.theme-coastal .usher-action-selected {
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, #67e8f9 24%, var(--background) 76%),
+    color-mix(in oklab, var(--sea-glass) 20%, var(--background) 80%)
+  ) !important;
+  border-left-color: color-mix(in oklab, #67e8f9 56%, var(--sea-glass) 44%);
+}
+
+.dark.theme-coastal .usher-badge {
+  background: color-mix(in oklab, var(--sea-glass) 30%, var(--background) 70%);
+  color: #eaffff;
+  border-color: color-mix(in oklab, var(--sea-glass) 70%, transparent);
 }

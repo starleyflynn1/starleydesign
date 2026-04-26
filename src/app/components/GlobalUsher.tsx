@@ -33,6 +33,7 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   const filteredActions = query
     ? mockActions.filter(
@@ -71,6 +72,39 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
     }
   };
 
+  const trapFocus = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'Tab') return;
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    const focusableSelector = [
+      'button:not([disabled])',
+      'input:not([disabled])',
+      '[href]',
+      '[tabindex]:not([tabindex="-1"])',
+    ].join(', ');
+    const focusableElements = Array.from(panel.querySelectorAll<HTMLElement>(focusableSelector))
+      .filter((element) => !element.hasAttribute('disabled') && element.tabIndex !== -1);
+    if (focusableElements.length === 0) return;
+
+    const first = focusableElements[0];
+    const last = focusableElements[focusableElements.length - 1];
+    const active = document.activeElement as HTMLElement | null;
+
+    if (event.shiftKey) {
+      if (!active || active === first || !panel.contains(active)) {
+        event.preventDefault();
+        last.focus();
+      }
+      return;
+    }
+
+    if (!active || active === last || !panel.contains(active)) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -92,10 +126,15 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
             transition={{ type: 'spring', duration: 0.4 }}
             className="usher-panel"
+            ref={panelRef}
             style={{
               boxShadow: '0 0 40px rgba(212, 175, 55, 0.3), 0 20px 50px rgba(0, 0, 0, 0.5)',
             }}
             onClick={(e) => e.stopPropagation()}
+            onKeyDown={trapFocus}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Global Usher command palette"
           >
             <div className="usher-search-wrap">
               <div className="usher-search-row">
@@ -114,7 +153,7 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
                   className="usher-close-btn"
                   aria-label="Close"
                 >
-                  <X className="icon-sm text-muted-foreground" />
+                  <X className="icon-md-muted" />
                 </button>
               </div>
             </div>

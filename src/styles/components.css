@@ -31,11 +31,44 @@
   .section-title { @apply text-2xl; font-family: var(--font-display); }
   .link-button { @apply text-sm text-spotlight hover:underline; }
   .shows-grid { @apply grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4; }
-  .component-panel { @apply bg-card rounded-2xl p-8 border border-spotlight/20; }
+  .component-panel {
+    @apply rounded-2xl p-8;
+    background: color-mix(in oklab, var(--card) 90%, var(--background) 10%);
+    border: 1px solid color-mix(in oklab, var(--foreground) 18%, transparent);
+  }
   .panel-header { @apply flex items-center justify-between mb-8; }
   .segment-control { @apply flex gap-2; }
-  .segment-btn { @apply px-4 py-2 rounded-lg transition-colors bg-secondary hover:bg-secondary/80; }
-  .segment-btn-active { @apply bg-spotlight text-stage-base; }
+  .segment-btn {
+    @apply relative inline-flex items-center justify-center text-center px-4 py-2 rounded-lg transition-colors;
+    line-height: 1.2;
+    min-height: 44px;
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--foreground) 10%, var(--card) 90%);
+    border: 1px solid color-mix(in oklab, var(--foreground) 22%, transparent);
+  }
+  .segment-btn:hover {
+    background: color-mix(in oklab, var(--foreground) 16%, var(--card) 84%);
+    border-color: color-mix(in oklab, var(--foreground) 30%, transparent);
+  }
+  .segment-btn.segment-btn-active {
+    background-color: var(--segment-active-bg, var(--velvet)) !important;
+    color: var(--segment-active-fg, var(--marquee-surface)) !important;
+    border-color: var(--segment-active-bg, var(--velvet)) !important;
+    border-width: 2px !important;
+    border-style: solid !important;
+    font-weight: 700;
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--velvet) 45%, transparent);
+  }
+  .segment-btn.segment-btn-active::after {
+    content: "";
+    position: absolute;
+    left: 20%;
+    right: 20%;
+    bottom: -3px;
+    height: 2px;
+    border-radius: 9999px;
+    background: color-mix(in oklab, var(--marquee-surface) 85%, transparent);
+  }
   .booking-view { @apply space-y-8; }
   .booking-nav { @apply flex items-center justify-center gap-4; }
   .btn-prev { @apply px-6 py-2 border border-border rounded-lg hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed; }
@@ -92,6 +125,29 @@
   .theater-marquee { @apply border-t border-spotlight/20 bg-gradient-to-r from-velvet/10 via-transparent to-spotlight/10; }
   .theater-marquee-inner { @apply container mx-auto px-4 py-2 flex items-center gap-2 text-xs text-muted-foreground; }
   .theater-live-pill { @apply px-2 py-1 bg-velvet/20 text-velvet rounded; }
+  .theater-live-pill-flash { animation: livePulse 2.8s ease-in-out infinite; }
+  .banner-container { @apply overflow-hidden whitespace-nowrap flex-1 min-w-0; }
+  .banner-text {
+    display: inline-block;
+    padding-left: 100%;
+    will-change: transform;
+    animation: marquee 25s linear infinite;
+  }
+  .banner-text-static {
+    padding-left: 0;
+    animation: none;
+    transform: none;
+  }
+
+  @keyframes marquee {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-100%, 0, 0); }
+  }
+
+  @keyframes livePulse {
+    0%, 100% { opacity: 0.86; filter: brightness(1); }
+    50% { opacity: 1; filter: brightness(1.12); }
+  }
 
   .style-picker-trigger { @apply p-2 hover:bg-accent/10 rounded-lg transition-colors; }
   .style-picker-menu { @apply w-64; }
@@ -105,45 +161,128 @@
   .style-picker-check { @apply w-4 h-4 text-primary; }
 
   .usher-overlay-wrap { @apply fixed inset-0 z-50 flex items-start justify-center pt-[15vh]; }
-  .usher-backdrop { @apply absolute inset-0 bg-stage-base/90 backdrop-blur-sm; }
-  .usher-panel { @apply relative w-full max-w-2xl mx-4 bg-stage-depth rounded-xl shadow-2xl overflow-hidden; }
+  .usher-backdrop { @apply absolute inset-0 bg-background/72 backdrop-blur-sm; }
+  .usher-panel {
+    @apply relative w-full max-w-2xl mx-4 bg-card rounded-xl shadow-2xl overflow-hidden;
+    color: var(--foreground);
+    border: 1px solid color-mix(in oklab, var(--border) 85%, transparent);
+  }
+  /* Isolate Global Usher controls from theme-level generic button styling. */
+  .usher-panel button {
+    font-family: inherit;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: normal;
+    border-radius: 0.5rem;
+    padding: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    overflow: visible;
+    transform: none;
+    filter: none;
+  }
+  .usher-panel button:hover {
+    box-shadow: none;
+    transform: none;
+    filter: none;
+  }
+  .usher-panel .usher-action-btn {
+    border-radius: 0.625rem !important;
+    padding: 0.75rem 1rem !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+  .usher-panel .usher-close-btn {
+    border-radius: 0.5rem !important;
+    padding: 0.25rem !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    min-width: 2rem;
+    min-height: 2rem;
+  }
   .usher-search-wrap { @apply border-b border-spotlight/20 p-4; }
   .usher-search-row { @apply flex items-center gap-3; }
   .icon-md-spotlight { @apply w-5 h-5 text-spotlight; }
-  .usher-input { @apply flex-1 bg-transparent outline-none placeholder:text-muted-foreground; font-family: var(--font-display); }
-  .usher-close-btn { @apply p-1 hover:bg-spotlight/10 rounded-md transition-colors; }
+  .usher-input {
+    @apply flex-1 bg-transparent outline-none;
+    color: var(--foreground);
+    font-family: var(--font-display);
+  }
+  .usher-input::placeholder {
+    color: color-mix(in oklab, var(--foreground) 58%, transparent);
+  }
+  .usher-close-btn {
+    @apply p-1 hover:bg-spotlight/10 rounded-md transition-colors;
+    color: color-mix(in oklab, var(--foreground) 72%, transparent);
+    border: 0;
+  }
   .usher-results { @apply max-h-[60vh] overflow-y-auto; }
-  .usher-no-results { @apply p-8 text-center text-muted-foreground; }
+  .usher-no-results {
+    @apply p-8 text-center;
+    color: color-mix(in oklab, var(--foreground) 68%, transparent);
+  }
   .usher-group-list { @apply py-2; }
-  .usher-group-label { @apply px-4 py-2 text-xs text-spotlight/70 uppercase tracking-wider; }
-  .usher-action-btn { @apply w-full flex items-center gap-3 px-4 py-3 transition-all; }
+  .usher-group-label {
+    @apply px-4 py-2 text-xs uppercase tracking-wider;
+    color: color-mix(in oklab, var(--spotlight) 92%, white 8%);
+  }
+  .usher-action-btn {
+    @apply w-full flex items-center gap-3 px-4 py-3 transition-all;
+    background: transparent;
+    border: 0;
+    border-radius: 0.625rem !important;
+    color: var(--foreground) !important;
+  }
   .usher-action-selected { @apply bg-gradient-to-r from-spotlight/20 to-transparent border-l-2 border-spotlight shadow-lg; }
   .usher-action-hover { @apply hover:bg-spotlight/5; }
-  .icon-md-muted { @apply w-5 h-5 text-muted-foreground; }
-  .usher-action-title { @apply flex-1 text-left; }
+  .icon-md-muted {
+    @apply w-5 h-5;
+    color: color-mix(in oklab, var(--foreground) 72%, transparent);
+  }
+  .usher-action-title {
+    @apply flex-1 text-left;
+    color: var(--foreground);
+    font-weight: 600;
+  }
   .usher-badge { @apply px-2 py-1 text-xs bg-accent-primary/20 text-accent-primary rounded-md border border-accent-primary/30; }
-  .usher-footer { @apply border-t border-spotlight/20 px-4 py-3 flex items-center justify-between text-xs text-muted-foreground; }
+  .usher-footer {
+    @apply border-t border-spotlight/20 px-4 py-3 flex items-center justify-between text-xs;
+    color: color-mix(in oklab, var(--foreground) 74%, transparent);
+  }
   .usher-footer-keys { @apply flex items-center gap-4; }
   .usher-footer-keygroup { @apply flex items-center gap-1; }
-  .usher-kbd { @apply px-2 py-1 bg-intermission-gray rounded text-spotlight; }
+  .usher-kbd {
+    @apply px-2.5 py-1.5 bg-intermission-gray rounded text-spotlight;
+    font-size: 0.875rem;
+    line-height: 1;
+    font-weight: 600;
+  }
 
-  .calendar-root { @apply space-y-6; }
+  .calendar-root { @apply space-y-4; }
+  .calendar-layout { @apply grid grid-cols-1 lg:grid-cols-[minmax(0,0.72fr)_minmax(260px,1fr)] gap-4 items-start; }
+  .calendar-main { @apply space-y-3; }
   .calendar-head { @apply flex items-center justify-between; }
-  .calendar-title { @apply text-xl; font-family: var(--font-display); }
+  .calendar-title { @apply text-lg; font-family: var(--font-display); }
   .calendar-nav { @apply flex gap-2; }
-  .calendar-nav-btn { @apply p-2 hover:bg-spotlight/10 rounded-lg transition-colors; }
-  .calendar-week-grid { @apply grid grid-cols-7 gap-2; }
-  .calendar-weekday { @apply text-center text-sm text-muted-foreground py-2; }
-  .calendar-empty-day { @apply aspect-square; }
-  .calendar-day-btn { @apply aspect-square rounded-lg flex items-center justify-center relative transition-all; }
+  .calendar-nav-btn { @apply p-1.5 hover:bg-spotlight/10 rounded-md transition-colors; }
+  .calendar-week-grid { @apply grid grid-cols-7 gap-1.5; }
+  .calendar-weekday { @apply text-center text-xs text-muted-foreground py-1; }
+  .calendar-empty-day { @apply h-9; }
+  .calendar-day-btn { @apply h-9 rounded-md relative transition-all; }
   .calendar-day-past { @apply text-muted-foreground/30 cursor-not-allowed; }
   .calendar-day-selected { @apply bg-spotlight text-stage-base ring-2 ring-spotlight; }
   .calendar-day-available { @apply hover:bg-spotlight/20 border border-spotlight/30; }
   .calendar-day-unavailable { @apply text-muted-foreground cursor-not-allowed; }
   .calendar-day-today { @apply ring-1 ring-accent-primary; }
-  .calendar-day-number { @apply text-sm; }
-  .calendar-dot { @apply absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-accent-primary; }
+  .calendar-day-number {
+    @apply absolute top-1 right-1 text-[11px] font-normal leading-none;
+    color: color-mix(in oklab, var(--foreground) 84%, transparent);
+  }
+  .calendar-dot { @apply absolute bottom-1.5 left-1.5 w-1 h-1 rounded-full bg-accent-primary; }
   .calendar-perf-panel { @apply p-6 bg-card rounded-lg border border-spotlight/30; }
+  .calendar-perf-panel-sticky { @apply lg:sticky lg:top-4; }
+  .calendar-empty-state { @apply py-4; }
   .calendar-perf-date { @apply text-sm text-muted-foreground mb-4; }
   .calendar-times { @apply space-y-3; }
   .calendar-time-btn { @apply w-full p-4 rounded-lg border transition-all text-left; }
@@ -158,32 +297,219 @@
   .calendar-available { @apply text-xs text-seat-available; }
   .calendar-soldout { @apply text-xs text-accent-primary; }
 
-  .seating-root { @apply space-y-6; }
+  .seating-root { @apply relative space-y-6; }
   .seating-stage-wrap { @apply text-center; }
-  .seating-stage { @apply inline-block px-8 py-2 bg-gradient-to-b from-spotlight/30 to-transparent rounded-t-lg border-t-2 border-spotlight/50; }
-  .seating-stage-label { @apply text-sm uppercase tracking-wider text-spotlight; }
-  .seating-grid { @apply space-y-2; }
-  .seating-row { @apply flex items-center justify-center gap-2; }
+  .seating-tools-row { @apply flex justify-end w-full px-2 sm:px-4 pb-2; }
+  .seating-stage-topbar { @apply flex items-center justify-center gap-3 w-full px-2 sm:px-4; }
+  .seating-stage {
+    @apply inline-block px-10 py-2.5 bg-gradient-to-b from-spotlight/40 via-spotlight/18 to-transparent rounded-t-lg border-t-2 border-spotlight/70;
+    box-shadow:
+      0 -6px 20px color-mix(in oklab, var(--spotlight) 35%, transparent),
+      0 0 22px color-mix(in oklab, var(--spotlight) 22%, transparent);
+  }
+  .seating-stage-label {
+    @apply text-base uppercase tracking-[0.16em] text-spotlight;
+    text-shadow: 0 0 12px color-mix(in oklab, var(--spotlight) 45%, transparent);
+  }
+  .seating-grid { @apply space-y-2 overflow-x-auto pb-1; }
+  .seating-row { @apply flex items-center justify-center gap-2; min-width: max-content; }
   .seating-row-label { @apply w-8 text-center text-sm text-spotlight/70; }
-  .seating-row-seats { @apply flex gap-2; }
-  .seating-seat-btn { @apply relative w-8 h-8 rounded-md transition-all; }
-  .seating-seat-available { @apply bg-seat-available hover:bg-seat-available/80 cursor-pointer; }
-  .seating-seat-taken { @apply bg-seat-taken cursor-not-allowed opacity-50; }
-  .seating-seat-vip { @apply bg-seat-vip hover:bg-seat-vip/80 cursor-pointer ring-2 ring-spotlight; }
-  .seating-seat-accessible { @apply bg-seat-accessible hover:bg-seat-accessible/80 cursor-pointer; }
-  .seating-seat-selected { @apply bg-accent-primary ring-2 ring-spotlight cursor-pointer; }
+  .seating-row-seats { @apply flex items-center gap-2; }
+  .seating-seat-wrap { @apply flex items-center; }
+  .seating-aisle-gap {
+    @apply w-8 sm:w-12 h-8 rounded-md;
+    background: transparent;
+  }
+  .seating-aisle-gap-left,
+  .seating-aisle-gap-right { @apply transition-transform duration-300; }
+  .seating-seat-btn {
+    @apply relative w-8 h-8 rounded-md transition-all outline-none;
+    border: 0 !important;
+    padding: 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    line-height: 1 !important;
+    font-family: inherit !important;
+    box-shadow: none !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .seating-seat-btn:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  .seating-seat-available { @apply bg-seat-available hover:bg-seat-available/85 cursor-pointer; filter: saturate(0.92); }
+  .seating-seat-taken { @apply bg-slate-500 cursor-not-allowed opacity-90 grayscale; }
+  .seating-seat-vip { @apply bg-seat-vip hover:bg-seat-vip/85 cursor-pointer ring-2 ring-seat-vip/70; }
+  .seating-seat-accessible { @apply bg-seat-accessible hover:bg-seat-accessible/85 cursor-pointer; }
+  .seating-seat-selected {
+    @apply bg-velvet text-white ring-2 ring-velvet cursor-pointer scale-[1.03];
+    box-shadow:
+      0 0 0 2px color-mix(in oklab, var(--velvet) 55%, transparent),
+      0 0 12px color-mix(in oklab, var(--velvet) 70%, transparent),
+      inset 0 0 0 1px color-mix(in oklab, white 35%, transparent);
+    transform: scale(1.03) !important;
+    filter: saturate(1.08);
+  }
+  .seating-seat-suggested { @apply ring-2 ring-emerald-400/90 ring-offset-1 ring-offset-background; }
+  .seating-seat-focused { @apply ring-2 ring-white ring-offset-2 ring-offset-spotlight; }
+  .seating-seat-btn:focus-visible { @apply ring-2 ring-foreground ring-offset-2 ring-offset-background; }
   .seating-accessible-icon { @apply w-4 h-4 absolute inset-0 m-auto text-white; }
+  .seating-seat-symbol { @apply absolute inset-0 grid place-items-center text-[10px] font-bold text-white; }
+  .seating-seat-vip .seating-seat-symbol { @apply text-stage-base; }
+  .seating-seat-taken .seating-seat-symbol { @apply line-through; }
+  /* Ensure global theme button rules never flatten seat states. */
+  .seating-seat-btn.seating-seat-available { background-color: var(--seat-available) !important; border-color: transparent !important; }
+  .seating-seat-btn.seating-seat-taken { background-color: #64748b !important; border-color: transparent !important; }
+  .seating-seat-btn.seating-seat-vip {
+    background-color: var(--seat-vip) !important;
+    border: 0 !important;
+  }
+  .seating-seat-btn.seating-seat-accessible { background-color: var(--seat-accessible) !important; border-color: transparent !important; }
+  .seating-seat-btn.seating-seat-selected { background-color: var(--velvet) !important; border-color: color-mix(in oklab, var(--velvet) 70%, transparent) !important; }
   .seating-legend { @apply flex items-center justify-center gap-6 pt-4 border-t border-spotlight/20; }
   .seating-legend-item { @apply flex items-center gap-2; }
   .seating-legend-dot { @apply w-4 h-4 rounded; }
   .seating-legend-label { @apply text-sm; }
-  .seating-summary { @apply p-4 bg-spotlight/10 rounded-lg border border-spotlight/30; }
-  .seating-summary-row { @apply flex items-center justify-between; }
-  .seating-summary-label { @apply text-sm text-muted-foreground; }
-  .seating-summary-tags { @apply flex gap-2 mt-1; }
-  .seating-seat-tag { @apply px-2 py-1 bg-stage-depth rounded text-sm; }
-  .seating-total-wrap { @apply text-right; }
-  .seating-total-value { @apply text-xl text-spotlight; }
+  .seating-controls { @apply flex flex-wrap items-center justify-center gap-3; }
+  .seating-tools-btn { @apply inline-flex items-center justify-center gap-1 rounded-full border border-border bg-card px-3 py-1.5 text-xs; }
+  .seating-tools-btn-desktop { @apply inline-flex; }
+  .seating-tools-btn-mobile { @apply hidden; }
+  .seating-tools-btn-on { @apply border-spotlight/70 bg-spotlight/20 text-spotlight; }
+  .seating-ticket-count-label { @apply inline-flex items-center gap-2 text-sm; }
+  .seating-ticket-count-select {
+    @apply rounded-md px-2 py-1 text-sm;
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--foreground) 8%, var(--card) 92%);
+    border: 1px solid color-mix(in oklab, var(--foreground) 24%, transparent);
+    color-scheme: light;
+  }
+  .seating-ticket-count-select option {
+    background: color-mix(in oklab, var(--card) 90%, var(--background) 10%);
+    color: var(--foreground);
+  }
+  .dark .seating-ticket-count-select {
+    color-scheme: dark;
+  }
+  .seating-suggest-btn {
+    @apply px-3 py-1.5 rounded-md text-sm min-h-[40px] inline-flex items-center justify-center;
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--spotlight) 20%, var(--card) 80%);
+    border: 1px solid color-mix(in oklab, var(--spotlight) 50%, transparent);
+  }
+  .seating-suggest-btn:hover {
+    background: color-mix(in oklab, var(--spotlight) 30%, var(--card) 70%);
+  }
+  .seating-tooltip { @apply fixed z-50 rounded-md border border-border bg-card/95 px-2 py-1 text-xs shadow-lg pointer-events-none; }
+  .seating-debug-toggle {
+    @apply inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs;
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--foreground) 8%, var(--card) 92%);
+    border: 1px solid color-mix(in oklab, var(--foreground) 24%, transparent);
+  }
+  .seating-debug-toggle-on { @apply border-spotlight/70 bg-spotlight/20 text-spotlight; }
+  .seating-tools-sidebar {
+    @apply absolute right-2 sm:right-4 top-14 z-40 w-[min(92vw,360px)] rounded-lg border border-border p-3 space-y-3 shadow-2xl transition-all duration-300 ease-out transform-gpu origin-top-right;
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--card) 82%, var(--foreground) 18%);
+    border-color: color-mix(in oklab, var(--foreground) 26%, transparent);
+  }
+  .seating-tools-sidebar-open { @apply opacity-100 translate-x-0 pointer-events-auto; }
+  .seating-tools-sidebar-closed { @apply opacity-0 translate-x-6 pointer-events-none; }
+  .seating-tools-header { @apply flex items-center justify-between gap-2; }
+  .seating-tools-actions { @apply flex items-center gap-2; }
+  .seating-tools-title { @apply text-sm font-medium text-spotlight; }
+  .seating-tools-subtitle { @apply text-xs font-medium text-foreground/80; }
+  .seating-tools-hint { @apply text-xs text-muted-foreground; }
+  .seating-assignment-tools {
+    @apply mt-1 rounded-md border border-border p-2 space-y-2;
+    background: color-mix(in oklab, var(--card) 88%, var(--foreground) 12%);
+    border-color: color-mix(in oklab, var(--foreground) 22%, transparent);
+  }
+  .seating-tools-selected-list {
+    @apply rounded-md px-2 py-1 text-xs text-muted-foreground;
+    background: color-mix(in oklab, var(--card) 90%, var(--foreground) 10%);
+  }
+  .seating-tools-close {
+    @apply inline-flex items-center justify-center rounded-full px-2 py-1;
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--foreground) 8%, var(--card) 92%);
+    border: 1px solid color-mix(in oklab, var(--foreground) 24%, transparent);
+  }
+  .seating-reset-btn {
+    @apply inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm min-h-[40px];
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--foreground) 8%, var(--card) 92%);
+    border: 1px solid color-mix(in oklab, var(--foreground) 24%, transparent);
+  }
+  .seating-reset-btn:hover {
+    background: color-mix(in oklab, var(--foreground) 14%, var(--card) 86%);
+  }
+
+  @media (max-width: 1024px) {
+    .seating-tools-btn-desktop { @apply hidden; }
+    .seating-tools-btn-mobile { @apply inline-flex w-full; }
+    .seating-controls { @apply flex-col items-stretch gap-2; }
+    .seating-controls .seating-ticket-count-label { @apply justify-between w-full; }
+    .seating-controls .seating-ticket-count-select { @apply w-24; }
+    .seating-controls .seating-suggest-btn,
+    .seating-controls .seating-reset-btn { @apply w-full; }
+    .seating-tools-sidebar {
+      @apply static mt-3 w-full max-w-none shadow-md;
+      right: auto;
+      top: auto;
+      transform-origin: top center;
+    }
+    .seating-tools-sidebar-open { @apply translate-x-0; }
+    .seating-tools-sidebar-closed { @apply translate-x-0 max-h-0 overflow-hidden p-0 border-transparent; }
+  }
+
+  @media (max-width: 768px) {
+    .panel-header { @apply flex-col items-stretch gap-3 mb-6; }
+    .segment-control { @apply grid grid-cols-3 w-full; }
+    .segment-btn { @apply w-full text-sm px-2 py-2; }
+
+    .component-panel { @apply p-4; }
+    .seating-row-seats { @apply gap-1.5; }
+    .seating-row-label { @apply w-6 text-xs; }
+    .seating-seat-btn { @apply w-7 h-7; }
+    .seating-aisle-gap { @apply w-4 h-7; }
+    .seating-legend { @apply flex-wrap gap-3; }
+  }
+  .seating-tools-grid { @apply grid gap-2; }
+  .seating-debug-panel {
+    @apply max-h-[32vh] w-full overflow-auto rounded-lg border border-border p-3 text-xs;
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--card) 90%, var(--foreground) 10%);
+    border-color: color-mix(in oklab, var(--foreground) 22%, transparent);
+  }
+  .seating-summary { @apply p-4 bg-card rounded-lg border border-border; }
+  .seating-summary-row { @apply flex items-center justify-between gap-4; }
+  .seating-summary-label { @apply text-sm text-foreground/80; }
+  .seating-summary-tags { @apply flex flex-wrap gap-2 mt-1 text-sm text-foreground; }
+  .seating-seat-tag { @apply px-0 py-0 bg-transparent text-inherit border-0 rounded-none; }
+  .seating-seat-tag::after { content: ","; margin-left: 0.15rem; opacity: 0.7; }
+  .seating-seat-tag:last-child::after { content: ""; margin-left: 0; }
+  .seating-total-wrap { @apply text-right min-w-[96px] p-2 rounded-md border border-border bg-card/70; }
+  .seating-total-value { @apply text-2xl text-primary font-semibold leading-none mt-1; }
+  .seating-assign-btn {
+    @apply px-3 py-1.5 rounded-md text-sm disabled:cursor-not-allowed;
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--spotlight) 30%, var(--card) 70%);
+    border: 1px solid color-mix(in oklab, var(--spotlight) 60%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--spotlight) 30%, transparent);
+  }
+  .seating-assign-btn:hover {
+    background: color-mix(in oklab, var(--spotlight) 40%, var(--card) 60%);
+  }
+  .seating-assign-btn-disabled {
+    color: color-mix(in oklab, var(--foreground) 55%, transparent);
+    background: color-mix(in oklab, var(--foreground) 8%, var(--card) 92%);
+    border-color: color-mix(in oklab, var(--foreground) 18%, transparent);
+    box-shadow: none;
+  }
 
   .show-card { @apply relative overflow-hidden rounded-xl bg-card hover:bg-card/80 border border-border transition-all cursor-pointer hover:shadow-xl hover:shadow-spotlight/10 hover:-translate-y-1; }
   .show-card-media { @apply aspect-[2/3] overflow-hidden relative; }

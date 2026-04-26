@@ -122,7 +122,18 @@ export default function App() {
         isOpen={isUsherOpen}
         onClose={() => setIsUsherOpen(false)}
         onSelect={(action) => {
-          console.log('Selected:', action);
+          const routeByTitle: Record<string, string> = {
+            'My Tickets': '/backstage#transactional-ux-data-schemas',
+            'Account Settings': '/backstage#global-theming-persistence',
+            Preferences: '/backstage#accessibility-motion-control',
+          };
+
+          const destination = routeByTitle[action.title];
+          if (destination) {
+            window.location.assign(destination);
+          } else {
+            console.log('Selected:', action);
+          }
         }}
       />
 

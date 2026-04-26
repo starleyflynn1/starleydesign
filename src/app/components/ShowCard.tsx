@@ -89,7 +89,18 @@ export function ShowCard({
           </div>
 
           <div className="show-card-action-row">
-            <button className="show-card-btn">
+            <button
+              type="button"
+              className="show-card-btn"
+              onClick={(event) => {
+                event.stopPropagation();
+                if (typeof window !== 'undefined') {
+                  window.location.assign('/script');
+                  return;
+                }
+                onClick?.();
+              }}
+            >
               View Script
             </button>
           </div>

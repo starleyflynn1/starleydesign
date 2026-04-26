@@ -9,7 +9,7 @@
   --stage-base: #0a0a0f;
   --stage-depth: #1a1a2e;
   --velvet: #c41e3a;
-  --spotlight: #d4af37;
+  --spotlight: #8b6b10;
   --marquee-surface: #f5f5f0;
   --curtain-burgundy: #800020;
   --intermission-gray: #2d2d3a;
@@ -32,12 +32,12 @@
   --secondary: oklch(0.95 0.0058 264.53);
   --secondary-foreground: #030213;
   --muted: #ececf0;
-  --muted-foreground: #717182;
+  --muted-foreground: #4f4f5f;
   --accent: var(--velvet);
   --accent-foreground: #ffffff;
   --destructive: #d4183d;
   --destructive-foreground: #ffffff;
-  --border: rgba(0, 0, 0, 0.1);
+  --border: rgba(10, 10, 15, 0.2);
   --input: transparent;
   --input-background: #f3f3f5;
   --switch-background: #cbced4;
@@ -66,6 +66,50 @@
   --spacing-lg: 2rem;
   --spacing-xl: 3rem;
   --spacing-2xl: 4rem;
+}
+
+/* ============================================================
+   STAGE THEME: LIGHT COMPONENT CONTRAST OVERRIDES
+   ============================================================ */
+.theme-stage .segment-btn,
+.theme-stage .btn-prev,
+.theme-stage .btn-next,
+.theme-stage .seating-suggest-btn,
+.theme-stage .seating-assign-btn,
+.theme-stage .seating-tools-btn,
+.theme-stage .seating-debug-toggle,
+.theme-stage .seating-reset-btn {
+  border-color: color-mix(in oklab, var(--stage-base) 24%, transparent);
+  color: var(--stage-base);
+}
+
+.theme-stage .segment-btn,
+.theme-stage .btn-prev,
+.theme-stage .seating-suggest-btn,
+.theme-stage .seating-assign-btn,
+.theme-stage .seating-tools-btn,
+.theme-stage .seating-debug-toggle,
+.theme-stage .seating-reset-btn {
+  background: color-mix(in oklab, var(--stage-base) 8%, var(--card) 92%);
+}
+
+.theme-stage .btn-next {
+  background: color-mix(in oklab, var(--velvet) 92%, black 8%);
+  color: var(--marquee-surface);
+}
+
+.theme-stage .segment-btn:hover,
+.theme-stage .btn-prev:hover,
+.theme-stage .seating-suggest-btn:hover,
+.theme-stage .seating-assign-btn:hover,
+.theme-stage .seating-tools-btn:hover,
+.theme-stage .seating-debug-toggle:hover,
+.theme-stage .seating-reset-btn:hover {
+  background: color-mix(in oklab, var(--stage-base) 14%, var(--card) 86%);
+}
+
+.theme-stage .btn-next:hover {
+  background: color-mix(in oklab, var(--velvet) 80%, black 20%);
 }
 
 /* ============================================================
@@ -119,4 +163,14 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Keep Global Usher bright in Stage light mode. */
+.theme-stage:not(.dark) .usher-backdrop {
+  background: color-mix(in oklab, var(--background) 76%, white 24%);
+}
+
+.theme-stage:not(.dark) .usher-panel {
+  background: color-mix(in oklab, var(--card) 94%, white 6%);
+  border-color: color-mix(in oklab, var(--stage-base) 16%, var(--border) 84%);
 }

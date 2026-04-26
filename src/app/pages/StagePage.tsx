@@ -172,7 +172,7 @@ export function StagePage({
               </p>
             </div>
             <div className="feature-item">
-              <h4 className="spotlight-text">Seating Charts</h4>
+              <h4 className="spotlight-text">Seating Chart</h4>
               <p className="feature-copy">
                 Interactive seat selection with VIP, accessible, and real-time availability states
               </p>
@@ -196,9 +196,21 @@ export function StagePage({
               </p>
             </div>
             <div className="feature-item">
+              <h4 className="spotlight-text">Motion Pause</h4>
+              <p className="feature-copy">
+                Static mode for sensitive viewers, silencing background transitions and ambient animations.
+              </p>
+            </div>
+            <div className="feature-item">
+              <h4 className="spotlight-text">Theme Toggles</h4>
+              <p className="feature-copy">
+                Dynamic environment presets that transition the Stage between high-visibility utility and ambient, atmospheric environments.
+              </p>
+            </div>
+            <div className="feature-item">
               <h4 className="spotlight-text">Show Cards</h4>
               <p className="feature-copy">
-                Rich media cards with badges, ratings, and theater-specific metadata
+                Modular media components designed for high-density theater metadata and production specs.
               </p>
             </div>
           </div>

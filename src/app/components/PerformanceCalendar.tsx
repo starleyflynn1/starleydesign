@@ -101,86 +101,99 @@ export function PerformanceCalendar({ performances, onSelectPerformance }: Perfo
 
   return (
     <div className="calendar-root">
-      <div className="calendar-head">
-        <h3 className="calendar-title">
-          {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
-        </h3>
-        <div className="calendar-nav">
-          <button
-            onClick={previousMonth}
-            className="calendar-nav-btn"
-            aria-label="Previous month"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button
-            onClick={nextMonth}
-            className="calendar-nav-btn"
-            aria-label="Next month"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-
-      <div className="calendar-week-grid">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-          <div key={day} className="calendar-weekday">
-            {day}
-          </div>
-        ))}
-        {days}
-      </div>
-
-      {selectedPerformance && (
-        <div className="calendar-perf-panel">
-          <div className="calendar-perf-date">
-            {selectedDate?.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-          </div>
-
-          <div className="calendar-times">
-            {selectedPerformance.times.map((performance) => (
+      <div className="calendar-layout">
+        <div className="calendar-main">
+          <div className="calendar-head">
+            <h3 className="calendar-title">
+              {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+            </h3>
+            <div className="calendar-nav">
               <button
-                key={performance.time}
-                onClick={() =>
-                  onSelectPerformance?.(selectedDate!, performance.time, performance.type)
-                }
-                disabled={performance.available === 0}
-                className={`calendar-time-btn ${
-                  performance.available === 0
-                    ? 'calendar-time-disabled'
-                    : 'calendar-time-enabled'
-                }`}
+                onClick={previousMonth}
+                className="calendar-nav-btn"
+                aria-label="Previous month"
               >
-                <div className="calendar-time-row">
-                  <div className="calendar-time-meta">
-                    {performance.type === 'matinee' ? (
-                      <Sun className="icon-md-spotlight" />
-                    ) : (
-                      <Moon className="icon-md-spotlight" />
-                    )}
-                    <div>
-                      <div className="calendar-time-type">{performance.type}</div>
-                      <div className="calendar-time-value">{performance.time}</div>
-                    </div>
-                  </div>
-
-                  <div className="calendar-time-availability">
-                    {performance.available > 0 ? (
-                      <>
-                        <div className="calendar-seats">{performance.available} seats</div>
-                        <div className="calendar-available">Available</div>
-                      </>
-                    ) : (
-                      <div className="calendar-soldout">Sold Out</div>
-                    )}
-                  </div>
-                </div>
+                <ChevronLeft className="w-5 h-5" />
               </button>
+              <button
+                onClick={nextMonth}
+                className="calendar-nav-btn"
+                aria-label="Next month"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          <div className="calendar-week-grid">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+              <div key={day} className="calendar-weekday">
+                {day}
+              </div>
             ))}
+            {days}
           </div>
         </div>
-      )}
+
+        <div className="calendar-perf-panel calendar-perf-panel-sticky">
+          {selectedPerformance ? (
+            <>
+              <div className="calendar-perf-date">
+                {selectedDate?.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+              </div>
+
+              <div className="calendar-times">
+                {selectedPerformance.times.map((performance) => (
+                  <button
+                    key={performance.time}
+                    onClick={() =>
+                      onSelectPerformance?.(selectedDate!, performance.time, performance.type)
+                    }
+                    disabled={performance.available === 0}
+                    className={`calendar-time-btn ${
+                      performance.available === 0
+                        ? 'calendar-time-disabled'
+                        : 'calendar-time-enabled'
+                    }`}
+                  >
+                    <div className="calendar-time-row">
+                      <div className="calendar-time-meta">
+                        {performance.type === 'matinee' ? (
+                          <Sun className="icon-md-spotlight" />
+                        ) : (
+                          <Moon className="icon-md-spotlight" />
+                        )}
+                        <div>
+                          <div className="calendar-time-type">{performance.type}</div>
+                          <div className="calendar-time-value">{performance.time}</div>
+                        </div>
+                      </div>
+
+                      <div className="calendar-time-availability">
+                        {performance.available > 0 ? (
+                          <>
+                            <div className="calendar-seats">{performance.available} seats</div>
+                            <div className="calendar-available">Available</div>
+                          </>
+                        ) : (
+                          <div className="calendar-soldout">Sold Out</div>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="calendar-empty-state">
+              <p className="calendar-perf-date">Select a highlighted date</p>
+              <p className="calendar-seats">
+                Matinee and evening performance details will appear here.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

@@ -29,6 +29,69 @@ interface ViewTransitionLike {
   finished: Promise<void>;
 }
 
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+const parseColorToRgb = (color: string): [number, number, number] | null => {
+  const value = color.trim().toLowerCase();
+  if (!value) return null;
+
+  if (value.startsWith('#')) {
+    if (value.length === 4) {
+      const r = parseInt(`${value[1]}${value[1]}`, 16);
+      const g = parseInt(`${value[2]}${value[2]}`, 16);
+      const b = parseInt(`${value[3]}${value[3]}`, 16);
+      return [r, g, b];
+    }
+    if (value.length === 7) {
+      const r = parseInt(value.slice(1, 3), 16);
+      const g = parseInt(value.slice(3, 5), 16);
+      const b = parseInt(value.slice(5, 7), 16);
+      return [r, g, b];
+    }
+    return null;
+  }
+
+  const rgbMatch = value.match(/rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)/);
+  if (!rgbMatch) return null;
+  return [Number(rgbMatch[1]), Number(rgbMatch[2]), Number(rgbMatch[3])];
+};
+
+const srgbToLinear = (channel: number) => {
+  const normalized = channel / 255;
+  return normalized <= 0.04045 ? normalized / 12.92 : Math.pow((normalized + 0.055) / 1.055, 2.4);
+};
+
+const calculateRelativeLuminance = (rgb: [number, number, number]) => {
+  const [r, g, b] = rgb;
+  const linearR = srgbToLinear(r);
+  const linearG = srgbToLinear(g);
+  const linearB = srgbToLinear(b);
+  return 0.2126 * linearR + 0.7152 * linearG + 0.0722 * linearB;
+};
+
+const contrastRatio = (a: [number, number, number], b: [number, number, number]) => {
+  const l1 = calculateRelativeLuminance(a);
+  const l2 = calculateRelativeLuminance(b);
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+};
+
+const mixRgb = (
+  source: [number, number, number],
+  target: [number, number, number],
+  factor: number
+): [number, number, number] => {
+  const f = clamp(factor, 0, 1);
+  return [
+    Math.round(source[0] + (target[0] - source[0]) * f),
+    Math.round(source[1] + (target[1] - source[1]) * f),
+    Math.round(source[2] + (target[2] - source[2]) * f),
+  ];
+};
+
+const rgbToCss = ([r, g, b]: [number, number, number]) => `rgb(${r} ${g} ${b})`;
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [currentTheme, setCurrentTheme] = useState<ThemeName>(() => {
     if (typeof window !== 'undefined') {
@@ -61,7 +124,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const lastPointerRef = useRef<{ x: number; y: number } | null>(null);
 
   const getTransitionKind = useCallback((theme: ThemeName): TransitionKind => {
-    if (theme === 'stage' || theme === 'neon') return 'spotlight';
+    if (theme === 'stage' || theme === 'neon' || theme === 'archive') return 'spotlight';
     if (theme === 'terminal' || theme === 'blueprint') return 'crt';
     if (theme === 'coastal') return 'atmospheric';
     return 'default';
@@ -80,6 +143,63 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const resolveVariableRgb = useCallback((variableName: string): [number, number, number] | null => {
+    const probe = document.createElement('div');
+    probe.style.position = 'fixed';
+    probe.style.inset = '0';
+    probe.style.opacity = '0';
+    probe.style.pointerEvents = 'none';
+    probe.style.visibility = 'hidden';
+    probe.style.color = `var(${variableName})`;
+    document.body.appendChild(probe);
+    const resolved = window.getComputedStyle(probe).color;
+    document.body.removeChild(probe);
+    return parseColorToRgb(resolved);
+  }, []);
+
+  const applySemanticContrastGuardrails = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const root = document.documentElement;
+
+    // Reset previous runtime overrides so we always calculate from theme defaults.
+    root.style.removeProperty('--primary');
+    root.style.removeProperty('--accent');
+
+    const backgroundRgb = resolveVariableRgb('--background');
+    const primaryRgb = resolveVariableRgb('--primary');
+    const accentRgb = resolveVariableRgb('--accent');
+    if (!backgroundRgb || !primaryRgb || !accentRgb) return;
+
+    const adjustTokenForContrast = (tokenRgb: [number, number, number]) => {
+      const minTextContrast = 4.5;
+      const initialContrast = contrastRatio(tokenRgb, backgroundRgb);
+      if (initialContrast >= minTextContrast) return tokenRgb;
+
+      const backgroundLuminance = calculateRelativeLuminance(backgroundRgb);
+      const target = backgroundLuminance > 0.45 ? ([0, 0, 0] as [number, number, number]) : ([255, 255, 255] as [number, number, number]);
+
+      let best = tokenRgb;
+      let bestContrast = initialContrast;
+      for (let i = 1; i <= 18; i += 1) {
+        const factor = i * 0.055;
+        const candidate = mixRgb(tokenRgb, target, factor);
+        const candidateContrast = contrastRatio(candidate, backgroundRgb);
+        if (candidateContrast > bestContrast) {
+          best = candidate;
+          bestContrast = candidateContrast;
+        }
+        if (candidateContrast >= minTextContrast) break;
+      }
+      return best;
+    };
+
+    const adjustedPrimary = adjustTokenForContrast(primaryRgb);
+    const adjustedAccent = adjustTokenForContrast(accentRgb);
+
+    root.style.setProperty('--primary', rgbToCss(adjustedPrimary));
+    root.style.setProperty('--accent', rgbToCss(adjustedAccent));
+  }, [resolveVariableRgb]);
+
   const runThemeTransition = useCallback(
     (nextTheme: ThemeName, nextMode: Mode) => {
       if (typeof window === 'undefined') return;
@@ -88,6 +208,65 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       const shouldReduceMotion = reduceMotionEnabled;
       const x = lastPointerRef.current?.x ?? window.innerWidth / 2;
       const y = lastPointerRef.current?.y ?? window.innerHeight / 2;
+      const startScrollX = window.scrollX;
+      const startScrollY = window.scrollY;
+
+      const resolveThemeBackgroundLuminance = (theme: ThemeName, currentMode: Mode) => {
+        const probe = document.createElement('div');
+        probe.classList.add(`theme-${theme}`);
+        if (currentMode === 'dark') probe.classList.add('dark');
+        probe.style.position = 'fixed';
+        probe.style.inset = '0';
+        probe.style.opacity = '0';
+        probe.style.pointerEvents = 'none';
+        probe.style.visibility = 'hidden';
+        probe.style.background = 'var(--background)';
+        document.body.appendChild(probe);
+
+        const resolvedColor = window.getComputedStyle(probe).backgroundColor;
+        document.body.removeChild(probe);
+
+        const rgb = parseColorToRgb(resolvedColor);
+        return rgb ? calculateRelativeLuminance(rgb) : null;
+      };
+
+      const applyLuminosityCap = (fromLuminance: number | null, toLuminance: number | null) => {
+        if (fromLuminance === null || toLuminance === null) return;
+        const delta = Math.abs(toLuminance - fromLuminance);
+        if (delta < 0.2) return;
+
+        // When switching from dark to bright themes, briefly darken the viewport.
+        // When switching from bright to dark themes, briefly brighten it.
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.inset = '0';
+        overlay.style.pointerEvents = 'none';
+        overlay.style.zIndex = '9999';
+        overlay.style.background = toLuminance > fromLuminance ? '#000000' : '#ffffff';
+        overlay.style.opacity = String(clamp(delta * 0.55, 0.12, 0.32));
+        document.body.appendChild(overlay);
+
+        const animation = overlay.animate(
+          [{ opacity: overlay.style.opacity }, { opacity: '0' }],
+          {
+            duration: Math.round(520 + delta * 900),
+            easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+          }
+        );
+
+        animation.finished
+          .catch(() => undefined)
+          .finally(() => {
+            if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+          });
+      };
+
+      const fromLuminance = resolveThemeBackgroundLuminance(currentTheme, mode);
+      const toLuminance = resolveThemeBackgroundLuminance(nextTheme, nextMode);
+
+      const restoreScrollPosition = () => {
+        window.scrollTo({ left: startScrollX, top: startScrollY, behavior: 'auto' });
+      };
 
       const animateRootFallback = () => {
         if (kind === 'spotlight') {
@@ -95,13 +274,29 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           const maxY = Math.max(y, window.innerHeight - y);
           const radius = Math.hypot(maxX, maxY);
           root.animate(
+            [
+              {
+                clipPath: `circle(0px at ${x}px ${y}px)`,
+                filter: 'brightness(1.12) contrast(1.06) saturate(1.08) blur(2.2px)',
+              },
+              {
+                clipPath: `circle(${Math.round(radius * 0.9)}px at ${x}px ${y}px)`,
+                filter: 'brightness(1.04) contrast(1.02) saturate(1.03) blur(1.2px)',
+                offset: 0.68,
+              },
+              {
+                clipPath: `circle(${Math.round(radius * 1.16)}px at ${x}px ${y}px)`,
+                filter: 'brightness(1.01) contrast(1.005) saturate(1.01) blur(0.5px)',
+                offset: 0.9,
+              },
+              {
+                clipPath: `circle(${Math.round(radius * 1.42)}px at ${x}px ${y}px)`,
+                filter: 'brightness(1) contrast(1) saturate(1) blur(0px)',
+              },
+            ],
             {
-              clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`],
-              filter: ['brightness(1.4) contrast(1.2) saturate(1.28)', 'brightness(1) contrast(1) saturate(1)'],
-            },
-            {
-              duration: 1800,
-              easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+              duration: 1750,
+              easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
             }
           );
           return;
@@ -110,15 +305,18 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         if (kind === 'crt') {
           root.animate(
             [
-              { filter: 'brightness(1.7) contrast(1.55) saturate(1.2)', transform: 'skewX(2.4deg) translateX(2px)', opacity: 0.5 },
-              { filter: 'brightness(0.62) contrast(1.65) saturate(0.86)', transform: 'skewX(-1.6deg) translateX(-2px)', opacity: 0.85 },
-              { filter: 'brightness(1) contrast(1)', transform: 'skewX(0deg)', opacity: 1 },
+              { transform: 'translateX(3px)', filter: 'contrast(1.06)' },
+              { transform: 'translateX(-3px)', filter: 'contrast(1.1)' },
+              { transform: 'translateX(1px)', filter: 'contrast(1.03)' },
+              { transform: 'translateX(0px)', filter: 'contrast(1)' },
             ],
             {
-              duration: 800,
-              easing: 'steps(2, end)',
+              duration: 520,
+              easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
             }
           );
+          // Prevent viewport jump during CRT transition.
+          requestAnimationFrame(() => requestAnimationFrame(restoreScrollPosition));
           return;
         }
 
@@ -138,8 +336,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         }
 
         root.animate(
-          [{ opacity: 0.5, filter: 'saturate(0.8) contrast(1.08)' }, { opacity: 1, filter: 'saturate(1) contrast(1)' }],
-          { duration: 920, easing: 'ease-out' }
+          [{ opacity: 0.72, filter: 'saturate(0.92) contrast(1.03)' }, { opacity: 1, filter: 'saturate(1) contrast(1)' }],
+          { duration: 700, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' }
         );
       };
 
@@ -149,6 +347,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           setModeState(nextMode);
         });
         applyRootTheme(nextTheme, nextMode);
+        applySemanticContrastGuardrails();
+        if (kind === 'crt') {
+          requestAnimationFrame(() => restoreScrollPosition());
+        }
       };
       if (shouldReduceMotion) {
         applyState();
@@ -156,9 +358,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       }
       // Deterministic path: always use one animation mechanism.
       applyState();
+      applyLuminosityCap(fromLuminance, toLuminance);
       animateRootFallback();
     },
-    [applyRootTheme, getTransitionKind, reduceMotionEnabled]
+    [applyRootTheme, applySemanticContrastGuardrails, currentTheme, getTransitionKind, mode, reduceMotionEnabled]
   );
 
   useEffect(() => {
@@ -174,11 +377,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (typeof window === 'undefined') return;
     const root = document.documentElement;
     applyRootTheme(currentTheme, mode);
+    applySemanticContrastGuardrails();
 
     localStorage.setItem(THEME_STORAGE_KEY, currentTheme);
     localStorage.setItem(MODE_STORAGE_KEY, mode);
     localStorage.setItem(REDUCE_MOTION_STORAGE_KEY, String(reduceMotionEnabled));
-  }, [currentTheme, mode, reduceMotionEnabled, applyRootTheme]);
+  }, [currentTheme, mode, reduceMotionEnabled, applyRootTheme, applySemanticContrastGuardrails]);
 
   const setTheme = (theme: ThemeName) => {
     runThemeTransition(theme, themeConfigs[theme].defaultMode);

@@ -127,8 +127,12 @@ export function TheaterHeader({ onSearchClick }: TheaterHeaderProps) {
 
       <div className="theater-marquee">
         <div className="theater-marquee-inner">
-          <div className="theater-live-pill">LIVE</div>
-          <span>Opening Night: "The Design Technologist" — May 2026 • Box Office: Open for Collaborative Innovation & Engineering Roles</span>
+          <div className="theater-live-pill theater-live-pill-flash">LIVE</div>
+          <div className="banner-container">
+            <span className={`banner-text ${!motionEnabled ? 'banner-text-static' : ''}`}>
+              Opening Night: "The Design Technologist" — May 2026 • Box Office: Open for Collaborative Innovation & Engineering Roles
+            </span>
+          </div>
         </div>
       </div>
     </header>

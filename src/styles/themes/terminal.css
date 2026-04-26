@@ -181,5 +181,40 @@
   box-shadow: 0 0 15px var(--foreground);
 }
 
+/* --- Global Usher terminal readability and hover behavior --- */
+.theme-terminal .usher-action-hover:hover {
+  background: color-mix(in oklab, var(--foreground) 14%, var(--background) 86%) !important;
+}
+
+.theme-terminal .usher-action-selected {
+  background: color-mix(in oklab, var(--foreground) 22%, var(--background) 78%) !important;
+  border-left-color: var(--foreground) !important;
+}
+
+.dark.theme-terminal .usher-action-hover:hover {
+  background: color-mix(in oklab, var(--foreground) 18%, var(--background) 82%) !important;
+}
+
+.dark.theme-terminal .usher-action-selected {
+  background: color-mix(in oklab, var(--foreground) 28%, var(--background) 72%) !important;
+}
+
+.theme-terminal .usher-kbd {
+  background: color-mix(in oklab, var(--background) 92%, var(--foreground) 8%);
+  color: var(--foreground);
+  border: 1px solid color-mix(in oklab, var(--foreground) 38%, transparent);
+}
+
+.dark.theme-terminal .usher-kbd {
+  background: color-mix(in oklab, var(--background) 86%, #1f2937 14%);
+  color: var(--foreground);
+  border: 1px solid color-mix(in oklab, var(--foreground) 45%, transparent);
+}
+
+.theme-terminal .usher-footer,
+.theme-terminal .usher-footer-keygroup span {
+  color: color-mix(in oklab, var(--foreground) 86%, transparent);
+}
+
 /* --- Card --- */
 .theme

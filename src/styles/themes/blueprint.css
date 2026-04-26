@@ -78,6 +78,11 @@
   color: var(--primary-foreground);
 }
 
+/* Keep VIP seat emphasis warm, not blueprint-blue */
+.theme-blueprint .seating-seat-vip {
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--safety-orange) 45%, transparent);
+}
+
 
 .theme-blueprint .show-card-meta {
   font-size: 0.8rem;
@@ -140,4 +145,42 @@
   color: var(--blueprint-blue);
   /* Give it a subtle glow like a backlit instrumentation panel */
   text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+/* --- Global Usher blueprint accessibility tuning --- */
+.theme-blueprint .usher-action-hover:hover {
+  background: color-mix(in oklab, var(--blueprint-blue) 14%, white 86%) !important;
+}
+
+.theme-blueprint .usher-action-selected {
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--blueprint-blue) 24%, white 76%),
+    color-mix(in oklab, white 96%, var(--blueprint-blue) 4%)
+  ) !important;
+  border-left-color: var(--blueprint-blue) !important;
+}
+
+.dark.theme-blueprint .usher-action-hover:hover {
+  background: color-mix(in oklab, var(--blueprint-blue) 26%, var(--background) 74%) !important;
+}
+
+.dark.theme-blueprint .usher-action-selected {
+  background: color-mix(in oklab, var(--blueprint-blue) 38%, var(--background) 62%) !important;
+}
+
+.theme-blueprint .usher-kbd,
+.dark.theme-blueprint .usher-kbd {
+  background: color-mix(in oklab, var(--background) 88%, var(--blueprint-blue) 12%);
+  color: var(--foreground);
+  border: 1px solid color-mix(in oklab, var(--blueprint-blue) 42%, transparent);
+}
+
+.dark.theme-blueprint .usher-footer-keygroup span,
+.dark.theme-blueprint .usher-footer {
+  color: color-mix(in oklab, var(--foreground) 90%, #ffffff 10%);
+}
+
+.dark.theme-blueprint .usher-close-btn:hover .icon-md-muted {
+  color: var(--foreground) !important;
 }
