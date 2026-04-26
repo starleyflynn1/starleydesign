@@ -23,6 +23,20 @@
   --spotlight: var(--blueprint-blue);
   --accent: var(--safety-orange);
   --border: #cbd5e1;
+  --calendar-soldout-color: color-mix(in oklab, var(--safety-orange) 82%, #111827 18%);
+  --calendar-soldout-color-dark: color-mix(in oklab, var(--safety-orange) 88%, #f8fafc 12%);
+  --btn-disabled-bg: color-mix(in oklab, #e2e8f0 86%, #64748b 14%);
+  --btn-disabled-border: color-mix(in oklab, var(--blueprint-blue) 22%, #64748b 78%);
+  --btn-disabled-fg: color-mix(in oklab, var(--ink-black) 80%, #334155 20%);
+  --script-modal-header-bg: color-mix(in oklab, #0f172a 88%, #111827 12%);
+  --script-modal-header-fg: #e6f0ff;
+  --script-modal-title-fg: #0b2d5e;
+  --script-modal-close-bg: color-mix(in oklab, #f8fafc 88%, #cbd5e1 12%);
+  --script-modal-close-fg: #0f172a;
+  --script-modal-close-border: color-mix(in oklab, var(--blueprint-blue) 28%, #64748b 72%);
+  --script-modal-close-hover-bg: color-mix(in oklab, var(--blueprint-blue) 14%, #f8fafc 86%);
+  --script-modal-close-hover-fg: #082f49;
+  --script-modal-close-hover-border: color-mix(in oklab, var(--blueprint-blue) 40%, #64748b 60%);
 
   /* --- Global Physics --- */
   font-family: "IBM Plex Mono", monospace;
@@ -135,6 +149,18 @@
   --card: #0f172a;
   --border: #1e293b;
   --stage-base: var(--blueprint-blue);
+  --btn-disabled-bg: color-mix(in oklab, #0f172a 80%, #e2e8f0 20%);
+  --btn-disabled-border: color-mix(in oklab, #e2e8f0 32%, transparent);
+  --btn-disabled-fg: color-mix(in oklab, #f8fafc 90%, transparent);
+  --script-modal-header-bg: #0a1222;
+  --script-modal-header-fg: #e0f2fe;
+  --script-modal-title-fg: #e0f2fe;
+  --script-modal-close-bg: color-mix(in oklab, #0f172a 82%, #38bdf8 18%);
+  --script-modal-close-fg: #f8fafc;
+  --script-modal-close-border: color-mix(in oklab, #7dd3fc 38%, transparent);
+  --script-modal-close-hover-bg: color-mix(in oklab, #38bdf8 24%, #0f172a 76%);
+  --script-modal-close-hover-fg: #f8fafc;
+  --script-modal-close-hover-border: color-mix(in oklab, #7dd3fc 56%, transparent);
 }
 
 /* ============================================================
@@ -183,4 +209,104 @@
 
 .dark.theme-blueprint .usher-close-btn:hover .icon-md-muted {
   color: var(--foreground) !important;
+}
+
+/* Blueprint calendar selected date needs explicit high-contrast state. */
+.theme-blueprint .calendar-day-selected {
+  background: color-mix(in oklab, var(--blueprint-blue) 32%, white 68%) !important;
+  color: var(--ink-black) !important;
+  border: 2px solid var(--blueprint-blue) !important;
+  box-shadow:
+    inset 0 0 0 999px color-mix(in oklab, var(--blueprint-blue) 28%, transparent),
+    inset 0 0 0 1px color-mix(in oklab, var(--blueprint-blue) 24%, transparent);
+}
+
+.theme-blueprint .calendar-day-selected .calendar-day-number {
+  color: var(--ink-black) !important;
+  font-weight: 700;
+}
+
+.dark.theme-blueprint .calendar-day-selected {
+  background: color-mix(in oklab, var(--blueprint-blue) 52%, var(--background) 48%) !important;
+  color: #f8fafc !important;
+  border: 2px solid color-mix(in oklab, var(--blueprint-blue) 86%, #ffffff 14%) !important;
+  box-shadow:
+    inset 0 0 0 999px color-mix(in oklab, var(--blueprint-blue) 34%, transparent),
+    inset 0 0 0 1px color-mix(in oklab, var(--blueprint-blue) 30%, transparent);
+}
+
+.dark.theme-blueprint .calendar-day-selected .calendar-day-number {
+  color: #f8fafc !important;
+}
+
+/* Style picker dropdown readability in blueprint, especially dark mode. */
+.theme-blueprint .ui-dropdown-content.style-picker-menu {
+  background: var(--card);
+  color: var(--foreground);
+  border-color: color-mix(in oklab, var(--blueprint-blue) 28%, var(--border) 72%);
+}
+
+.theme-blueprint .style-picker-title {
+  color: var(--foreground);
+}
+
+.theme-blueprint .style-picker-description {
+  color: color-mix(in oklab, var(--foreground) 68%, transparent);
+}
+
+.theme-blueprint .style-picker-check {
+  color: var(--safety-orange);
+}
+
+.theme-blueprint .style-picker-item[data-highlighted],
+.theme-blueprint .style-picker-item:hover {
+  background: color-mix(in oklab, var(--safety-orange) 88%, white 12%);
+  color: #ffffff !important;
+}
+
+.theme-blueprint .style-picker-item[data-highlighted] .style-picker-title,
+.theme-blueprint .style-picker-item:hover .style-picker-title,
+.theme-blueprint .style-picker-item[data-highlighted] .style-picker-description,
+.theme-blueprint .style-picker-item:hover .style-picker-description {
+  color: #ffffff !important;
+}
+
+.theme-blueprint .style-picker-item[data-highlighted] .style-picker-check,
+.theme-blueprint .style-picker-item:hover .style-picker-check {
+  color: #ffffff !important;
+}
+
+.theme-blueprint .style-picker-item[data-highlighted] .style-picker-swatch,
+.theme-blueprint .style-picker-item:hover .style-picker-swatch {
+  border-color: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.dark.theme-blueprint .ui-dropdown-content.style-picker-menu {
+  background: color-mix(in oklab, var(--card) 92%, #0b1220 8%);
+  color: #e2ecff;
+  border-color: color-mix(in oklab, var(--blueprint-blue) 36%, var(--border) 64%);
+}
+
+.dark.theme-blueprint .style-picker-title {
+  color: #f8fafc;
+}
+
+.dark.theme-blueprint .style-picker-description {
+  color: color-mix(in oklab, #c7d8ff 76%, transparent);
+}
+
+.dark.theme-blueprint .style-picker-item[data-highlighted],
+.dark.theme-blueprint .style-picker-item:hover {
+  background: color-mix(in oklab, var(--safety-orange) 72%, #1e293b 28%);
+  color: #f8fafc;
+}
+
+.dark.theme-blueprint .style-picker-item[data-highlighted] .style-picker-title,
+.dark.theme-blueprint .style-picker-item:hover .style-picker-title,
+.dark.theme-blueprint .style-picker-item[data-highlighted] .style-picker-description,
+.dark.theme-blueprint .style-picker-item:hover .style-picker-description,
+.dark.theme-blueprint .style-picker-item[data-highlighted] .style-picker-check,
+.dark.theme-blueprint .style-picker-item:hover .style-picker-check {
+  color: #f8fafc !important;
 }

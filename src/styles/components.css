@@ -17,6 +17,12 @@
 
   .app-root { @apply min-h-screen bg-background; }
   .app-main { @apply container mx-auto px-4 py-8 space-y-12; }
+  .app-main-booking {
+    @apply py-4 space-y-0;
+    min-height: calc(100vh - 76px);
+    display: flex;
+    flex-direction: column;
+  }
   .hero-section { @apply text-center py-12 space-y-4; }
   .hero-badge { @apply inline-flex items-center gap-2 px-4 py-2 bg-velvet/10 border border-velvet/30 rounded-full text-sm text-velvet mb-4; }
   .icon-sm { @apply w-4 h-4; }
@@ -35,6 +41,14 @@
     @apply rounded-2xl p-8;
     background: color-mix(in oklab, var(--card) 90%, var(--background) 10%);
     border: 1px solid color-mix(in oklab, var(--foreground) 18%, transparent);
+  }
+  .component-panel-booking {
+    @apply p-4 md:p-5;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
   .panel-header { @apply flex items-center justify-between mb-8; }
   .segment-control { @apply flex gap-2; }
@@ -70,13 +84,230 @@
     background: color-mix(in oklab, var(--marquee-surface) 85%, transparent);
   }
   .booking-view { @apply space-y-8; }
-  .booking-nav { @apply flex items-center justify-center gap-4; }
-  .btn-prev { @apply px-6 py-2 border border-border rounded-lg hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed; }
-  .btn-next { @apply px-6 py-2 bg-velvet hover:bg-velvet/80 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed; }
+  .booking-view-no-scroll {
+    @apply space-y-3;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .booking-step-panel { @apply rounded-lg border border-border bg-card p-4 md:p-6; }
+  .booking-step-panel-scroll {
+    @apply p-4 md:p-4;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+  }
+  .booking-step-content { @apply space-y-3; }
+  .booking-step-content-seat { min-height: 0; }
+  .booking-step-content-confirmation {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    padding-top: 0.5rem;
+  }
+  .booking-step-calendar .calendar-root { @apply mt-2; }
+  .booking-step-calendar .calendar-time-btn {
+    min-height: 84px;
+    padding-top: 1.05rem !important;
+    padding-bottom: 1.05rem !important;
+  }
+  .booking-step-calendar { min-height: 0; }
+  .booking-step-heading { @apply text-lg font-semibold; }
+  .booking-step-copy { @apply text-sm text-muted-foreground; }
+  .booking-field-label { @apply block text-sm font-medium text-foreground/90 mb-1; }
+  .booking-show-select,
+  .booking-field {
+    @apply w-full rounded-md px-3 py-2 text-sm;
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--card) 90%, var(--background) 10%);
+    border: 1px solid color-mix(in oklab, var(--foreground) 22%, transparent);
+  }
+  .booking-field:disabled { @apply cursor-not-allowed; opacity: 0.85; }
+  .booking-field-label,
+  .booking-show-select,
+  .booking-show-summary {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .booking-show-summary {
+    @apply rounded-md p-3;
+    text-align: left;
+    background: color-mix(in oklab, var(--card) 86%, var(--spotlight) 14%);
+    border: 1px solid color-mix(in oklab, var(--spotlight) 40%, transparent);
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--spotlight) 18%, transparent),
+      0 10px 20px -16px color-mix(in oklab, var(--spotlight) 36%, transparent);
+  }
+  .booking-show-title { @apply text-sm font-semibold; }
+  .booking-show-meta { @apply text-xs text-muted-foreground mt-1; }
+  .booking-payment-balance { @apply rounded-md border border-border px-3 py-2 flex items-center justify-between text-sm; }
+  .booking-payment-form { @apply rounded-md border border-border p-3 space-y-3; }
+  .booking-mock-note {
+    @apply mt-2 text-xs;
+    color: var(--text-muted-aa);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .booking-mock-note-icon {
+    width: 0.85rem;
+    height: 0.85rem;
+    flex: 0 0 auto;
+  }
+  .booking-field-row { @apply grid grid-cols-2 gap-3; }
+  .booking-confirmation-header {
+    @apply space-y-2 pb-2 mb-2;
+    border-bottom: 1px solid color-mix(in oklab, var(--foreground) 20%, transparent);
+  }
+  .booking-confirmation-summary { @apply rounded-md border border-border p-3 space-y-2; }
+  .booking-summary-row { @apply flex items-center justify-between gap-3 text-sm; }
+  .booking-summary-row-order-total {
+    @apply mt-1 pt-2;
+    border-top: 1px solid color-mix(in oklab, var(--foreground) 20%, transparent);
+  }
+  .booking-summary-row-order-total strong {
+    font-weight: 800;
+    font-size: 1.05rem;
+  }
+  .booking-confirmation-note { @apply text-xs text-muted-foreground pt-2; }
+  .booking-seat-layout { @apply grid gap-4; min-height: 0; align-items: start; }
+  .booking-seat-main {
+    min-width: 0;
+    max-height: min(52vh, 540px);
+    overflow: auto;
+    padding-right: 0.25rem;
+  }
+  @media (min-width: 1024px) {
+    .booking-seat-main .seating-root-compact { @apply space-y-4; }
+    .booking-seat-main .seating-root-compact .seating-stage { @apply px-8 py-2; }
+    .booking-seat-main .seating-root-compact .seating-stage-label { @apply text-sm tracking-[0.12em]; }
+    .booking-seat-main .seating-root-compact .seating-grid { @apply space-y-1.5 pb-0; }
+    .booking-seat-main .seating-root-compact .seating-row { @apply gap-1.5; }
+    .booking-seat-main .seating-root-compact .seating-row-seats { gap: 0.375rem; }
+    .booking-seat-main .seating-root-compact .seating-seat-btn { width: 1.625rem; height: 1.625rem; }
+    .booking-seat-main .seating-root-compact .seating-aisle-gap { width: 1.5rem; height: 1.625rem; }
+    .booking-seat-main .seating-root-compact .seating-row-label { width: 1.25rem; font-size: 0.75rem; }
+    .booking-seat-main .seating-root-compact .seating-seat-symbol { font-size: 0.5rem; }
+    .booking-seat-main .seating-root-compact .seating-accessible-icon { width: 0.7rem; height: 0.7rem; }
+    .booking-seat-main .seating-root-compact .seating-legend { @apply gap-4 pt-2; }
+    .booking-seat-main .seating-root-compact .seating-legend-label { @apply text-xs; }
+    .booking-seat-main .seating-root-compact .seating-legend-dot { @apply w-3.5 h-3.5; }
+  }
+  .booking-seat-sidebar {
+    @apply rounded-lg border border-border bg-card p-6 space-y-3;
+    height: fit-content;
+  }
+  .booking-seat-sidebar-controls { @apply space-y-2 pb-1 border-b border-border/70; }
+  .booking-seat-ticket-row {
+    @apply flex items-center justify-between;
+    margin-bottom: 24px;
+  }
+  .booking-seat-ticket-select {
+    @apply rounded-md px-3 py-2;
+    min-width: 88px;
+  }
+  .booking-seat-sidebar-btn { @apply w-full; }
+  .booking-seat-sidebar-suggest {
+    @apply font-semibold;
+    background: color-mix(in oklab, var(--velvet) 90%, black 10%);
+    color: white;
+    border-color: color-mix(in oklab, var(--velvet) 68%, transparent);
+  }
+  .booking-seat-sidebar-suggest:hover {
+    background: color-mix(in oklab, var(--velvet) 82%, black 18%);
+  }
+  .booking-seat-sidebar-reset {
+    @apply text-sm;
+    min-height: 34px;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+    background: transparent;
+    border-style: dashed;
+    border-color: color-mix(in oklab, var(--foreground) 24%, transparent);
+    color: color-mix(in oklab, var(--foreground) 80%, transparent);
+  }
+  .booking-seat-sidebar-reset:hover {
+    background: color-mix(in oklab, var(--foreground) 8%, transparent);
+    color: var(--foreground);
+  }
+  .booking-seat-sidebar-title { @apply text-sm font-semibold; }
+  .booking-seat-sidebar-list {
+    @apply text-sm text-muted-foreground break-words;
+    max-height: 4.75rem;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+  }
+  .booking-seat-sidebar-list-selected {
+    color: var(--foreground);
+    font-weight: 600;
+  }
+  .booking-seat-sidebar-total { @apply flex items-center justify-between text-sm; }
+  .booking-confetti {
+    @apply pointer-events-none absolute inset-0;
+    z-index: 0;
+  }
+  .booking-confetti-piece {
+    position: absolute;
+    top: -10px;
+    width: 8px;
+    height: 14px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #ffd66b, #c8a243);
+    box-shadow: 0 0 8px rgba(255, 214, 107, 0.45);
+    animation: bookingConfettiBurst ease-out forwards;
+    opacity: 0;
+  }
+  .booking-step-content-confirmation > :not(.booking-confetti) {
+    position: relative;
+    z-index: 1;
+  }
+  @keyframes bookingConfettiBurst {
+    0% {
+      transform: translateY(0) rotate(0deg) scale(0.7);
+      opacity: 0;
+    }
+    18% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(320px) rotate(210deg) scale(1);
+      opacity: 0;
+    }
+  }
+  @media (min-width: 1024px) {
+    .booking-seat-layout {
+      grid-template-columns: minmax(0, 1fr) 280px;
+      align-items: start;
+    }
+    .booking-seat-sidebar { @apply sticky top-20; }
+  }
+  .booking-nav {
+    @apply flex items-center justify-center gap-4;
+    position: sticky;
+    bottom: 0;
+    z-index: 3;
+    padding-top: 0.5rem;
+    background: color-mix(in oklab, var(--card) 95%, transparent);
+  }
+  .btn-prev {
+    @apply px-6 py-2 border rounded-lg hover:bg-secondary disabled:cursor-not-allowed;
+    border-color: color-mix(in oklab, var(--foreground) 28%, transparent);
+  }
+  .btn-next { @apply px-6 py-2 bg-velvet hover:bg-velvet/80 text-white rounded-lg disabled:cursor-not-allowed; }
+  .btn-prev:disabled,
+  .btn-next:disabled {
+    opacity: 1 !important;
+    background: var(--btn-disabled-bg) !important;
+    border-color: var(--btn-disabled-border) !important;
+    color: var(--btn-disabled-fg) !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
   .feature-banner { @apply bg-gradient-to-r from-velvet/10 via-transparent to-spotlight/10 rounded-2xl p-8 border border-spotlight/20; }
   .feature-banner-inner { @apply max-w-3xl mx-auto text-center space-y-4; }
   .icon-xl { @apply w-16 h-16 mx-auto text-spotlight; }
   .feature-grid { @apply grid gap-6 text-left pt-6 md:grid-cols-2; }
+  .director-feature-grid { @apply grid-cols-1; }
   .feature-item { @apply space-y-2; }
   .feature-copy { @apply text-sm text-muted-foreground; }
   .app-footer { @apply border-t border-border bg-card/50 mt-16; }
@@ -90,20 +321,55 @@
 
   .booking-progress-root { @apply w-full max-w-4xl mx-auto py-8; }
   .booking-progress-track-wrap { @apply relative; }
-  .booking-progress-track { @apply absolute top-5 left-0 w-full h-0.5 bg-border; }
-  .booking-progress-fill { @apply absolute top-0 left-0 h-full bg-spotlight transition-all duration-500; }
+  .booking-progress-track {
+    @apply absolute top-5 left-0 w-full h-0.5;
+    background: var(--stepper-track-bg);
+  }
+  .booking-progress-fill {
+    @apply absolute top-0 left-0 h-full transition-all duration-500;
+    background: var(--stepper-fill-bg);
+  }
   .booking-progress-steps { @apply relative flex justify-between; }
   .booking-step-item { @apply flex flex-col items-center; }
   .booking-step-bubble { @apply w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all; }
   .booking-step-completed { @apply bg-spotlight border-spotlight text-stage-base; }
-  .booking-step-current { @apply bg-stage-depth border-spotlight text-spotlight ring-4 ring-spotlight/20; }
-  .booking-step-pending { @apply bg-card border-border text-muted-foreground; }
-  .booking-step-meta { @apply mt-3 text-center max-w-32; }
+  .booking-step-current {
+    @apply ring-4 ring-spotlight/20;
+    background: var(--stepper-current-bg, var(--stage-depth));
+    color: var(--stepper-current-fg, var(--spotlight));
+    border-color: var(--stepper-current-border, color-mix(in oklab, var(--spotlight) 90%, white 10%));
+    border-width: 3px;
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--spotlight) 38%, transparent),
+      0 0 14px color-mix(in oklab, var(--spotlight) 28%, transparent);
+  }
+  .booking-step-pending {
+    background: var(--stepper-pending-bg);
+    border-color: var(--stepper-pending-border);
+    color: var(--stepper-pending-fg);
+  }
+  .booking-step-meta {
+    @apply mt-3 text-center;
+    width: 8.5rem;
+    max-width: 8.5rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
   .booking-step-title { @apply text-sm; }
   .booking-step-title-current { @apply text-spotlight; }
   .booking-step-title-completed { @apply text-foreground; }
-  .booking-step-title-pending { @apply text-muted-foreground; }
-  .booking-step-desc { @apply text-xs text-muted-foreground mt-1; }
+  .booking-step-title-pending { color: var(--text-subtle-aa); }
+  .booking-step-desc {
+    @apply text-xs mt-1;
+    color: var(--text-muted-aa);
+    text-align: center;
+  }
+  .app-main-booking .booking-progress-root { @apply py-3; }
+  .app-main-booking .booking-step-meta { @apply mt-2; }
+  .app-main-booking .booking-step-desc { @apply mt-0.5; }
+  .app-main-booking .booking-step-heading { @apply text-base; }
+  .app-main-booking .booking-step-copy { @apply text-xs; }
+  .app-main-booking .panel-header { @apply mb-3; }
 
   .theater-header { @apply sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-lg; }
   .theater-header-container { @apply container mx-auto px-4; }
@@ -119,8 +385,10 @@
   .theater-icon-btn { @apply p-2 hover:bg-spotlight/10 rounded-lg transition-colors; }
   .theater-mobile-search-btn { @apply md:hidden p-2 hover:bg-spotlight/10 rounded-lg transition-colors; }
   .theater-mobile-menu-btn { @apply lg:hidden p-2 hover:bg-spotlight/10 rounded-lg transition-colors; }
-  .theater-mobile-controls { @apply md:hidden flex items-center justify-end gap-2 pb-2; }
   .theater-nav-mobile { @apply lg:hidden py-4 space-y-2 border-t border-border; }
+  .theater-nav-mobile-controls {
+    @apply flex items-center justify-end gap-2 px-4 pb-2 mb-2 border-b border-border/70;
+  }
   .theater-nav-mobile-link { @apply block py-2 px-4 hover:bg-spotlight/10 rounded-lg transition-colors; }
   .theater-marquee { @apply border-t border-spotlight/20 bg-gradient-to-r from-velvet/10 via-transparent to-spotlight/10; }
   .theater-marquee-inner { @apply container mx-auto px-4 py-2 flex items-center gap-2 text-xs text-muted-foreground; }
@@ -159,6 +427,32 @@
   .style-picker-title { @apply font-medium; }
   .style-picker-description { @apply text-xs text-muted-foreground; }
   .style-picker-check { @apply w-4 h-4 text-primary; }
+  .style-picker-menu {
+    background: var(--card);
+    color: var(--foreground);
+    border-color: color-mix(in oklab, var(--border) 80%, transparent);
+  }
+  .style-picker-menu .style-picker-item[data-highlighted],
+  .style-picker-menu .style-picker-item:hover {
+    background: var(--picker-hover-bg, color-mix(in oklab, var(--spotlight) 28%, var(--card) 72%));
+    color: var(--picker-hover-fg, var(--foreground));
+  }
+  .style-picker-menu .style-picker-item[data-highlighted] .style-picker-title,
+  .style-picker-menu .style-picker-item:hover .style-picker-title,
+  .style-picker-menu .style-picker-item[data-highlighted] .style-picker-description,
+  .style-picker-menu .style-picker-item:hover .style-picker-description,
+  .style-picker-menu .style-picker-item[data-highlighted] .style-picker-check,
+  .style-picker-menu .style-picker-item:hover .style-picker-check {
+    color: var(--picker-hover-fg, var(--foreground)) !important;
+  }
+  .style-picker-menu .style-picker-item[data-highlighted] .style-picker-description,
+  .style-picker-menu .style-picker-item:hover .style-picker-description {
+    color: var(--picker-hover-muted, color-mix(in oklab, var(--picker-hover-fg, var(--foreground)) 86%, transparent)) !important;
+  }
+  .style-picker-menu .style-picker-item[data-highlighted] .style-picker-swatch,
+  .style-picker-menu .style-picker-item:hover .style-picker-swatch {
+    border-color: color-mix(in oklab, var(--picker-hover-fg, var(--foreground)) 40%, transparent) !important;
+  }
 
   .usher-overlay-wrap { @apply fixed inset-0 z-50 flex items-start justify-center pt-[15vh]; }
   .usher-backdrop { @apply absolute inset-0 bg-background/72 backdrop-blur-sm; }
@@ -270,8 +564,13 @@
   .calendar-weekday { @apply text-center text-xs text-muted-foreground py-1; }
   .calendar-empty-day { @apply h-9; }
   .calendar-day-btn { @apply h-9 rounded-md relative transition-all; }
-  .calendar-day-past { @apply text-muted-foreground/30 cursor-not-allowed; }
-  .calendar-day-selected { @apply bg-spotlight text-stage-base ring-2 ring-spotlight; }
+  .calendar-day-selected {
+    @apply ring-2 ring-spotlight;
+    background: color-mix(in oklab, var(--spotlight) 34%, transparent);
+    color: var(--foreground);
+    border: 1px solid color-mix(in oklab, var(--spotlight) 72%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--spotlight) 26%, transparent);
+  }
   .calendar-day-available { @apply hover:bg-spotlight/20 border border-spotlight/30; }
   .calendar-day-unavailable { @apply text-muted-foreground cursor-not-allowed; }
   .calendar-day-today { @apply ring-1 ring-accent-primary; }
@@ -279,23 +578,156 @@
     @apply absolute top-1 right-1 text-[11px] font-normal leading-none;
     color: color-mix(in oklab, var(--foreground) 84%, transparent);
   }
-  .calendar-dot { @apply absolute bottom-1.5 left-1.5 w-1 h-1 rounded-full bg-accent-primary; }
+  .calendar-dot { @apply absolute bottom-1 left-1 w-3 h-3 rounded-full bg-accent-primary; }
+  .calendar-day-selected .calendar-day-number {
+    color: var(--foreground) !important;
+    font-weight: 600;
+  }
   .calendar-perf-panel { @apply p-6 bg-card rounded-lg border border-spotlight/30; }
   .calendar-perf-panel-sticky { @apply lg:sticky lg:top-4; }
   .calendar-empty-state { @apply py-4; }
   .calendar-perf-date { @apply text-sm text-muted-foreground mb-4; }
   .calendar-times { @apply space-y-3; }
-  .calendar-time-btn { @apply w-full p-4 rounded-lg border transition-all text-left; }
-  .calendar-time-disabled { @apply border-border bg-card/50 cursor-not-allowed opacity-50; }
-  .calendar-time-enabled { @apply border-spotlight/30 hover:bg-spotlight/10 hover:border-spotlight; }
+  .calendar-time-btn {
+    @apply w-full p-4 rounded-lg border transition-all text-left;
+    text-transform: none;
+    letter-spacing: normal;
+    backdrop-filter: none;
+    overflow: visible;
+    box-shadow: none;
+  }
+  .calendar-time-btn:hover {
+    transform: none;
+    filter: none;
+    box-shadow: none;
+  }
+  /* Global safeguard: calendar time cards are semantic data cards, not themed button chrome. */
+  .calendar-root .calendar-time-btn,
+  .calendar-root .calendar-time-btn:hover,
+  .calendar-root .calendar-time-btn:focus-visible,
+  .calendar-root .calendar-time-btn:active {
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    font-family: inherit !important;
+    padding: 1rem !important;
+    backdrop-filter: none !important;
+    transform: none !important;
+    filter: none !important;
+    overflow: visible !important;
+  }
+  .calendar-root .calendar-day-btn,
+  .calendar-root .calendar-nav-btn {
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    font-family: inherit !important;
+    box-shadow: none !important;
+    transform: none !important;
+    filter: none !important;
+    overflow: visible !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+  .calendar-root .calendar-day-btn,
+  .calendar-root .calendar-nav-btn,
+  .calendar-root .calendar-time-btn {
+    border-style: solid !important;
+    border-width: 1px !important;
+    border-radius: 0.5rem !important;
+  }
+  .calendar-root .calendar-day-btn {
+    padding: 0 !important;
+    width: 100%;
+    height: 2.25rem;
+  }
+  .calendar-root .calendar-nav-btn {
+    padding: 0 !important;
+    width: 2.75rem;
+    height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+  }
+  .calendar-time-disabled {
+    @apply cursor-not-allowed;
+    border-color: var(--calendar-time-disabled-border, color-mix(in oklab, var(--foreground) 22%, transparent));
+    background: var(--calendar-time-disabled-bg, color-mix(in oklab, var(--card) 88%, var(--background) 12%));
+    opacity: 1;
+    color: var(--calendar-time-disabled-fg, color-mix(in oklab, var(--foreground) 78%, transparent));
+  }
+  .calendar-time-btn.calendar-time-disabled:hover {
+    background: var(--calendar-time-disabled-hover-bg, var(--calendar-time-disabled-bg, color-mix(in oklab, var(--card) 88%, var(--background) 12%))) !important;
+    border-color: var(--calendar-time-disabled-hover-border, var(--calendar-time-disabled-border, color-mix(in oklab, var(--foreground) 24%, transparent))) !important;
+    color: var(--calendar-time-disabled-hover-fg, color-mix(in oklab, var(--foreground) 82%, transparent)) !important;
+  }
+  .calendar-time-enabled {
+    @apply border-spotlight/30;
+    background: color-mix(in oklab, var(--card) 94%, transparent);
+    color: var(--foreground);
+  }
+  .calendar-time-btn.calendar-time-enabled:hover {
+    background: color-mix(in oklab, var(--spotlight) 18%, var(--card) 82%);
+    border-color: color-mix(in oklab, var(--spotlight) 82%, transparent);
+    color: var(--foreground);
+  }
+  .calendar-time-btn.calendar-time-selected {
+    background: color-mix(in oklab, var(--spotlight) 36%, var(--card) 64%) !important;
+    border-color: color-mix(in oklab, var(--spotlight) 92%, transparent) !important;
+    box-shadow:
+      inset 0 0 0 1px color-mix(in oklab, var(--spotlight) 36%, transparent),
+      0 0 0 2px color-mix(in oklab, var(--spotlight) 44%, transparent) !important;
+  }
+  .calendar-time-selected-badge {
+    @apply inline-flex items-center rounded-full px-2 py-0.5 mb-1 text-[10px] font-semibold uppercase tracking-wide;
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--spotlight) 34%, transparent);
+    border: 1px solid color-mix(in oklab, var(--spotlight) 56%, transparent);
+  }
+  .calendar-time-btn.calendar-time-selected .calendar-time-type,
+  .calendar-time-btn.calendar-time-selected .calendar-time-value,
+  .calendar-time-btn.calendar-time-selected .calendar-seats,
+  .calendar-time-btn.calendar-time-selected .calendar-time-availability,
+  .calendar-time-btn.calendar-time-selected .calendar-available {
+    color: var(--foreground) !important;
+  }
   .calendar-time-row { @apply flex items-center justify-between; }
   .calendar-time-meta { @apply flex items-center gap-3; }
-  .calendar-time-type { @apply text-sm capitalize; }
-  .calendar-time-value { @apply text-lg; }
+  .calendar-time-type { @apply text-sm capitalize; color: color-mix(in oklab, var(--foreground) 82%, transparent); }
+  .calendar-time-value { @apply text-lg; color: var(--foreground); }
   .calendar-time-availability { @apply text-right; }
-  .calendar-seats { @apply text-sm text-muted-foreground; }
+  .calendar-seats { @apply text-sm; color: color-mix(in oklab, var(--foreground) 82%, transparent); }
   .calendar-available { @apply text-xs text-seat-available; }
   .calendar-soldout { @apply text-xs text-accent-primary; }
+  .calendar-time-disabled .calendar-time-type,
+  .calendar-time-disabled .calendar-time-value,
+  .calendar-time-disabled .calendar-time-availability {
+    color: var(--calendar-time-disabled-meta-fg, color-mix(in oklab, var(--foreground) 84%, transparent)) !important;
+  }
+  .calendar-time-disabled .icon-md-spotlight,
+  .calendar-time-disabled .calendar-seats {
+    color: var(--calendar-time-disabled-meta-fg, color-mix(in oklab, var(--foreground) 84%, transparent)) !important;
+  }
+  .calendar-time-disabled .calendar-soldout {
+    color: var(--calendar-soldout-color, color-mix(in oklab, var(--foreground) 84%, transparent)) !important;
+    font-weight: var(--calendar-soldout-weight, 700);
+  }
+  .dark .calendar-time-disabled .calendar-soldout {
+    color: var(--calendar-soldout-color-dark, var(--calendar-soldout-color, color-mix(in oklab, var(--foreground) 84%, transparent))) !important;
+  }
+  .calendar-time-btn.calendar-time-enabled:hover .calendar-time-type,
+  .calendar-time-btn.calendar-time-enabled:hover .calendar-time-value,
+  .calendar-time-btn.calendar-time-enabled:hover .calendar-seats,
+  .calendar-time-btn.calendar-time-enabled:hover .calendar-time-availability,
+  .calendar-time-btn.calendar-time-enabled:hover .calendar-available {
+    color: var(--foreground);
+  }
+  .dark .calendar-time-btn.calendar-time-enabled:hover .calendar-time-type,
+  .dark .calendar-time-btn.calendar-time-enabled:hover .calendar-time-value,
+  .dark .calendar-time-btn.calendar-time-enabled:hover .calendar-seats,
+  .dark .calendar-time-btn.calendar-time-enabled:hover .calendar-time-availability,
+  .dark .calendar-time-btn.calendar-time-enabled:hover .calendar-available {
+    color: var(--foreground);
+  }
 
   .seating-root { @apply relative space-y-6; }
   .seating-stage-wrap { @apply text-center; }
@@ -347,15 +779,24 @@
   .seating-seat-selected {
     @apply bg-velvet text-white ring-2 ring-velvet cursor-pointer scale-[1.03];
     box-shadow:
-      0 0 0 2px color-mix(in oklab, var(--velvet) 55%, transparent),
-      0 0 12px color-mix(in oklab, var(--velvet) 70%, transparent),
-      inset 0 0 0 1px color-mix(in oklab, white 35%, transparent);
-    transform: scale(1.03) !important;
-    filter: saturate(1.08);
+      0 0 0 2px var(--seating-selected-ring, color-mix(in oklab, var(--velvet) 55%, transparent)),
+      0 0 12px var(--seating-selected-glow, color-mix(in oklab, var(--velvet) 70%, transparent)),
+      inset 0 0 0 1px var(--seating-selected-inset, color-mix(in oklab, white 35%, transparent));
+    transform: scale(var(--seating-selected-scale, 1.03)) !important;
+    filter: var(--seating-selected-filter, saturate(1.08));
   }
   .seating-seat-suggested { @apply ring-2 ring-emerald-400/90 ring-offset-1 ring-offset-background; }
-  .seating-seat-focused { @apply ring-2 ring-white ring-offset-2 ring-offset-spotlight; }
-  .seating-seat-btn:focus-visible { @apply ring-2 ring-foreground ring-offset-2 ring-offset-background; }
+  .seating-seat-focused {
+    @apply ring-2 ring-offset-2;
+    box-shadow: 0 0 0 1px var(--seating-focused-shadow, color-mix(in oklab, var(--spotlight) 35%, transparent));
+    --tw-ring-color: var(--seating-focused-ring, #ffffff);
+    --tw-ring-offset-color: var(--seating-focused-offset, var(--spotlight));
+  }
+  .seating-seat-btn:focus-visible {
+    @apply ring-2 ring-offset-2;
+    --tw-ring-color: var(--seating-focus-ring, var(--foreground));
+    --tw-ring-offset-color: var(--seating-focus-offset, var(--background));
+  }
   .seating-accessible-icon { @apply w-4 h-4 absolute inset-0 m-auto text-white; }
   .seating-seat-symbol { @apply absolute inset-0 grid place-items-center text-[10px] font-bold text-white; }
   .seating-seat-vip .seating-seat-symbol { @apply text-stage-base; }
@@ -372,18 +813,34 @@
   .seating-legend { @apply flex items-center justify-center gap-6 pt-4 border-t border-spotlight/20; }
   .seating-legend-item { @apply flex items-center gap-2; }
   .seating-legend-dot { @apply w-4 h-4 rounded; }
+  .seating-legend-dot-indicated { @apply grid place-items-center; }
+  .seating-legend-dot-symbol {
+    @apply text-[10px] leading-none font-bold text-white;
+  }
+  .seating-legend-dot-symbol-vip { @apply text-stage-base; }
+  .seating-legend-dot-accessible { @apply relative grid place-items-center; }
+  .seating-legend-accessible-icon { @apply w-3 h-3 text-white; }
   .seating-legend-label { @apply text-sm; }
   .seating-controls { @apply flex flex-wrap items-center justify-center gap-3; }
-  .seating-tools-btn { @apply inline-flex items-center justify-center gap-1 rounded-full border border-border bg-card px-3 py-1.5 text-xs; }
+  .seating-tools-btn {
+    @apply inline-flex items-center justify-center gap-1 rounded-full px-3 py-1.5 text-xs;
+    color: var(--seating-control-fg, var(--foreground));
+    background: var(--seating-control-bg, color-mix(in oklab, var(--foreground) 8%, var(--card) 92%));
+    border: 1px solid var(--seating-control-border, color-mix(in oklab, var(--foreground) 24%, transparent));
+  }
+  .seating-tools-btn:hover {
+    background: var(--seating-control-hover-bg, color-mix(in oklab, var(--foreground) 14%, var(--card) 86%));
+    color: var(--seating-control-hover-fg, var(--seating-control-fg, var(--foreground)));
+  }
   .seating-tools-btn-desktop { @apply inline-flex; }
   .seating-tools-btn-mobile { @apply hidden; }
   .seating-tools-btn-on { @apply border-spotlight/70 bg-spotlight/20 text-spotlight; }
   .seating-ticket-count-label { @apply inline-flex items-center gap-2 text-sm; }
   .seating-ticket-count-select {
     @apply rounded-md px-2 py-1 text-sm;
-    color: var(--foreground);
-    background: color-mix(in oklab, var(--foreground) 8%, var(--card) 92%);
-    border: 1px solid color-mix(in oklab, var(--foreground) 24%, transparent);
+    color: var(--seating-control-fg, var(--foreground));
+    background: var(--seating-control-bg, color-mix(in oklab, var(--foreground) 8%, var(--card) 92%));
+    border: 1px solid var(--seating-control-border, color-mix(in oklab, var(--foreground) 24%, transparent));
     color-scheme: light;
   }
   .seating-ticket-count-select option {
@@ -395,57 +852,63 @@
   }
   .seating-suggest-btn {
     @apply px-3 py-1.5 rounded-md text-sm min-h-[40px] inline-flex items-center justify-center;
-    color: var(--foreground);
-    background: color-mix(in oklab, var(--spotlight) 20%, var(--card) 80%);
-    border: 1px solid color-mix(in oklab, var(--spotlight) 50%, transparent);
+    color: var(--seating-accent-fg, var(--foreground));
+    background: var(--seating-accent-bg, color-mix(in oklab, var(--spotlight) 20%, var(--card) 80%));
+    border: 1px solid var(--seating-accent-border, color-mix(in oklab, var(--spotlight) 50%, transparent));
   }
   .seating-suggest-btn:hover {
-    background: color-mix(in oklab, var(--spotlight) 30%, var(--card) 70%);
+    background: var(--seating-accent-hover-bg, color-mix(in oklab, var(--spotlight) 30%, var(--card) 70%));
+    color: var(--seating-accent-hover-fg, var(--seating-accent-fg, var(--foreground)));
   }
   .seating-tooltip { @apply fixed z-50 rounded-md border border-border bg-card/95 px-2 py-1 text-xs shadow-lg pointer-events-none; }
   .seating-debug-toggle {
     @apply inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs;
-    color: var(--foreground);
-    background: color-mix(in oklab, var(--foreground) 8%, var(--card) 92%);
-    border: 1px solid color-mix(in oklab, var(--foreground) 24%, transparent);
+    color: var(--seating-control-fg, var(--foreground));
+    background: var(--seating-control-bg, color-mix(in oklab, var(--foreground) 8%, var(--card) 92%));
+    border: 1px solid var(--seating-control-border, color-mix(in oklab, var(--foreground) 24%, transparent));
   }
   .seating-debug-toggle-on { @apply border-spotlight/70 bg-spotlight/20 text-spotlight; }
   .seating-tools-sidebar {
     @apply absolute right-2 sm:right-4 top-14 z-40 w-[min(92vw,360px)] rounded-lg border border-border p-3 space-y-3 shadow-2xl transition-all duration-300 ease-out transform-gpu origin-top-right;
-    color: var(--foreground);
-    background: color-mix(in oklab, var(--card) 82%, var(--foreground) 18%);
-    border-color: color-mix(in oklab, var(--foreground) 26%, transparent);
+    color: var(--seating-panel-fg, var(--foreground));
+    background: var(--seating-panel-bg, color-mix(in oklab, var(--card) 82%, var(--foreground) 18%));
+    border-color: var(--seating-panel-border, color-mix(in oklab, var(--foreground) 26%, transparent));
   }
   .seating-tools-sidebar-open { @apply opacity-100 translate-x-0 pointer-events-auto; }
   .seating-tools-sidebar-closed { @apply opacity-0 translate-x-6 pointer-events-none; }
   .seating-tools-header { @apply flex items-center justify-between gap-2; }
   .seating-tools-actions { @apply flex items-center gap-2; }
-  .seating-tools-title { @apply text-sm font-medium text-spotlight; }
-  .seating-tools-subtitle { @apply text-xs font-medium text-foreground/80; }
+  .seating-tools-title { @apply text-sm font-medium; color: var(--seating-panel-title-fg, var(--spotlight)); }
+  .seating-tools-subtitle { @apply text-xs font-medium; color: var(--seating-panel-subtitle-fg, color-mix(in oklab, var(--foreground) 80%, transparent)); }
   .seating-tools-hint { @apply text-xs text-muted-foreground; }
   .seating-assignment-tools {
     @apply mt-1 rounded-md border border-border p-2 space-y-2;
-    background: color-mix(in oklab, var(--card) 88%, var(--foreground) 12%);
-    border-color: color-mix(in oklab, var(--foreground) 22%, transparent);
+    background: var(--seating-subpanel-bg, color-mix(in oklab, var(--card) 88%, var(--foreground) 12%));
+    border-color: var(--seating-subpanel-border, color-mix(in oklab, var(--foreground) 22%, transparent));
   }
   .seating-tools-selected-list {
     @apply rounded-md px-2 py-1 text-xs text-muted-foreground;
-    background: color-mix(in oklab, var(--card) 90%, var(--foreground) 10%);
+    background: var(--seating-subpanel-list-bg, color-mix(in oklab, var(--card) 90%, var(--foreground) 10%));
   }
   .seating-tools-close {
     @apply inline-flex items-center justify-center rounded-full px-2 py-1;
-    color: var(--foreground);
-    background: color-mix(in oklab, var(--foreground) 8%, var(--card) 92%);
-    border: 1px solid color-mix(in oklab, var(--foreground) 24%, transparent);
+    color: var(--seating-control-fg, var(--foreground));
+    background: var(--seating-control-bg, color-mix(in oklab, var(--foreground) 8%, var(--card) 92%));
+    border: 1px solid var(--seating-control-border, color-mix(in oklab, var(--foreground) 24%, transparent));
+  }
+  .seating-tools-close:hover {
+    background: var(--seating-control-hover-bg, color-mix(in oklab, var(--foreground) 14%, var(--card) 86%));
+    color: var(--seating-control-hover-fg, var(--seating-control-fg, var(--foreground)));
   }
   .seating-reset-btn {
     @apply inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm min-h-[40px];
-    color: var(--foreground);
-    background: color-mix(in oklab, var(--foreground) 8%, var(--card) 92%);
-    border: 1px solid color-mix(in oklab, var(--foreground) 24%, transparent);
+    color: var(--seating-control-fg, var(--foreground));
+    background: var(--seating-control-bg, color-mix(in oklab, var(--foreground) 8%, var(--card) 92%));
+    border: 1px solid var(--seating-control-border, color-mix(in oklab, var(--foreground) 24%, transparent));
   }
   .seating-reset-btn:hover {
-    background: color-mix(in oklab, var(--foreground) 14%, var(--card) 86%);
+    background: var(--seating-control-hover-bg, color-mix(in oklab, var(--foreground) 14%, var(--card) 86%));
+    color: var(--seating-control-hover-fg, var(--seating-control-fg, var(--foreground)));
   }
 
   @media (max-width: 1024px) {
@@ -472,6 +935,26 @@
     .segment-btn { @apply w-full text-sm px-2 py-2; }
 
     .component-panel { @apply p-4; }
+    .booking-progress-root { @apply py-2; }
+    .booking-step-meta { display: none; }
+    .booking-step-item-current .booking-step-meta { @apply block mt-2 max-w-20; }
+    .booking-step-item-current .booking-step-title {
+      @apply text-xs;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+    .booking-step-desc { display: none; }
+    .app-main-booking .booking-step-calendar .calendar-layout { @apply gap-3; }
+    .app-main-booking .booking-step-calendar .calendar-head { @apply gap-2; }
+    .app-main-booking .booking-step-calendar .calendar-title { @apply text-base; }
+    .app-main-booking .booking-step-calendar .calendar-nav { @apply gap-1.5; }
+    .app-main-booking .booking-step-calendar .calendar-root .calendar-nav-btn {
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+    .app-main-booking .booking-step-calendar .calendar-week-grid { @apply gap-1; }
+    .app-main-booking .booking-step-calendar .calendar-root .calendar-day-btn { height: 2.1rem; }
+    .app-main-booking .booking-step-calendar .calendar-weekday { @apply text-[11px] py-0.5; }
     .seating-row-seats { @apply gap-1.5; }
     .seating-row-label { @apply w-6 text-xs; }
     .seating-seat-btn { @apply w-7 h-7; }
@@ -481,13 +964,13 @@
   .seating-tools-grid { @apply grid gap-2; }
   .seating-debug-panel {
     @apply max-h-[32vh] w-full overflow-auto rounded-lg border border-border p-3 text-xs;
-    color: var(--foreground);
-    background: color-mix(in oklab, var(--card) 90%, var(--foreground) 10%);
-    border-color: color-mix(in oklab, var(--foreground) 22%, transparent);
+    color: var(--seating-panel-fg, var(--foreground));
+    background: var(--seating-subpanel-bg, color-mix(in oklab, var(--card) 90%, var(--foreground) 10%));
+    border-color: var(--seating-subpanel-border, color-mix(in oklab, var(--foreground) 22%, transparent));
   }
   .seating-summary { @apply p-4 bg-card rounded-lg border border-border; }
   .seating-summary-row { @apply flex items-center justify-between gap-4; }
-  .seating-summary-label { @apply text-sm text-foreground/80; }
+  .seating-summary-label { @apply text-sm; color: var(--seating-panel-subtitle-fg, color-mix(in oklab, var(--foreground) 80%, transparent)); }
   .seating-summary-tags { @apply flex flex-wrap gap-2 mt-1 text-sm text-foreground; }
   .seating-seat-tag { @apply px-0 py-0 bg-transparent text-inherit border-0 rounded-none; }
   .seating-seat-tag::after { content: ","; margin-left: 0.15rem; opacity: 0.7; }
@@ -496,13 +979,14 @@
   .seating-total-value { @apply text-2xl text-primary font-semibold leading-none mt-1; }
   .seating-assign-btn {
     @apply px-3 py-1.5 rounded-md text-sm disabled:cursor-not-allowed;
-    color: var(--foreground);
-    background: color-mix(in oklab, var(--spotlight) 30%, var(--card) 70%);
-    border: 1px solid color-mix(in oklab, var(--spotlight) 60%, transparent);
-    box-shadow: 0 0 0 1px color-mix(in oklab, var(--spotlight) 30%, transparent);
+    color: var(--seating-accent-fg, var(--foreground));
+    background: var(--seating-accent-bg, color-mix(in oklab, var(--spotlight) 30%, var(--card) 70%));
+    border: 1px solid var(--seating-accent-border, color-mix(in oklab, var(--spotlight) 60%, transparent));
+    box-shadow: 0 0 0 1px var(--seating-accent-shadow, color-mix(in oklab, var(--spotlight) 30%, transparent));
   }
   .seating-assign-btn:hover {
-    background: color-mix(in oklab, var(--spotlight) 40%, var(--card) 60%);
+    background: var(--seating-accent-hover-bg, color-mix(in oklab, var(--spotlight) 40%, var(--card) 60%));
+    color: var(--seating-accent-hover-fg, var(--seating-accent-fg, var(--foreground)));
   }
   .seating-assign-btn-disabled {
     color: color-mix(in oklab, var(--foreground) 55%, transparent);
@@ -524,11 +1008,11 @@
   .show-card-body { @apply p-4 space-y-3; }
   .show-card-title { @apply text-lg line-clamp-2; font-family: var(--font-display); }
   .show-card-meta { @apply space-y-2 text-sm text-foreground/80; }
-  .show-card-meta-row { @apply flex items-center gap-2; }
+  .show-card-meta-row { @apply flex items-center gap-2; line-height: 1.25; }
   .show-card-meta-primary { @apply gap-3; }
-  .show-card-meta-value { @apply leading-none font-medium text-foreground/85; }
+  .show-card-meta-value { @apply font-medium text-foreground/85; line-height: 1.25; padding-bottom: 1px; }
   .show-card-meta-divider { @apply h-4 w-px bg-border/70; }
-  .show-card-stack { @apply font-mono text-foreground/80; }
+  .show-card-stack { @apply font-mono text-foreground/80; line-height: 1.3; padding-bottom: 1px; }
   .show-card-icon-sm { @apply w-4 h-4 text-spotlight; }
   .show-card-footer { @apply pt-3 border-t border-border space-y-3; }
   .show-card-impact { @apply space-y-1; }
@@ -767,7 +1251,69 @@
   .script-modal-wrap { @apply fixed inset-0 z-50 flex items-start justify-center pt-[8vh] px-4; }
   .script-modal-backdrop { @apply absolute inset-0 bg-stage-base/90 backdrop-blur-sm; }
   .script-modal-panel { @apply relative w-full max-w-5xl bg-stage-depth rounded-xl shadow-2xl overflow-hidden border border-spotlight/20; }
-  .script-modal-header { @apply flex items-center justify-between border-b border-spotlight/20 p-4; }
+  .script-modal-header {
+    @apply flex items-center justify-between border-b border-spotlight/20 p-4;
+    background: var(--script-modal-header-bg);
+    color: var(--script-modal-header-fg);
+  }
+  .script-modal-panel .script-modal-title {
+    color: var(--script-modal-header-fg) !important;
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    background-clip: initial !important;
+    -webkit-text-fill-color: currentColor !important;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.18) !important;
+    opacity: 1 !important;
+  }
+  .script-modal-panel .script-modal-close-btn {
+    @apply inline-flex items-center justify-center rounded-lg;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    border-radius: var(--radius);
+    background: var(--script-modal-close-bg, color-mix(in oklab, var(--script-modal-header-bg) 72%, var(--script-modal-header-fg) 28%)) !important;
+    color: var(--script-modal-close-fg, var(--script-modal-header-fg)) !important;
+    border: 1px solid var(--script-modal-close-border, color-mix(in oklab, var(--script-modal-header-fg) 42%, transparent)) !important;
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--script-modal-header-fg) 18%, transparent);
+    transform: none;
+    filter: none;
+    overflow: visible;
+  }
+  .script-modal-panel .script-modal-close-btn:hover {
+    background: var(--script-modal-close-hover-bg, color-mix(in oklab, var(--script-modal-header-fg) 22%, var(--script-modal-header-bg) 78%)) !important;
+    color: var(--script-modal-close-hover-fg, var(--script-modal-close-fg, var(--script-modal-header-fg))) !important;
+    border-color: var(--script-modal-close-hover-border, color-mix(in oklab, var(--script-modal-header-fg) 56%, transparent)) !important;
+  }
+  .script-modal-panel .script-modal-close-btn:hover .script-modal-close-glyph {
+    color: var(--script-modal-close-hover-fg, var(--script-modal-close-fg, var(--script-modal-header-fg))) !important;
+  }
+  .script-modal-panel .script-modal-close-btn:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  .script-modal-panel .script-modal-close-icon {
+    color: currentColor !important;
+    stroke: currentColor !important;
+    stroke-width: 2.75 !important;
+    opacity: 1 !important;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+  }
+  .script-modal-panel .script-modal-close-glyph {
+    position: absolute;
+    font-size: 1.55rem;
+    line-height: 1;
+    font-weight: 700;
+    color: var(--script-modal-close-fg, var(--script-modal-header-fg)) !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    opacity: 1 !important;
+    pointer-events: none;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
   .script-modal-content { @apply h-[70vh] bg-card; }
   .script-resume-frame { @apply w-full h-full; }
   .script-modal-footer { @apply flex justify-end border-t border-spotlight/20 p-4 bg-stage-depth; }
@@ -783,14 +1329,14 @@
   .booking-step-desc,
   .show-card-meta,
   .show-card-price-label {
-    color: color-mix(in oklab, var(--foreground) 86%, transparent);
+    color: var(--text-muted-aa);
   }
 
   .show-card-meta-value,
   .show-card-stack,
   .calendar-weekday,
   .calendar-time-type {
-    color: color-mix(in oklab, var(--foreground) 92%, transparent);
+    color: var(--text-subtle-aa);
   }
 
   .theater-icon-btn:focus-visible,

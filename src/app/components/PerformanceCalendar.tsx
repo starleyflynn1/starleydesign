@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Sun, Moon } from 'lucide-react';
 
 interface Performance {
@@ -9,11 +9,36 @@ interface Performance {
 interface PerformanceCalendarProps {
   performances: Performance[];
   onSelectPerformance?: (date: Date, time: string, type: 'matinee' | 'evening') => void;
+  interactionHint?: string;
+  initialSelectedDate?: Date | null;
 }
 
-export function PerformanceCalendar({ performances, onSelectPerformance }: PerformanceCalendarProps) {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+export function PerformanceCalendar({
+  performances,
+  onSelectPerformance,
+  interactionHint,
+  initialSelectedDate,
+}: PerformanceCalendarProps) {
+  const [currentMonth, setCurrentMonth] = useState<Date>(
+    initialSelectedDate ? new Date(initialSelectedDate) : new Date()
+  );
+  const [selectedDate, setSelectedDate] = useState<Date | null>(initialSelectedDate ?? null);
+  const [selectedTimeKey, setSelectedTimeKey] = useState<string | null>(null);
+
+  const firstAvailableDate = useMemo(() => {
+    if (performances.length === 0) return null;
+    return [...performances]
+      .map((performance) => performance.date)
+      .sort((a, b) => a.getTime() - b.getTime())[0];
+  }, [performances]);
+
+  useEffect(() => {
+    const nextDate = initialSelectedDate ?? firstAvailableDate;
+    if (!nextDate) return;
+    setCurrentMonth(new Date(nextDate));
+    setSelectedDate(new Date(nextDate));
+    setSelectedTimeKey(null);
+  }, [firstAvailableDate, initialSelectedDate]);
 
   const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
@@ -66,13 +91,16 @@ export function PerformanceCalendar({ performances, onSelectPerformance }: Perfo
         disabled={isPast || !hasShow}
         className={`calendar-day-btn ${
           isPast
-            ? 'calendar-day-past'
+            ? 'calendar-day-unavailable'
             : isSelected
             ? 'calendar-day-selected'
             : hasShow
             ? 'calendar-day-available'
             : 'calendar-day-unavailable'
         } ${isToday && !isSelected ? 'calendar-day-today' : ''}`}
+        onMouseDown={() => {
+          if (hasShow && !isPast) setSelectedTimeKey(null);
+        }}
       >
         <span className="calendar-day-number">{day}</span>
         {hasShow && !isPast && (
@@ -98,6 +126,11 @@ export function PerformanceCalendar({ performances, onSelectPerformance }: Perfo
   ];
 
   const selectedPerformance = selectedDate ? getPerformancesForDate(selectedDate) : null;
+  const defaultHint = "Navigation: Entering Backstage for 'Calendar & Date Schema' technical specs.";
+  const timeSelectionHint = interactionHint ?? defaultHint;
+
+  const buildTimeKey = (date: Date, time: string, type: 'matinee' | 'evening') =>
+    `${date.toDateString()}-${time}-${type}`;
 
   return (
     <div className="calendar-root">
@@ -143,17 +176,27 @@ export function PerformanceCalendar({ performances, onSelectPerformance }: Perfo
               </div>
 
               <div className="calendar-times">
-                {selectedPerformance.times.map((performance) => (
+                {selectedPerformance.times.map((performance) => {
+                  const timeKey = buildTimeKey(selectedDate!, performance.time, performance.type);
+                  const isTimeSelected = selectedTimeKey === timeKey;
+                  return (
                   <button
                     key={performance.time}
-                    onClick={() =>
-                      onSelectPerformance?.(selectedDate!, performance.time, performance.type)
-                    }
+                    onClick={() => {
+                      setSelectedTimeKey(timeKey);
+                      onSelectPerformance?.(selectedDate!, performance.time, performance.type);
+                    }}
                     disabled={performance.available === 0}
+                    title={timeSelectionHint}
+                    aria-label={`${performance.type} ${performance.time}. ${timeSelectionHint}`}
                     className={`calendar-time-btn ${
                       performance.available === 0
                         ? 'calendar-time-disabled'
                         : 'calendar-time-enabled'
+                    } ${
+                      isTimeSelected
+                        ? 'calendar-time-selected'
+                        : ''
                     }`}
                   >
                     <div className="calendar-time-row">
@@ -172,8 +215,13 @@ export function PerformanceCalendar({ performances, onSelectPerformance }: Perfo
                       <div className="calendar-time-availability">
                         {performance.available > 0 ? (
                           <>
+                            {isTimeSelected && (
+                              <div className="calendar-time-selected-badge">Selected</div>
+                            )}
                             <div className="calendar-seats">{performance.available} seats</div>
-                            <div className="calendar-available">Available</div>
+                            <div className="calendar-available">
+                              {performance.available <= 8 ? 'Nearly Sold Out' : 'Available'}
+                            </div>
                           </>
                         ) : (
                           <div className="calendar-soldout">Sold Out</div>
@@ -181,7 +229,7 @@ export function PerformanceCalendar({ performances, onSelectPerformance }: Perfo
                       </div>
                     </div>
                   </button>
-                ))}
+                )})}
               </div>
             </>
           ) : (

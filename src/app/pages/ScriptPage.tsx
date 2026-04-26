@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Download, FileText, X } from 'lucide-react';
+import { Download, FileText } from 'lucide-react';
 
 interface ScriptPageProps {
   resumeUrl: string;
@@ -51,13 +51,13 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="script-modal-header">
-                <h3 className="section-title">Resume Preview</h3>
+                <h3 className="section-title script-modal-title">Resume Preview</h3>
                 <button
                   onClick={() => setIsResumeOpen(false)}
-                  className="theater-icon-btn"
+                  className="script-modal-close-btn"
                   aria-label="Close resume preview"
                 >
-                  <X className="w-5 h-5" />
+                  <span aria-hidden="true" className="script-modal-close-glyph">×</span>
                 </button>
               </div>
 

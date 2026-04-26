@@ -20,6 +20,39 @@
   --segment-active-fg: #ffffff;
   --border: rgba(219, 39, 119, 0.2);
   --card: var(--glass-white);
+  --picker-hover-bg: color-mix(in oklab, var(--primary) 22%, var(--card) 78%);
+  --picker-hover-fg: #f8fafc;
+  --picker-hover-muted: color-mix(in oklab, #f8fafc 82%, transparent);
+  --seating-panel-bg: color-mix(in oklab, var(--background) 94%, black 6%);
+  --seating-panel-border: color-mix(in oklab, var(--primary) 35%, var(--border) 65%);
+  --seating-panel-fg: var(--foreground);
+  --seating-subpanel-bg: color-mix(in oklab, var(--background) 94%, black 6%);
+  --seating-subpanel-border: color-mix(in oklab, var(--primary) 35%, var(--border) 65%);
+  --seating-subpanel-list-bg: color-mix(in oklab, var(--background) 94%, black 6%);
+  --seating-panel-title-fg: color-mix(in oklab, var(--foreground) 88%, white 12%);
+  --seating-panel-subtitle-fg: color-mix(in oklab, var(--foreground) 88%, white 12%);
+  --seating-control-bg: color-mix(in oklab, var(--background) 88%, black 12%);
+  --seating-control-border: color-mix(in oklab, var(--primary) 38%, var(--border) 62%);
+  --seating-control-fg: var(--foreground);
+  --seating-control-hover-bg: color-mix(in oklab, var(--primary) 28%, var(--background) 72%);
+  --seating-control-hover-fg: #ffffff;
+  --seating-accent-bg: color-mix(in oklab, var(--background) 88%, black 12%);
+  --seating-accent-border: color-mix(in oklab, var(--primary) 38%, var(--border) 62%);
+  --seating-accent-fg: var(--foreground);
+  --seating-accent-hover-bg: color-mix(in oklab, var(--primary) 28%, var(--background) 72%);
+  --seating-accent-hover-fg: #ffffff;
+  --btn-disabled-bg: color-mix(in oklab, var(--background) 86%, #4b5563 14%);
+  --btn-disabled-border: color-mix(in oklab, var(--primary) 22%, #6b7280 78%);
+  --btn-disabled-fg: color-mix(in oklab, var(--foreground) 82%, #111827 18%);
+  --script-modal-header-bg: color-mix(in oklab, #2a1030 88%, #111827 12%);
+  --script-modal-header-fg: #fdeaf6;
+  --script-modal-title-fg: #2a1030;
+  --script-modal-close-bg: color-mix(in oklab, #ffffff 86%, #db2777 14%);
+  --script-modal-close-fg: #2a1030;
+  --script-modal-close-border: color-mix(in oklab, #db2777 30%, #6b7280 70%);
+  --script-modal-close-hover-bg: color-mix(in oklab, #db2777 18%, #ffffff 82%);
+  --script-modal-close-hover-fg: #1b1025;
+  --script-modal-close-hover-border: color-mix(in oklab, #db2777 48%, #6b7280 52%);
 
   /* --- Global Physics --- */
   font-family: 'Space Grotesk', sans-serif;
@@ -32,11 +65,44 @@
    ============================================================ */
 .dark.theme-neon {
   --background: #020203; /* Deep OLED black */
-  --foreground: #ffffff;
+  --foreground: #d9e0ea; /* Misty off-white for reduced glare */
   --primary: #ff007f;
   --secondary: #00f2ff;
   --segment-active-bg: var(--primary);
   --segment-active-fg: #ffffff;
+  --picker-hover-bg: color-mix(in oklab, var(--primary) 28%, var(--card) 72%);
+  --picker-hover-fg: #f8fafc;
+  --picker-hover-muted: color-mix(in oklab, #f8fafc 82%, transparent);
+  --seating-panel-bg: color-mix(in oklab, var(--background) 94%, black 6%);
+  --seating-panel-border: color-mix(in oklab, var(--primary) 35%, var(--border) 65%);
+  --seating-panel-fg: var(--foreground);
+  --seating-subpanel-bg: color-mix(in oklab, var(--background) 94%, black 6%);
+  --seating-subpanel-border: color-mix(in oklab, var(--primary) 35%, var(--border) 65%);
+  --seating-subpanel-list-bg: color-mix(in oklab, var(--background) 94%, black 6%);
+  --seating-panel-title-fg: color-mix(in oklab, var(--foreground) 88%, white 12%);
+  --seating-panel-subtitle-fg: color-mix(in oklab, var(--foreground) 88%, white 12%);
+  --seating-control-bg: color-mix(in oklab, var(--background) 88%, black 12%);
+  --seating-control-border: color-mix(in oklab, var(--primary) 38%, var(--border) 62%);
+  --seating-control-fg: var(--foreground);
+  --seating-control-hover-bg: color-mix(in oklab, var(--primary) 28%, var(--background) 72%);
+  --seating-control-hover-fg: #ffffff;
+  --seating-accent-bg: color-mix(in oklab, var(--background) 88%, black 12%);
+  --seating-accent-border: color-mix(in oklab, var(--primary) 38%, var(--border) 62%);
+  --seating-accent-fg: var(--foreground);
+  --seating-accent-hover-bg: color-mix(in oklab, var(--primary) 28%, var(--background) 72%);
+  --seating-accent-hover-fg: #ffffff;
+  --btn-disabled-bg: color-mix(in oklab, #12131c 80%, #d9e0ea 20%);
+  --btn-disabled-border: color-mix(in oklab, #d9e0ea 30%, transparent);
+  --btn-disabled-fg: color-mix(in oklab, #d9e0ea 90%, transparent);
+  --script-modal-header-bg: #140a1b;
+  --script-modal-header-fg: #fce7f3;
+  --script-modal-title-fg: #fce7f3;
+  --script-modal-close-bg: color-mix(in oklab, #1c1125 78%, #ff007f 22%);
+  --script-modal-close-fg: #fce7f3;
+  --script-modal-close-border: color-mix(in oklab, #ff7ac2 36%, transparent);
+  --script-modal-close-hover-bg: color-mix(in oklab, #ff007f 28%, #1c1125 72%);
+  --script-modal-close-hover-fg: #ffffff;
+  --script-modal-close-hover-border: color-mix(in oklab, #ff7ac2 58%, transparent);
   
   --card: rgba(20, 20, 28, 0.9);
   --border: rgba(255, 0, 127, 0.3);
@@ -136,6 +202,22 @@
   box-shadow: 0 4px 15px rgba(0, 242, 255, 0.3);
 }
 
+/* Stage shortcut readability: keep neon feel, increase text contrast. */
+.theme-neon .hero-shortcut {
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--primary) 70%, black 30%),
+    color-mix(in oklab, var(--secondary) 70%, black 30%)
+  );
+  color: #f8fbff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.theme-neon .hero-shortcut .spotlight-text {
+  color: color-mix(in oklab, #ffb800 74%, #fff 26%);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
 /* --- Card --- */
 .theme-neon .card {
   border: 1px solid var(--border);
@@ -159,6 +241,28 @@
 .dark.theme-neon .show-card-btn:hover {
   background: color-mix(in oklab, var(--primary) 28%, black 72%);
   color: #ffffff;
+}
+
+/* Calendar selected state clarity in neon (light + dark). */
+.theme-neon .calendar-day-selected {
+  background: color-mix(in oklab, var(--primary) 82%, var(--background) 18%) !important;
+  color: #ffffff !important;
+  border: 2px solid color-mix(in oklab, var(--secondary) 54%, white 46%) !important;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--secondary) 32%, transparent),
+    0 0 14px color-mix(in oklab, var(--primary) 42%, transparent);
+}
+
+.theme-neon .calendar-day-selected .calendar-day-number {
+  color: #ffffff !important;
+}
+
+.dark.theme-neon .calendar-day-selected {
+  background: color-mix(in oklab, var(--primary) 72%, #0a0a12 28%) !important;
+  border: 2px solid color-mix(in oklab, var(--secondary) 62%, white 38%) !important;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--secondary) 38%, transparent),
+    0 0 16px color-mix(in oklab, var(--primary) 48%, transparent);
 }
 
 /* --- Global Usher: stronger dark-mode contrast --- */
@@ -220,38 +324,53 @@
   border: 1px solid color-mix(in oklab, var(--secondary) 52%, transparent);
 }
 
-/* --- Seating Tools readability --- */
-.theme-neon .seating-tools-sidebar,
-.theme-neon .seating-assignment-tools,
-.theme-neon .seating-debug-panel,
-.theme-neon .seating-tools-selected-list {
-  background: color-mix(in oklab, var(--background) 94%, black 6%);
-  border-color: color-mix(in oklab, var(--primary) 35%, var(--border) 65%);
-  color: var(--foreground);
+/* --- Backstage polish: subtle spotlight spill + premium panel edges --- */
+.theme-neon .backstage-page .component-panel {
+  position: relative;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--card), var(--card)) padding-box,
+    linear-gradient(
+      135deg,
+      color-mix(in oklab, var(--secondary) 20%, transparent),
+      color-mix(in oklab, var(--primary) 18%, transparent) 52%,
+      color-mix(in oklab, #ffb800 18%, transparent)
+    ) border-box;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--primary) 16%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--secondary) 10%, transparent);
 }
 
-.theme-neon .seating-tools-title,
-.theme-neon .seating-tools-subtitle,
-.theme-neon .seating-summary-label {
-  color: color-mix(in oklab, var(--foreground) 88%, white 12%);
+.theme-neon .backstage-page .component-panel::before,
+.theme-neon .backstage-page .component-panel::after {
+  content: "";
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  pointer-events: none;
+  border-radius: 9999px;
+  filter: blur(36px);
+  opacity: 0.12;
 }
 
-.theme-neon .seating-ticket-count-select,
-.theme-neon .seating-suggest-btn,
-.theme-neon .seating-reset-btn,
-.theme-neon .seating-assign-btn,
-.theme-neon .seating-debug-toggle,
-.theme-neon .seating-tools-close {
-  background: color-mix(in oklab, var(--background) 88%, black 12%);
-  color: var(--foreground);
-  border-color: color-mix(in oklab, var(--primary) 38%, var(--border) 62%);
+.theme-neon .backstage-page .component-panel::before {
+  top: -96px;
+  left: -88px;
+  background: radial-gradient(circle, color-mix(in oklab, var(--secondary) 45%, transparent) 0%, transparent 72%);
 }
 
-.theme-neon .seating-suggest-btn:hover,
-.theme-neon .seating-reset-btn:hover,
-.theme-neon .seating-assign-btn:hover,
-.theme-neon .seating-debug-toggle:hover,
-.theme-neon .seating-tools-close:hover {
-  background: color-mix(in oklab, var(--primary) 28%, var(--background) 72%);
-  color: #fff;
+.theme-neon .backstage-page .component-panel::after {
+  top: -88px;
+  right: -88px;
+  background: radial-gradient(circle, color-mix(in oklab, #ffb800 34%, transparent) 0%, transparent 72%);
+}
+
+/* Keep neon content readable in dark mode with misty off-white body copy. */
+.dark.theme-neon .backstage-page .hero-description,
+.dark.theme-neon .backstage-page .feature-copy {
+  color: #d9e0ea;
+}
+
+.dark.theme-neon .backstage-page .section-title {
+  color: color-mix(in oklab, #ffb800 70%, #f8fafc 30%);
 }

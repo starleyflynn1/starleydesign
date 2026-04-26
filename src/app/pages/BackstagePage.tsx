@@ -2,7 +2,14 @@ import React from 'react';
 
 export function BackstagePage() {
   return (
-    <main className="app-main">
+    <main className="app-main backstage-page">
+      <section className="component-panel section-stack">
+        <h2 className="section-title">Backstage</h2>
+        <p className="hero-description">
+          Technical Specifications &amp; Design System Architecture
+        </p>
+      </section>
+
       <section id="transactional-ux-data-schemas" className="component-panel section-stack">
         <h3 className="section-title">Transactional UX &amp; Data Schemas</h3>
         <p className="hero-description">
@@ -13,36 +20,42 @@ export function BackstagePage() {
           <article className="feature-item">
             <h4 className="spotlight-text">State Management</h4>
             <p className="feature-copy">
-              Designed with the intent to support a centralized store, the current implementation
-              uses React Context for global theming/motion state along with local component state
-              for state-intensive modules like seat selection (Available, Selected, VIP,
-              Accessible).
+              Global themes are managed via a centralized store, while localized interactions
+              (like hovers or selections) use custom synchronization hooks to ensure transient
+              states remain harmonized across the system.
+            </p>
+          </article>
+          <article id="recursive-component-logic" className="feature-item">
+            <h4 className="spotlight-text">Recursive &amp; Scalable Rendering</h4>
+            <p className="feature-copy">
+              The system employs recursive mapping and decoupled primitives to scale layouts
+              dynamically, allowing the same logic to handle everything from 7-column calendars to
+              complex, high-density seating grids.
             </p>
           </article>
           <article className="feature-item">
-            <h4 className="spotlight-text">Recursive Component Logic</h4>
+            <h4 className="spotlight-text">Modular Data Schema</h4>
             <p className="feature-copy">
-              The seating arrangement is rendered through a recursive mapping of the seat object
-              schema, allowing the grid to scale dynamically based on row and aisle configurations.
-              This decoupled approach ensures the UI remains performant even as the venue size or
-              seating density increases.
+              Seats and UI nodes are treated as modular objects containing metadata for
+              positioning, pricing, and accessibility, supported by an integrated debugger for
+              real-time JSON state introspection.
             </p>
           </article>
           <article className="feature-item">
-            <h4 className="spotlight-text">The Seat Object Schema</h4>
+            <h4 className="spotlight-text">Optimistic UI &amp; Resilience</h4>
             <p className="feature-copy">
-              Each seat is treated as a modular node containing metadata for coordinate
-              positioning, pricing tiers, and accessibility flags. Navigation to the tools section
-              of the seating chart allows for real-time introspection of the JSON state via the
-              integrated Debugger.
+              Designed for zero-latency, the interface reflects user actions instantaneously while
+              utilizing robust rollback semantics to handle potential asynchronous API conflicts or
+              reservation errors.
             </p>
           </article>
-          <article className="feature-item">
-            <h4 className="spotlight-text">Optimistic UI Patterns</h4>
+          <article id="scalable-venue-logic" className="feature-item">
+            <h4 className="spotlight-text">Scalable Venue Logic</h4>
             <p className="feature-copy">
-              Designed to support optimistic UI with rollback paths, the current codebase focuses on
-              immediate client-side interaction and can be extended with reservation APIs for
-              conflict detection and rollback semantics.
+              Venue modeling is structured to scale with configurable rows, seats-per-row, aisle
+              boundaries, and section types. This lets the same rendering primitives support
+              different venue footprints while preserving consistent interaction rules and
+              accessibility behavior.
             </p>
           </article>
         </div>
@@ -124,21 +137,21 @@ export function BackstagePage() {
             </p>
           </article>
           <article className="feature-item">
-            <h4 className="spotlight-text">Focus Management & Aria-Live</h4>
-            <p className="feature-copy">
-            To ensure a non-visual narrative of the 'Stage,' the system utilizes a strict focus-trap 
-            architecture for modals and palette interfaces. Dynamic seat selections trigger aria-live 
-            announcements, providing immediate feedback for screen reader users on inventory changes 
-            and seat status updates without requiring a manual page scan.
-            </p>
-          </article>
-          <article className="feature-item">
             <h4 className="spotlight-text">Low-Glare Optimization</h4>
             <p className="feature-copy">
               The Dark Mode implementation is specifically calibrated for low-light environments
               (like a dim theater). By reducing blue light emission and maintaining high-contrast
               ratios for text, the UI remains legible without being disruptive to the surrounding
               environment.
+            </p>
+          </article>
+          <article className="feature-item">
+            <h4 className="spotlight-text">Focus Management & Aria-Live</h4>
+            <p className="feature-copy">
+            To ensure a non-visual narrative of the 'Stage,' the system utilizes a strict focus-trap 
+            architecture for modals and palette interfaces. Dynamic seat selections trigger aria-live 
+            announcements, providing immediate feedback for screen reader users on inventory changes 
+            and seat status updates without requiring a manual page scan.
             </p>
           </article>
           <article className="feature-item">

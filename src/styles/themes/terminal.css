@@ -24,6 +24,23 @@
   --accent: var(--amber-warning);
   --border: #9ca3af;
   --ring: var(--matrix-green);
+  --picker-hover-bg: color-mix(in oklab, var(--spotlight) 26%, var(--card) 74%);
+  --picker-hover-fg: #053f30;
+  --picker-hover-muted: color-mix(in oklab, #053f30 84%, transparent);
+  --calendar-soldout-color: color-mix(in oklab, var(--amber-warning) 90%, #111827 10%);
+  --calendar-soldout-color-dark: color-mix(in oklab, var(--amber-warning) 92%, #f8fafc 8%);
+  --btn-disabled-bg: color-mix(in oklab, #e5e7eb 84%, #9ca3af 16%);
+  --btn-disabled-border: color-mix(in oklab, var(--matrix-green) 20%, #6b7280 80%);
+  --btn-disabled-fg: color-mix(in oklab, var(--matrix-green) 76%, #1f2937 24%);
+  --script-modal-header-bg: color-mix(in oklab, #1f2937 88%, #0f172a 12%);
+  --script-modal-header-fg: #ecfff5;
+  --script-modal-title-fg: #0f3f31;
+  --script-modal-close-bg: color-mix(in oklab, #f3f4f6 82%, #6b7280 18%);
+  --script-modal-close-fg: #064e3b;
+  --script-modal-close-border: color-mix(in oklab, #064e3b 28%, #6b7280 72%);
+  --script-modal-close-hover-bg: color-mix(in oklab, #065f46 18%, #f3f4f6 82%);
+  --script-modal-close-hover-fg: #053f30;
+  --script-modal-close-hover-border: color-mix(in oklab, #065f46 42%, #6b7280 58%);
 
   /* --- Global Theme Physics --- */
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
@@ -41,6 +58,9 @@
   --terminal-bg: #0a0c10;    /* The Void */
   --slate-dark: #161b22;
   --glitch-cyan: #00e5ff;
+  --picker-hover-bg: color-mix(in oklab, var(--foreground) 20%, var(--card) 80%);
+  --picker-hover-fg: var(--foreground);
+  --picker-hover-muted: color-mix(in oklab, var(--foreground) 84%, transparent);
 
   /* --- Core Semantic Tokens (Dark) --- */
   --background: var(--terminal-bg);
@@ -55,6 +75,18 @@
   --velvet: var(--amber-warning);
   --spotlight: var(--glitch-cyan);
   --border: #30363d;
+  --btn-disabled-bg: color-mix(in oklab, #15171c 74%, #00ff41 26%);
+  --btn-disabled-border: color-mix(in oklab, #00ff41 30%, transparent);
+  --btn-disabled-fg: color-mix(in oklab, #00ff41 88%, transparent);
+  --script-modal-header-bg: #0d1117;
+  --script-modal-header-fg: #b7ffd0;
+  --script-modal-title-fg: #8dffb3;
+  --script-modal-close-bg: color-mix(in oklab, #15171c 72%, #00ff41 28%);
+  --script-modal-close-fg: #d7ffe8;
+  --script-modal-close-border: color-mix(in oklab, #00ff41 38%, transparent);
+  --script-modal-close-hover-bg: color-mix(in oklab, #00ff41 32%, #15171c 68%);
+  --script-modal-close-hover-fg: #ffffff;
+  --script-modal-close-hover-border: color-mix(in oklab, #00ff41 60%, transparent);
 }
 
 /* ============================================================
@@ -128,6 +160,44 @@
   content: " _";
   animation: terminal-cursor-blink 1s steps(2, start) infinite;
 }
+
+/* Terminal calendar hover/readability isolation. */
+.theme-terminal .calendar-time-btn.calendar-time-enabled:hover {
+  background: color-mix(in oklab, var(--foreground) 12%, var(--background) 88%) !important;
+  border-color: color-mix(in oklab, var(--foreground) 70%, transparent) !important;
+  color: var(--foreground) !important;
+}
+
+.dark.theme-terminal .calendar-time-btn.calendar-time-enabled:hover {
+  background: color-mix(in oklab, var(--foreground) 14%, var(--background) 86%) !important;
+  border-color: color-mix(in oklab, var(--foreground) 58%, transparent) !important;
+}
+
+.theme-terminal .calendar-day-selected {
+  background: color-mix(in oklab, var(--glitch-cyan) 34%, var(--background) 66%) !important;
+  border: 2px solid color-mix(in oklab, var(--amber-warning) 92%, transparent) !important;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--amber-warning) 42%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--amber-warning) 28%, transparent);
+}
+
+.theme-terminal .calendar-day-selected .calendar-day-number {
+  color: var(--foreground) !important;
+  font-weight: 700;
+}
+
+.dark.theme-terminal .calendar-day-selected {
+  background: color-mix(in oklab, var(--glitch-cyan) 40%, var(--background) 60%) !important;
+  border: 2px solid color-mix(in oklab, var(--amber-warning) 94%, transparent) !important;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--amber-warning) 48%, transparent),
+    0 0 8px color-mix(in oklab, var(--amber-warning) 34%, transparent);
+}
+
+.dark.theme-terminal .calendar-day-selected .calendar-day-number {
+  color: #d9ffe2 !important;
+}
+
 
 .theme-terminal .show-card-meta {
   font-size: 0.8rem;

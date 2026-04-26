@@ -44,6 +44,29 @@
   --font-weight-medium: 500;
   --font-weight-normal: 400;
   --ring: var(--spotlight);
+  --picker-hover-bg: color-mix(in oklab, var(--spotlight) 22%, var(--card) 78%);
+  --picker-hover-fg: var(--foreground);
+  --picker-hover-muted: color-mix(in oklab, var(--foreground) 84%, transparent);
+  --seating-control-bg: color-mix(in oklab, var(--stage-base) 8%, var(--card) 92%);
+  --seating-control-border: color-mix(in oklab, var(--stage-base) 24%, transparent);
+  --seating-control-fg: var(--stage-base);
+  --seating-control-hover-bg: color-mix(in oklab, var(--stage-base) 14%, var(--card) 86%);
+  --seating-control-hover-fg: var(--stage-base);
+  --seating-accent-bg: color-mix(in oklab, var(--spotlight) 30%, var(--card) 70%);
+  --seating-accent-border: color-mix(in oklab, var(--spotlight) 60%, transparent);
+  --seating-accent-fg: var(--stage-base);
+  --seating-accent-hover-bg: color-mix(in oklab, var(--spotlight) 40%, var(--card) 60%);
+  --seating-accent-hover-fg: var(--stage-base);
+  --script-modal-title-fg: #1b1b28;
+  --script-modal-close-bg: color-mix(in oklab, var(--card) 86%, var(--background) 14%);
+  --script-modal-close-fg: #1b1b28;
+  --script-modal-close-border: color-mix(in oklab, var(--stage-base) 34%, transparent);
+  --script-modal-close-hover-bg: color-mix(in oklab, var(--spotlight) 18%, var(--card) 82%);
+  --script-modal-close-hover-fg: #111827;
+  --script-modal-close-hover-border: color-mix(in oklab, var(--spotlight) 56%, transparent);
+  --btn-disabled-bg: color-mix(in oklab, var(--card) 88%, var(--stage-base) 12%);
+  --btn-disabled-border: color-mix(in oklab, var(--stage-base) 26%, transparent);
+  --btn-disabled-fg: color-mix(in oklab, var(--stage-base) 78%, black 22%);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -73,23 +96,13 @@
    ============================================================ */
 .theme-stage .segment-btn,
 .theme-stage .btn-prev,
-.theme-stage .btn-next,
-.theme-stage .seating-suggest-btn,
-.theme-stage .seating-assign-btn,
-.theme-stage .seating-tools-btn,
-.theme-stage .seating-debug-toggle,
-.theme-stage .seating-reset-btn {
+.theme-stage .btn-next {
   border-color: color-mix(in oklab, var(--stage-base) 24%, transparent);
   color: var(--stage-base);
 }
 
 .theme-stage .segment-btn,
-.theme-stage .btn-prev,
-.theme-stage .seating-suggest-btn,
-.theme-stage .seating-assign-btn,
-.theme-stage .seating-tools-btn,
-.theme-stage .seating-debug-toggle,
-.theme-stage .seating-reset-btn {
+.theme-stage .btn-prev {
   background: color-mix(in oklab, var(--stage-base) 8%, var(--card) 92%);
 }
 
@@ -99,12 +112,7 @@
 }
 
 .theme-stage .segment-btn:hover,
-.theme-stage .btn-prev:hover,
-.theme-stage .seating-suggest-btn:hover,
-.theme-stage .seating-assign-btn:hover,
-.theme-stage .seating-tools-btn:hover,
-.theme-stage .seating-debug-toggle:hover,
-.theme-stage .seating-reset-btn:hover {
+.theme-stage .btn-prev:hover {
   background: color-mix(in oklab, var(--stage-base) 14%, var(--card) 86%);
 }
 
@@ -138,6 +146,19 @@
   --ring: var(--spotlight);
   --font-weight-medium: 500;
   --font-weight-normal: 400;
+  --picker-hover-bg: color-mix(in oklab, var(--spotlight) 28%, var(--card) 72%);
+  --picker-hover-fg: var(--foreground);
+  --picker-hover-muted: color-mix(in oklab, var(--foreground) 84%, transparent);
+  --seating-control-bg: color-mix(in oklab, var(--foreground) 10%, transparent);
+  --seating-control-border: color-mix(in oklab, var(--foreground) 30%, transparent);
+  --seating-control-fg: var(--foreground);
+  --seating-control-hover-bg: color-mix(in oklab, var(--foreground) 18%, transparent);
+  --seating-control-hover-fg: var(--foreground);
+  --seating-accent-bg: color-mix(in oklab, var(--spotlight) 36%, var(--card) 64%);
+  --seating-accent-border: color-mix(in oklab, var(--spotlight) 64%, transparent);
+  --seating-accent-fg: var(--foreground);
+  --seating-accent-hover-bg: color-mix(in oklab, var(--spotlight) 46%, var(--card) 54%);
+  --seating-accent-hover-fg: var(--foreground);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -151,6 +172,64 @@
   --sidebar-accent-foreground: var(--marquee-surface);
   --sidebar-border: rgba(212, 175, 55, 0.2);
   --sidebar-ring: var(--spotlight);
+  --segment-active-bg: var(--spotlight);
+  --segment-active-fg: var(--marquee-surface);
+  --script-modal-title-fg: color-mix(in oklab, var(--marquee-surface) 94%, white 6%);
+  --script-modal-close-bg: color-mix(in oklab, var(--card) 82%, var(--foreground) 18%);
+  --script-modal-close-fg: color-mix(in oklab, var(--foreground) 96%, white 4%);
+  --script-modal-close-border: color-mix(in oklab, var(--foreground) 36%, transparent);
+  --script-modal-close-hover-bg: color-mix(in oklab, var(--spotlight) 24%, var(--card) 76%);
+  --script-modal-close-hover-fg: color-mix(in oklab, var(--foreground) 98%, white 2%);
+  --script-modal-close-hover-border: color-mix(in oklab, var(--spotlight) 56%, transparent);
+  --btn-disabled-bg: color-mix(in oklab, var(--card) 82%, var(--foreground) 18%);
+  --btn-disabled-border: color-mix(in oklab, var(--foreground) 30%, transparent);
+  --btn-disabled-fg: color-mix(in oklab, var(--foreground) 88%, transparent);
+}
+
+/* Keep primary CTA accents aligned with calendar indicator in Stage dark mode. */
+.dark.theme-stage .show-card-btn,
+.dark.theme-stage .script-open-btn {
+  background: var(--spotlight) !important;
+  color: var(--background) !important;
+  border-color: color-mix(in oklab, var(--spotlight) 78%, transparent) !important;
+}
+
+.dark.theme-stage .show-card-btn:hover,
+.dark.theme-stage .script-open-btn:hover {
+  background: color-mix(in oklab, var(--spotlight) 84%, black 16%) !important;
+  color: var(--background) !important;
+}
+
+/* Increase selected-day clarity in calendar for Stage dark mode. */
+.dark.theme-stage .calendar-day-selected {
+  background: var(--spotlight) !important;
+  color: var(--background) !important;
+  border-color: color-mix(in oklab, var(--spotlight) 88%, transparent) !important;
+}
+
+.dark.theme-stage .segment-btn.segment-btn-active {
+  background: var(--spotlight) !important;
+  color: var(--marquee-surface) !important;
+  border-color: color-mix(in oklab, var(--spotlight) 88%, transparent) !important;
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--spotlight) 45%, transparent);
+}
+
+/* Ensure non-active tabs stay legible in Stage dark mode. */
+.dark.theme-stage .segment-btn {
+  background: color-mix(in oklab, var(--foreground) 10%, var(--card) 90%) !important;
+  color: var(--marquee-surface) !important;
+  border-color: color-mix(in oklab, var(--spotlight) 34%, transparent) !important;
+}
+
+.dark.theme-stage .segment-btn:hover {
+  background: color-mix(in oklab, var(--spotlight) 22%, var(--card) 78%) !important;
+  color: var(--marquee-surface) !important;
+}
+
+/* In Stage dark mode, today's date ring should use spotlight, not velvet red. */
+.dark.theme-stage .calendar-day-today {
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--spotlight) 64%, transparent) !important;
+  border-color: color-mix(in oklab, var(--spotlight) 54%, transparent) !important;
 }
 
 .theme-stage .show-card-meta-primary {

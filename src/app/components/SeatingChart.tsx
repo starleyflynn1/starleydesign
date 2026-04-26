@@ -17,6 +17,14 @@ interface Seat {
 interface SeatingChartProps {
   section: string;
   onSeatSelect?: (seats: Seat[]) => void;
+  hideTools?: boolean;
+  hideSummary?: boolean;
+  compactMode?: boolean;
+  hideQuickControls?: boolean;
+  ticketCount?: number;
+  onTicketCountChange?: (count: number) => void;
+  suggestRequestKey?: number;
+  resetRequestKey?: number;
 }
 
 const seatColors = {
@@ -33,7 +41,18 @@ const DEFAULT_SECTION_TYPES: { left: SectionType; center: SectionType; right: Se
   right: 'mixed',
 };
 
-export function SeatingChart({ section, onSeatSelect }: SeatingChartProps) {
+export function SeatingChart({
+  section,
+  onSeatSelect,
+  hideTools = false,
+  hideSummary = false,
+  compactMode = false,
+  hideQuickControls = false,
+  ticketCount: controlledTicketCount,
+  onTicketCountChange,
+  suggestRequestKey,
+  resetRequestKey,
+}: SeatingChartProps) {
   const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
   const [seatLiveMessage, setSeatLiveMessage] = useState('');
   const [isToolsOpen, setIsToolsOpen] = useState(false);
@@ -43,7 +62,7 @@ export function SeatingChart({ section, onSeatSelect }: SeatingChartProps) {
   const [focusedSeatId, setFocusedSeatId] = useState<string | null>(null);
   const [isDragSelecting, setIsDragSelecting] = useState(false);
   const [suggestedSeatIds, setSuggestedSeatIds] = useState<string[]>([]);
-  const [ticketCount, setTicketCount] = useState(2);
+  const [ticketCountState, setTicketCountState] = useState(2);
   const [rowCount, setRowCount] = useState(10);
   const [seatsPerRow, setSeatsPerRow] = useState(8);
   const [assignmentType, setAssignmentType] = useState<AssignmentType>('available');
@@ -51,6 +70,14 @@ export function SeatingChart({ section, onSeatSelect }: SeatingChartProps) {
   const [sectionTypes, setSectionTypes] = useState<{ left: SectionType; center: SectionType; right: SectionType }>(
     DEFAULT_SECTION_TYPES
   );
+  const ticketCount = controlledTicketCount ?? ticketCountState;
+  const updateTicketCount = (count: number) => {
+    if (typeof controlledTicketCount === 'number') {
+      onTicketCountChange?.(count);
+      return;
+    }
+    setTicketCountState(count);
+  };
 
   const generateSeats = (
     rowCountValue: number,
@@ -143,7 +170,7 @@ export function SeatingChart({ section, onSeatSelect }: SeatingChartProps) {
   useEffect(() => {
     if (selectedSeats.length === 0) return;
     const clampedCount = Math.max(1, Math.min(6, selectedSeats.length));
-    setTicketCount(clampedCount);
+    updateTicketCount(clampedCount);
   }, [selectedSeats.length]);
 
   const announceSeatSelectionChange = (previousSelection: Seat[], nextSelection: Seat[], triggerSeat: Seat) => {
@@ -196,13 +223,13 @@ export function SeatingChart({ section, onSeatSelect }: SeatingChartProps) {
     const stageStartSeat = 2;
     const stageEndSeat = Math.max(stageStartSeat, seatsPerRow - 1);
     const seatCount = stageEndSeat - stageStartSeat + 1;
-    const seatSizePx = 32; // matches `w-8`
-    const seatGapPx = 8; // matches `gap-2`
-    const aisleWidthPx = 32; // base `w-8`
+    const seatSizePx = compactMode ? 26 : 32;
+    const seatGapPx = compactMode ? 6 : 8;
+    const aisleWidthPx = compactMode ? 24 : 32;
     const aisleCount = aisleBreaks.filter((breakSeat) => breakSeat >= stageStartSeat && breakSeat < stageEndSeat).length;
 
     return seatCount * seatSizePx + (seatCount - 1) * seatGapPx + aisleCount * aisleWidthPx;
-  }, [seatsPerRow, aisleBreaks]);
+  }, [seatsPerRow, aisleBreaks, compactMode]);
 
   const getSeatLocationLabel = (seat: Seat) => `Row ${seat.row}, Seat ${seat.number}`;
 
@@ -214,7 +241,8 @@ export function SeatingChart({ section, onSeatSelect }: SeatingChartProps) {
     const targetRowIndex = Math.round((sortedRows.length - 1) * 0.35);
 
     type Candidate = { ids: string[]; score: number };
-    let best: Candidate | null = null;
+    let bestNonAisle: Candidate | null = null;
+    let bestAny: Candidate | null = null;
 
     for (let rowIndex = 0; rowIndex < sortedRows.length; rowIndex++) {
       const row = sortedRows[rowIndex];
@@ -227,6 +255,9 @@ export function SeatingChart({ section, onSeatSelect }: SeatingChartProps) {
         const group = rowSeats.slice(start, start + count);
         const contiguous = group.every((seat, idx) => idx === 0 || seat.number === group[idx - 1].number + 1);
         if (!contiguous) continue;
+        const minSeat = group[0].number;
+        const maxSeat = group[group.length - 1].number;
+        const crossesAisle = aisleBreaks.some((breakSeat) => breakSeat >= minSeat && breakSeat < maxSeat);
 
         const groupCenterSeat = group[Math.floor(group.length / 2)].number;
         const centerDistance = Math.abs(groupCenterSeat - centerSeat);
@@ -244,15 +275,20 @@ export function SeatingChart({ section, onSeatSelect }: SeatingChartProps) {
           - centerDistance * 15
           - rowDistance * 9
           + vipCount * 12
-          - accessibleCount * 3;
+          - accessibleCount * 3
+          - (crossesAisle ? 60 : 0);
 
-        if (!best || score > best.score) {
-          best = { ids: group.map((seat) => seat.id), score };
+        const candidate = { ids: group.map((seat) => seat.id), score };
+        if (!bestAny || score > bestAny.score) {
+          bestAny = candidate;
+        }
+        if (!crossesAisle && (!bestNonAisle || score > bestNonAisle.score)) {
+          bestNonAisle = candidate;
         }
       }
     }
 
-    return best?.ids ?? [];
+    return (bestNonAisle ?? bestAny)?.ids ?? [];
   };
 
   const handleSuggestBest = () => {
@@ -289,6 +325,16 @@ export function SeatingChart({ section, onSeatSelect }: SeatingChartProps) {
     onSeatSelect?.([]);
   };
 
+  useEffect(() => {
+    if (typeof suggestRequestKey !== 'number' || suggestRequestKey <= 0) return;
+    handleSuggestBest();
+  }, [suggestRequestKey]);
+
+  useEffect(() => {
+    if (typeof resetRequestKey !== 'number' || resetRequestKey <= 0) return;
+    resetAssignments();
+  }, [resetRequestKey]);
+
   const handleSeatKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, seat: Seat) => {
     const key = event.key;
     if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', ' '].includes(key)) return;
@@ -322,12 +368,12 @@ export function SeatingChart({ section, onSeatSelect }: SeatingChartProps) {
 
   return (
     <div
-      className="seating-root"
+      className={`seating-root ${compactMode ? 'seating-root-compact' : ''}`}
       onMouseUp={() => setIsDragSelecting(false)}
       onMouseLeave={() => setIsDragSelecting(false)}
     >
       <div className="seating-stage-wrap">
-        {!isToolsOpen && (
+        {!hideTools && !isToolsOpen && (
           <div className="seating-tools-row">
             <button
               className="seating-tools-btn seating-tools-btn-desktop"
@@ -413,6 +459,7 @@ export function SeatingChart({ section, onSeatSelect }: SeatingChartProps) {
                         style={isUnavailable && !isToolsOpen ? { cursor: 'not-allowed' } : undefined}
                       >
                         {isAccessible && <Accessibility className="seating-accessible-icon" />}
+                        {seat.status === 'available' && <span className="seating-seat-symbol">•</span>}
                         {isVIP && <span className="seating-seat-symbol">V</span>}
                         {isUnavailable && <span className="seating-seat-symbol">X</span>}
                       </button>
@@ -446,19 +493,27 @@ export function SeatingChart({ section, onSeatSelect }: SeatingChartProps) {
 
       <div className="seating-legend">
         <div className="seating-legend-item">
-          <div className="seating-legend-dot seating-seat-available"></div>
-          <span className="seating-legend-label">Available</span>
+          <div className="seating-legend-dot seating-seat-available seating-legend-dot-indicated">
+            <span className="seating-legend-dot-symbol">•</span>
+          </div>
+          <span className="seating-legend-label">Available (•)</span>
         </div>
         <div className="seating-legend-item">
-          <div className="seating-legend-dot seating-seat-vip"></div>
+          <div className="seating-legend-dot seating-seat-vip seating-legend-dot-indicated">
+            <span className="seating-legend-dot-symbol seating-legend-dot-symbol-vip">V</span>
+          </div>
           <span className="seating-legend-label">VIP (V)</span>
         </div>
         <div className="seating-legend-item">
-          <div className="seating-legend-dot seating-seat-accessible"></div>
+          <div className="seating-legend-dot seating-seat-accessible seating-legend-dot-accessible">
+            <Accessibility className="seating-legend-accessible-icon" />
+          </div>
           <span className="seating-legend-label">Accessible</span>
         </div>
         <div className="seating-legend-item">
-          <div className="seating-legend-dot seating-seat-taken"></div>
+          <div className="seating-legend-dot seating-seat-taken seating-legend-dot-indicated">
+            <span className="seating-legend-dot-symbol">X</span>
+          </div>
           <span className="seating-legend-label">Unavailable (X)</span>
         </div>
         <div className="seating-legend-item">
@@ -467,6 +522,7 @@ export function SeatingChart({ section, onSeatSelect }: SeatingChartProps) {
         </div>
       </div>
 
+      {!hideTools && (
       <aside className={`seating-tools-sidebar ${isToolsOpen ? 'seating-tools-sidebar-open' : 'seating-tools-sidebar-closed'}`}>
           <div className="seating-tools-header">
             <div className="seating-tools-title">Seating Tools</div>
@@ -632,9 +688,11 @@ export function SeatingChart({ section, onSeatSelect }: SeatingChartProps) {
             </pre>
           )}
       </aside>
+      )}
 
+      {!hideQuickControls && (
       <div className="seating-controls">
-        {!isToolsOpen && (
+        {!hideTools && !isToolsOpen && (
           <button
             className="seating-tools-btn seating-tools-btn-mobile"
             type="button"
@@ -650,7 +708,7 @@ export function SeatingChart({ section, onSeatSelect }: SeatingChartProps) {
           Tickets
           <select
             value={ticketCount}
-            onChange={(event) => setTicketCount(Number(event.target.value))}
+            onChange={(event) => updateTicketCount(Number(event.target.value))}
             className="seating-ticket-count-select"
           >
             {[1, 2, 3, 4, 5, 6].map((count) => (
@@ -667,8 +725,9 @@ export function SeatingChart({ section, onSeatSelect }: SeatingChartProps) {
           Reset
         </button>
       </div>
+      )}
 
-      {selectedSeats.length > 0 && (
+      {!hideSummary && selectedSeats.length > 0 && (
         <div className="seating-summary">
           <div className="seating-summary-row">
             <div>

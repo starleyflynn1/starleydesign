@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, Theater, MapPin, Calendar, User, CreditCard, Settings, X } from 'lucide-react';
+import { Search, Theater, MapPin, Grid3X3, Calendar, User, CreditCard, Settings, X } from 'lucide-react';
 
 interface Action {
   id: string;
@@ -24,7 +24,7 @@ const mockActions: Action[] = [
   { id: '5', title: 'The Lion King', category: 'Coming Soon', icon: Calendar },
   { id: '6', title: 'My Tickets', category: 'Account', icon: CreditCard },
   { id: '7', title: 'Venue Information', category: 'Venue Info', icon: MapPin },
-  { id: '8', title: 'Seating Charts', category: 'Venue Info', icon: MapPin },
+  { id: '8', title: 'Seating Chart', category: 'Venue Info', icon: Grid3X3 },
   { id: '9', title: 'Account Settings', category: 'Account', icon: User },
   { id: '10', title: 'Preferences', category: 'Account', icon: Settings },
 ];

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { GlobalUsher } from './components/GlobalUsher';
 import { TheaterHeader } from './components/TheaterHeader';
@@ -8,11 +8,17 @@ import { StagePage } from './pages/StagePage';
 import { ScriptPage } from './pages/ScriptPage';
 import { DirectorPage } from './pages/DirectorPage';
 import { BackstagePage } from './pages/BackstagePage';
+import { SHOWS } from './data/shows';
+import { BOOKING_SHOWS, BOOKING_SHOWS_CATEGORY } from './data/booking-shows';
+import { BOOKING_STEPS } from './data/booking-steps';
+import { buildUpcomingPerformances } from './lib/performances';
+import { resolveUsherDestination } from './lib/usher-routing';
 
 export default function App() {
   const [isUsherOpen, setIsUsherOpen] = useState(false);
   const [currentView, setCurrentView] = useState<'home' | 'booking' | 'seating' | 'calendar'>('home');
   const [bookingStep, setBookingStep] = useState(1);
+  const [bookingShowOverride, setBookingShowOverride] = useState<string | undefined>(undefined);
   const resumeUrl = '/Starley-F-Resume.pdf';
 
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
@@ -24,6 +30,14 @@ export default function App() {
     : normalizedPath === '/backstage'
     ? 'backstage'
     : 'home';
+  const bookingShowFromQuery =
+    typeof window !== 'undefined'
+      ? new URLSearchParams(window.location.search).get('bookingShow') ?? undefined
+      : undefined;
+  const bookingCategoryFromQuery =
+    typeof window !== 'undefined'
+      ? new URLSearchParams(window.location.search).get('bookingCategory') ?? undefined
+      : undefined;
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -46,72 +60,35 @@ export default function App() {
     window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#stage`);
   }, []);
 
-  const shows = [
-    {
-    title: 'The Design System',
-    image: 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?w=400', 
-    date: '2026',
-    scope: 'User Experience Architecture',
-    stack: 'React · TypeScript · Figma', 
-    impact: 'Current Run', 
-    role: 'Interaction Designer' 
-    },
-    {
-    title: 'Salesforce',
-    image: 'https://images.unsplash.com/photo-1721553710744-e02e98f2cbfb?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', 
-    date: '2022 — 2026',
-    scope: 'Digital Campus at Scale',
-    stack: 'Javascript · GraphQL · Java', 
-    impact: 'Architectual Design', 
-    role: 'Senior Member of Technical Staff' 
-    },
-    {
-    title: 'Google',
-    image: 'https://images.unsplash.com/photo-1593940256067-fb4acd831804?q=80&w=776&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', 
-    date: '2021 — 2022',
-    scope: 'Lead Management Engine',
-    stack: 'Javascript · LWC · Java', 
-    impact: 'High Performance Delivery', 
-    role: 'Application Engineer' 
-    },
-    {
-    title: 'BFA Theater',
-    image: 'https://images.unsplash.com/photo-1503095396549-807759245b35?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', 
-    date: '2004 — 2026',
-    scope: 'Collaborative Production',
-    stack: 'Narrative & User Psychology', 
-    impact: 'Foundational Empathy', 
-    role: 'The Origin Story' 
-    },
-  ];
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.location.pathname !== '/') return;
 
-  const bookingSteps = [
-    { number: 1, title: 'Select Seats', description: 'Choose your seats' },
-    { number: 2, title: 'Add-ons', description: 'Parking & concessions' },
-    { number: 3, title: 'Payment', description: 'Secure checkout' },
-    { number: 4, title: 'Confirmation', description: 'Get your tickets' },
-  ];
+    const syncViewWithHash = () => {
+      const hash = window.location.hash;
+      if (hash === '#seating-chart' || hash === '#seating') {
+        setCurrentView('seating');
+        return;
+      }
+      if (hash === '#booking-flow' || hash === '#booking') {
+        setCurrentView('booking');
+        return;
+      }
+      if (hash === '#calendar') {
+        setCurrentView('calendar');
+        return;
+      }
+      setCurrentView('home');
+    };
 
-  const performances = [
-    {
-      date: new Date(2026, 3, 25),
-      times: [
-        { time: '2:00 PM', type: 'matinee' as const, available: 45 },
-        { time: '7:30 PM', type: 'evening' as const, available: 23 },
-      ],
-    },
-    {
-      date: new Date(2026, 3, 26),
-      times: [
-        { time: '2:00 PM', type: 'matinee' as const, available: 12 },
-        { time: '7:30 PM', type: 'evening' as const, available: 0 },
-      ],
-    },
-    {
-      date: new Date(2026, 3, 27),
-      times: [{ time: '7:30 PM', type: 'evening' as const, available: 67 }],
-    },
-  ];
+    syncViewWithHash();
+    window.addEventListener('hashchange', syncViewWithHash);
+    return () => window.removeEventListener('hashchange', syncViewWithHash);
+  }, []);
+
+  const performances = useMemo(() => buildUpcomingPerformances(), []);
+  const bookingShowTitles = useMemo(() => new Set(BOOKING_SHOWS.map((show) => show.title)), []);
+  const hideFooterForBooking = currentPage === 'home' && currentView !== 'home';
 
   return (
     <ThemeProvider>
@@ -122,13 +99,26 @@ export default function App() {
         isOpen={isUsherOpen}
         onClose={() => setIsUsherOpen(false)}
         onSelect={(action) => {
-          const routeByTitle: Record<string, string> = {
-            'My Tickets': '/backstage#transactional-ux-data-schemas',
-            'Account Settings': '/backstage#global-theming-persistence',
-            Preferences: '/backstage#accessibility-motion-control',
-          };
+          if (bookingShowTitles.has(action.title)) {
+            setBookingShowOverride(action.title);
+            setBookingStep(1);
+            setCurrentView('booking');
+            if (typeof window !== 'undefined') {
+              const bookingUrl = `/?bookingCategory=${encodeURIComponent(
+                BOOKING_SHOWS_CATEGORY
+              )}&bookingShow=${encodeURIComponent(action.title)}#booking-flow`;
+              window.history.replaceState(null, '', bookingUrl);
+              requestAnimationFrame(() => {
+                document.getElementById('booking-flow')?.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                });
+              });
+            }
+            return;
+          }
 
-          const destination = routeByTitle[action.title];
+          const destination = resolveUsherDestination(action);
           if (destination) {
             window.location.assign(destination);
           } else {
@@ -139,11 +129,16 @@ export default function App() {
 
       {currentPage === 'home' && (
         <StagePage
-          shows={shows}
-          bookingSteps={bookingSteps}
+          shows={SHOWS}
+          bookingShows={BOOKING_SHOWS}
+          bookingSteps={BOOKING_STEPS}
           performances={performances}
           currentView={currentView}
           bookingStep={bookingStep}
+          initialBookingShow={
+            bookingShowOverride ??
+            (bookingCategoryFromQuery === BOOKING_SHOWS_CATEGORY ? bookingShowFromQuery : undefined)
+          }
           setCurrentView={setCurrentView}
           setBookingStep={setBookingStep}
         />
@@ -153,29 +148,37 @@ export default function App() {
       {currentPage === 'director' && <DirectorPage />}
       {currentPage === 'backstage' && <BackstagePage />}
 
-      <footer className="app-footer">
-        <div className="app-footer-inner">
-          <div className="app-footer-row">
-            <div className="footer-brand">
-              <Theater className="icon-md-velvet" />
-              <span className="footer-copy">
-                © 2026 The Designed Stage. Theater Design System by Starley Flynn.
-              </span>
-            </div>
-            <div className="footer-links">
-              <a href="#" className="footer-link">
-                Technical Specs
-              </a>
-              <a href="#" className="footer-link">
-                Backstage
-              </a>
-              <a href="#" className="footer-link">
-                Accessibility
-              </a>
+      {!hideFooterForBooking && (
+        <footer className="app-footer">
+          <div className="app-footer-inner">
+            <div className="app-footer-row">
+              <div className="footer-brand">
+                <Theater className="icon-md-velvet" />
+                <span className="footer-copy">
+                  © 2026 The Designed Stage. Theater Design System by Starley Flynn.
+                </span>
+              </div>
+              <div className="footer-links">
+                <a href="/#stage" className="footer-link">
+                  Stage
+                </a>
+                <a href="/script" className="footer-link">
+                  Script
+                </a>
+                <a href="/director" className="footer-link">
+                  Director
+                </a>
+                <a href="/backstage" className="footer-link">
+                  Backstage
+                </a>
+                <a href="/backstage#accessibility-motion-control" className="footer-link">
+                  Accessibility
+                </a>
+              </div>
             </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      )}
     </div>
     </ThemeProvider>
   );

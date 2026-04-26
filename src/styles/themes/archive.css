@@ -30,6 +30,39 @@
   --accent-foreground: var(--paper);
   --border: rgba(28, 25, 23, 0.15);
   --ring: var(--spotlight);
+  --picker-hover-bg: color-mix(in oklab, var(--velvet) 24%, var(--card) 76%);
+  --picker-hover-fg: var(--stage-base);
+  --picker-hover-muted: color-mix(in oklab, var(--stage-base) 82%, transparent);
+  --seating-control-bg: color-mix(in oklab, var(--foreground) 8%, transparent);
+  --seating-control-border: color-mix(in oklab, var(--foreground) 28%, transparent);
+  --seating-control-fg: var(--foreground);
+  --seating-control-hover-bg: color-mix(in oklab, var(--foreground) 16%, transparent);
+  --seating-control-hover-fg: var(--foreground);
+  --seating-accent-bg: var(--seating-control-bg);
+  --seating-accent-border: var(--seating-control-border);
+  --seating-accent-fg: var(--seating-control-fg);
+  --seating-accent-hover-bg: var(--seating-control-hover-bg);
+  --seating-accent-hover-fg: var(--seating-control-hover-fg);
+  --seating-selected-ring: color-mix(in oklab, var(--velvet) 60%, transparent);
+  --seating-selected-glow: color-mix(in oklab, var(--velvet) 48%, transparent);
+  --seating-selected-inset: color-mix(in oklab, #fff8e8 38%, transparent);
+  --seating-focused-ring: color-mix(in oklab, var(--stage-base) 84%, white 16%);
+  --seating-focused-offset: color-mix(in oklab, var(--spotlight) 48%, transparent);
+  --seating-focused-shadow: color-mix(in oklab, var(--spotlight) 42%, transparent);
+  --seating-focus-ring: color-mix(in oklab, var(--stage-base) 84%, white 16%);
+  --seating-focus-offset: var(--background);
+  --btn-disabled-bg: color-mix(in oklab, var(--card) 86%, #a8a29e 14%);
+  --btn-disabled-border: color-mix(in oklab, var(--stage-base) 24%, #a8a29e 76%);
+  --btn-disabled-fg: color-mix(in oklab, var(--stage-base) 82%, #57534e 18%);
+  --script-modal-header-bg: #2b231c;
+  --script-modal-header-fg: #f9edd8;
+  --script-modal-title-fg: #f9edd8;
+  --script-modal-close-bg: #f4e9d4;
+  --script-modal-close-fg: #1a1410;
+  --script-modal-close-border: #8b7355;
+  --script-modal-close-hover-bg: #e2c5a0;
+  --script-modal-close-hover-fg: #1a1410;
+  --script-modal-close-hover-border: #7c2d12;
 
   /* --- Global Theme Physics --- */
   font-family: "Playfair Display", serif;
@@ -128,6 +161,50 @@
   color: var(--marquee-surface);
 }
 
+.theme-archive .ui-dropdown-content.style-picker-menu {
+  background: color-mix(in oklab, var(--paper) 92%, #ffffff 8%);
+  color: var(--stage-base);
+  border-color: color-mix(in oklab, var(--stage-base) 24%, transparent);
+}
+
+.theme-archive .style-picker-title {
+  color: var(--stage-base);
+}
+
+.theme-archive .style-picker-description {
+  color: color-mix(in oklab, var(--stage-base) 70%, transparent);
+}
+
+.dark.theme-archive .ui-dropdown-content.style-picker-menu {
+  background: color-mix(in oklab, var(--card) 90%, #181310 10%);
+  color: var(--foreground);
+  border-color: color-mix(in oklab, var(--spotlight) 28%, transparent);
+}
+
+.dark.theme-archive {
+  --picker-hover-bg: color-mix(in oklab, var(--velvet) 30%, var(--card) 70%);
+  --picker-hover-fg: var(--foreground);
+  --picker-hover-muted: color-mix(in oklab, var(--foreground) 84%, transparent);
+  --seating-control-bg: color-mix(in oklab, var(--foreground) 10%, transparent);
+  --seating-control-border: color-mix(in oklab, var(--foreground) 35%, transparent);
+  --seating-control-fg: var(--foreground);
+  --seating-control-hover-bg: color-mix(in oklab, var(--foreground) 22%, transparent);
+  --seating-control-hover-fg: var(--foreground);
+  --seating-accent-bg: var(--seating-control-bg);
+  --seating-accent-border: var(--seating-control-border);
+  --seating-accent-fg: var(--seating-control-fg);
+  --seating-accent-hover-bg: var(--seating-control-hover-bg);
+  --seating-accent-hover-fg: var(--seating-control-hover-fg);
+  --seating-selected-ring: color-mix(in oklab, var(--velvet) 62%, transparent);
+  --seating-selected-glow: color-mix(in oklab, var(--velvet) 72%, transparent);
+  --seating-selected-inset: color-mix(in oklab, #ffffff 24%, transparent);
+  --seating-focused-ring: color-mix(in oklab, var(--foreground) 86%, white 14%);
+  --seating-focused-offset: color-mix(in oklab, var(--spotlight) 42%, transparent);
+  --seating-focused-shadow: color-mix(in oklab, var(--spotlight) 36%, transparent);
+  --seating-focus-ring: color-mix(in oklab, var(--foreground) 86%, white 14%);
+  --seating-focus-offset: var(--background);
+}
+
 /* Archive tabs should retain the classic double-border treatment */
 .theme-archive .segment-btn,
 .dark.theme-archive .segment-btn {
@@ -137,6 +214,35 @@
 .theme-archive .segment-btn.segment-btn-active,
 .dark.theme-archive .segment-btn.segment-btn-active {
   border: 3px double color-mix(in oklab, var(--velvet) 80%, var(--stage-base) 20%) !important;
+}
+
+/* Match calendar selected state to the same velvet maroon as active mode buttons. */
+.theme-archive .calendar-day-selected {
+  background: color-mix(in oklab, var(--background) 92%, var(--velvet) 8%) !important;
+  color: var(--stage-base) !important;
+  border: 3px double color-mix(in oklab, var(--velvet) 82%, black 18%) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--velvet) 24%, transparent);
+}
+
+.dark.theme-archive .calendar-day-selected {
+  background: color-mix(in oklab, var(--background) 82%, var(--velvet) 18%) !important;
+  color: var(--foreground) !important;
+  border: 3px double color-mix(in oklab, var(--velvet) 86%, black 14%) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--velvet) 30%, transparent);
+}
+
+/* Keep Archive calendar time-card hover readable in all modes. */
+.theme-archive .calendar-time-btn.calendar-time-enabled:hover {
+  background: color-mix(in oklab, var(--background) 84%, var(--spotlight) 16%) !important;
+  border-color: color-mix(in oklab, var(--spotlight) 48%, transparent) !important;
+  color: var(--foreground) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--spotlight) 16%, transparent);
+}
+
+.dark.theme-archive .calendar-time-btn.calendar-time-enabled:hover {
+  background: color-mix(in oklab, var(--foreground) 12%, var(--background) 88%) !important;
+  border-color: color-mix(in oklab, var(--spotlight) 62%, transparent) !important;
+  color: var(--foreground) !important;
 }
 
 .theme-archive .show-card-meta-primary {
@@ -195,6 +301,18 @@
   /* 4. Semantic Update */
   --primary: var(--stage-base);
   --accent: var(--velvet);
+  --btn-disabled-bg: color-mix(in oklab, var(--card) 78%, #f5f1e8 22%);
+  --btn-disabled-border: color-mix(in oklab, var(--foreground) 30%, transparent);
+  --btn-disabled-fg: color-mix(in oklab, var(--foreground) 90%, transparent);
+  --script-modal-header-bg: #171210;
+  --script-modal-header-fg: #fff1dd;
+  --script-modal-title-fg: #fff1dd;
+  --script-modal-close-bg: #3a2d25;
+  --script-modal-close-fg: #fff4e6;
+  --script-modal-close-border: #d4a574;
+  --script-modal-close-hover-bg: #6a3c33;
+  --script-modal-close-hover-fg: #ffffff;
+  --script-modal-close-hover-border: #fca5a5;
 }
 
 /* ============================================================
@@ -278,25 +396,13 @@
 /* ============================================================
    ARCHIVE THEME: DARK BOOKING/SEATING CONTROL CONTRAST
    ============================================================ */
-.dark.theme-archive .segment-btn,
-.dark.theme-archive .seating-suggest-btn,
-.dark.theme-archive .seating-reset-btn,
-.dark.theme-archive .seating-assign-btn,
-.dark.theme-archive .seating-tools-btn,
-.dark.theme-archive .seating-debug-toggle,
-.dark.theme-archive .seating-tools-close {
+.dark.theme-archive .segment-btn {
   background: color-mix(in oklab, var(--foreground) 10%, transparent);
   color: var(--foreground);
   border: 1px solid color-mix(in oklab, var(--foreground) 35%, transparent);
 }
 
-.dark.theme-archive .segment-btn:hover,
-.dark.theme-archive .seating-suggest-btn:hover,
-.dark.theme-archive .seating-reset-btn:hover,
-.dark.theme-archive .seating-assign-btn:hover,
-.dark.theme-archive .seating-tools-btn:hover,
-.dark.theme-archive .seating-debug-toggle:hover,
-.dark.theme-archive .seating-tools-close:hover {
+.dark.theme-archive .segment-btn:hover {
   background: color-mix(in oklab, var(--foreground) 22%, transparent);
   color: var(--foreground);
 }

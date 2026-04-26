@@ -62,6 +62,29 @@
   --color-seat-accessible: var(--seat-accessible);
 }
 
+/* Cross-theme accessibility tokens (AA-oriented defaults). */
+:root {
+  --text-muted-aa: color-mix(in oklab, var(--foreground) 92%, transparent);
+  --text-subtle-aa: color-mix(in oklab, var(--foreground) 82%, transparent);
+  --stepper-track-bg: color-mix(in oklab, var(--foreground) 30%, transparent);
+  --stepper-fill-bg: var(--spotlight);
+  --stepper-pending-bg: color-mix(in oklab, var(--card) 92%, var(--foreground) 8%);
+  --stepper-pending-border: color-mix(in oklab, var(--foreground) 42%, transparent);
+  --stepper-pending-fg: color-mix(in oklab, var(--foreground) 88%, transparent);
+  --btn-disabled-bg: color-mix(in oklab, var(--card) 86%, var(--foreground) 14%);
+  --btn-disabled-border: color-mix(in oklab, var(--foreground) 36%, transparent);
+  --btn-disabled-fg: color-mix(in oklab, var(--foreground) 90%, transparent);
+  --script-modal-title-fg: color-mix(in oklab, var(--foreground) 96%, black 4%);
+  --script-modal-header-bg: color-mix(in oklab, var(--stage-depth) 86%, black 14%);
+  --script-modal-header-fg: color-mix(in oklab, var(--marquee-surface) 94%, white 6%);
+  --script-modal-close-bg: color-mix(in oklab, var(--card) 82%, var(--background) 18%);
+  --script-modal-close-fg: color-mix(in oklab, var(--foreground) 96%, black 4%);
+  --script-modal-close-border: color-mix(in oklab, var(--foreground) 40%, transparent);
+  --script-modal-close-hover-bg: color-mix(in oklab, var(--spotlight) 22%, var(--card) 78%);
+  --script-modal-close-hover-fg: color-mix(in oklab, var(--foreground) 98%, black 2%);
+  --script-modal-close-hover-border: color-mix(in oklab, var(--spotlight) 56%, transparent);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

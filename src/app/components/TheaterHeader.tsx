@@ -88,29 +88,28 @@ export function TheaterHeader({ onSearchClick }: TheaterHeaderProps) {
           </div>
         </div>
 
-        <div className="theater-mobile-controls">
-          <StylePicker />
-          <button
-            onClick={toggleMode}
-            className="theater-icon-btn"
-            aria-label="Toggle dark mode"
-          >
-            {mode === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          </button>
-          <button
-            onClick={toggleMotion}
-            className="theater-icon-btn"
-            aria-label={motionEnabled ? 'Reduce motion' : 'Enable animations'}
-            aria-pressed={motionEnabled}
-            title={motionEnabled ? 'Reduce motion' : 'Enable animations'}
-            type="button"
-          >
-            {motionEnabled ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
-          </button>
-        </div>
-
         {isMobileMenuOpen && (
           <div className="theater-nav-mobile">
+            <div className="theater-nav-mobile-controls">
+              <StylePicker />
+              <button
+                onClick={toggleMode}
+                className="theater-icon-btn"
+                aria-label="Toggle dark mode"
+              >
+                {mode === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
+              <button
+                onClick={toggleMotion}
+                className="theater-icon-btn"
+                aria-label={motionEnabled ? 'Reduce motion' : 'Enable animations'}
+                aria-pressed={motionEnabled}
+                title={motionEnabled ? 'Reduce motion' : 'Enable animations'}
+                type="button"
+              >
+                {motionEnabled ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
+              </button>
+            </div>
             {navItems.map((item) => (
               <a
                 key={item.label}

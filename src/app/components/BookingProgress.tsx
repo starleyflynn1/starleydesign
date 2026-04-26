@@ -13,13 +13,20 @@ interface BookingProgressProps {
 }
 
 export function BookingProgress({ currentStep, steps }: BookingProgressProps) {
+  const progressPercent = ((currentStep - 1) / (steps.length - 1)) * 100;
+  const activeBubbleRadiusPx = 20; // matches `booking-step-bubble` 40px diameter
+  const progressWidth =
+    currentStep <= 1
+      ? '0%'
+      : `min(calc(${progressPercent}% + ${activeBubbleRadiusPx}px), 100%)`;
+
   return (
     <div className="booking-progress-root">
       <div className="booking-progress-track-wrap">
         <div className="booking-progress-track">
           <div
             className="booking-progress-fill"
-            style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
+            style={{ width: progressWidth }}
           ></div>
         </div>
 
@@ -29,7 +36,16 @@ export function BookingProgress({ currentStep, steps }: BookingProgressProps) {
             const isCurrent = step.number === currentStep;
 
             return (
-              <div key={step.number} className="booking-step-item">
+              <div
+                key={step.number}
+                className={`booking-step-item ${
+                  isCurrent
+                    ? 'booking-step-item-current'
+                    : isCompleted
+                    ? 'booking-step-item-completed'
+                    : 'booking-step-item-pending'
+                }`}
+              >
                 <div
                   className={`booking-step-bubble ${
                     isCompleted
