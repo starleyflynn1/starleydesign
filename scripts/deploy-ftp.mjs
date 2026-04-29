@@ -27,6 +27,9 @@ let port = Number(process.env.FTP_PORT ?? 21);
 let secure = toBool(process.env.FTP_SECURE, port === 990);
 let remoteDir = process.env.FTP_REMOTE_DIR ?? "public_html";
 let clearRemote = toBool(process.env.FTP_CLEAR_REMOTE, false);
+const timeoutMs = Number(process.env.FTP_TIMEOUT_MS ?? 60000);
+const maxRetries = Math.max(0, Number(process.env.FTP_MAX_RETRIES ?? 2));
+const retryDelayMs = Math.max(0, Number(process.env.FTP_RETRY_DELAY_MS ?? 1500));
 
 if (isPromptMode) {
   const rl = createInterface({ input, output });
@@ -58,6 +61,18 @@ if (!Number.isFinite(port) || port <= 0) {
   console.error("Invalid FTP_PORT. Use a positive number, e.g. 21 or 990.");
   process.exit(1);
 }
+if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+  console.error("Invalid FTP_TIMEOUT_MS. Use a positive number in milliseconds.");
+  process.exit(1);
+}
+if (!Number.isFinite(maxRetries) || maxRetries < 0) {
+  console.error("Invalid FTP_MAX_RETRIES. Use 0 or a positive integer.");
+  process.exit(1);
+}
+if (!Number.isFinite(retryDelayMs) || retryDelayMs < 0) {
+  console.error("Invalid FTP_RETRY_DELAY_MS. Use 0 or a positive number in milliseconds.");
+  process.exit(1);
+}
 
 if (remoteDir.includes(".")) {
   console.warn(
@@ -67,6 +82,7 @@ if (remoteDir.includes(".")) {
 }
 
 const localDistDir = path.resolve("dist");
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 try {
   await access(localDistDir);
@@ -75,31 +91,42 @@ try {
   process.exit(1);
 }
 
-const client = new Client();
-client.ftp.verbose = false;
+let lastError = null;
+for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
+  const client = new Client(timeoutMs);
+  client.ftp.verbose = false;
+  try {
+    await client.access({
+      host,
+      user,
+      password,
+      port,
+      secure,
+      secureOptions: secure ? { rejectUnauthorized: false } : undefined,
+    });
 
-try {
-  await client.access({
-    host,
-    user,
-    password,
-    port,
-    secure,
-    secureOptions: secure ? { rejectUnauthorized: false } : undefined,
-  });
+    await client.ensureDir(remoteDir);
 
-  await client.ensureDir(remoteDir);
+    if (clearRemote) {
+      await client.clearWorkingDir();
+    }
 
-  if (clearRemote) {
-    await client.clearWorkingDir();
+    await client.uploadFromDir(localDistDir);
+    console.log(`Deploy complete: uploaded dist/ to ${host}:${remoteDir}`);
+    process.exit(0);
+  } catch (error) {
+    lastError = error;
+    const message = error instanceof Error ? error.message : String(error);
+    const remaining = maxRetries - attempt;
+    console.warn(`FTP attempt ${attempt + 1} failed: ${message}`);
+    if (remaining <= 0) break;
+    console.warn(`Retrying in ${retryDelayMs}ms (${remaining} attempt${remaining === 1 ? "" : "s"} left)...`);
+    await sleep(retryDelayMs);
+  } finally {
+    client.close();
   }
-
-  await client.uploadFromDir(localDistDir);
-  console.log(`Deploy complete: uploaded dist/ to ${host}:${remoteDir}`);
-} catch (error) {
-  console.error("FTP deploy failed.");
-  console.error(error instanceof Error ? error.message : error);
-  process.exit(1);
-} finally {
-  client.close();
 }
+
+console.error("FTP deploy failed after retries.");
+console.error(lastError instanceof Error ? lastError.message : lastError);
+process.exit(1);

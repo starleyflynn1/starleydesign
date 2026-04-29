@@ -25,6 +25,7 @@ export default function App() {
   const [bookingShowOverride, setBookingShowOverride] = useState<string | undefined>(undefined);
   const [isExitBookingDialogOpen, setIsExitBookingDialogOpen] = useState(false);
   const [pendingExitHref, setPendingExitHref] = useState<string | null>(null);
+  const [exitDialogAnchorTop, setExitDialogAnchorTop] = useState<number | null>(null);
   const [performances, setPerformances] = useState<Performance[]>([]);
   const isPageTransitioningRef = useRef(false);
   const resumeUrl = '/Starley-F-Resume.pdf';
@@ -129,6 +130,22 @@ export default function App() {
     setBookingShowOverride(undefined);
 
     if (typeof window === 'undefined') return;
+    const scrollToBookingFlow = (panelSelector?: string) => {
+      requestAnimationFrame(() => {
+        document.getElementById('booking-flow')?.scrollIntoView({
+          behavior: 'auto',
+          block: 'start',
+        });
+
+        if (!panelSelector) return;
+        requestAnimationFrame(() => {
+          document.querySelector(panelSelector)?.scrollIntoView({
+            behavior: 'auto',
+            block: 'start',
+          });
+        });
+      });
+    };
     if (!href || href === '/#stage') {
       setCurrentView('home');
       window.history.replaceState(null, '', '/#stage');
@@ -145,23 +162,13 @@ export default function App() {
     if (href.includes('#seating')) {
       setCurrentView('seating');
       window.history.replaceState(null, '', '/#seating');
-      requestAnimationFrame(() => {
-        document.getElementById('booking-flow')?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-      });
+      scrollToBookingFlow('#seating-chart');
       return;
     }
     if (href.includes('#calendar')) {
       setCurrentView('calendar');
       window.history.replaceState(null, '', '/#calendar');
-      requestAnimationFrame(() => {
-        document.getElementById('booking-flow')?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-      });
+      scrollToBookingFlow();
       return;
     }
     setCurrentView('home');
@@ -227,6 +234,61 @@ export default function App() {
     window.addEventListener('keydown', handleEscapeCloseDialog);
     return () => window.removeEventListener('keydown', handleEscapeCloseDialog);
   }, [handleCancelExitBooking, isExitBookingDialogOpen]);
+  useEffect(() => {
+    if (!isExitBookingDialogOpen || typeof window === 'undefined') {
+      setExitDialogAnchorTop(null);
+      return;
+    }
+
+    const isMobileViewport = window.matchMedia('(max-width: 768px)').matches;
+    if (!isMobileViewport) {
+      setExitDialogAnchorTop(null);
+      return;
+    }
+
+    const updateExitDialogAnchor = () => {
+      const bookingFlow = document.getElementById('booking-flow');
+      const header = document.querySelector('.theater-header') as HTMLElement | null;
+      const headerBottom = header?.getBoundingClientRect().bottom ?? 0;
+      const bookingFlowRect = bookingFlow?.getBoundingClientRect();
+      const viewportPadding = 16;
+      const estimatedDialogHeight = 232;
+      const visibleFlowTop = bookingFlowRect
+        ? Math.max(bookingFlowRect.top, headerBottom + viewportPadding)
+        : headerBottom + viewportPadding;
+      const visibleFlowBottom = bookingFlowRect
+        ? Math.min(bookingFlowRect.bottom, window.innerHeight - viewportPadding)
+        : window.innerHeight - viewportPadding;
+      const visibleFlowHeight = Math.max(0, visibleFlowBottom - visibleFlowTop);
+      const centeredWithinFlow = visibleFlowTop + Math.max(0, (visibleFlowHeight - estimatedDialogHeight) / 2);
+      const fallbackTop = Math.max(headerBottom + 28, 112);
+      const maxTop = Math.max(viewportPadding, window.innerHeight - estimatedDialogHeight - viewportPadding);
+      const anchoredTop = visibleFlowHeight > 0 ? centeredWithinFlow : fallbackTop;
+
+      setExitDialogAnchorTop(Math.round(Math.max(fallbackTop, Math.min(anchoredTop, maxTop))));
+    };
+
+    updateExitDialogAnchor();
+    window.addEventListener('scroll', updateExitDialogAnchor, { passive: true });
+    window.addEventListener('resize', updateExitDialogAnchor);
+    return () => {
+      window.removeEventListener('scroll', updateExitDialogAnchor);
+      window.removeEventListener('resize', updateExitDialogAnchor);
+    };
+  }, [isExitBookingDialogOpen]);
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (!isExitBookingDialogOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const previousTouchAction = document.body.style.touchAction;
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.style.touchAction = previousTouchAction;
+    };
+  }, [isExitBookingDialogOpen]);
   const runUsherSpotlightTransition = useCallback((navigate: () => void) => {
     if (typeof window === 'undefined' || typeof document === 'undefined') {
       navigate();
@@ -388,7 +450,13 @@ export default function App() {
       const targetPath = normalizePath(url.pathname);
       const currentPath = normalizePath(window.location.pathname);
       if (!isAppPagePath(targetPath)) return;
-      if (targetPath === currentPath) return;
+      if (targetPath === currentPath) {
+        if (url.hash === '#stage' && !isExitBookingDialogOpen) {
+          document.body.style.overflow = '';
+          document.body.style.touchAction = '';
+        }
+        return;
+      }
 
       const destination = `${targetPath}${url.search}${url.hash}`;
       if (!confirmExitBooking(destination)) {
@@ -402,7 +470,7 @@ export default function App() {
 
     document.addEventListener('click', handleDocumentClick, true);
     return () => document.removeEventListener('click', handleDocumentClick, true);
-  }, [confirmExitBooking, runThemeMatchedPageTransition]);
+  }, [confirmExitBooking, isExitBookingDialogOpen, runThemeMatchedPageTransition]);
 
   return (
     <ThemeProvider>
@@ -477,14 +545,33 @@ export default function App() {
         )}
       </Suspense>
       {isExitBookingDialogOpen && (
-        <div className="booking-exit-dialog-wrap" role="dialog" aria-modal="true" aria-labelledby="exit-booking-title">
+        <div
+          className="booking-exit-dialog-wrap"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="exit-booking-title"
+        >
           <button
             className="booking-exit-dialog-backdrop"
             type="button"
             aria-label="Close exit booking dialog"
             onClick={handleCancelExitBooking}
           />
-          <div className="booking-exit-dialog-card">
+          <div
+            className="booking-exit-dialog-card"
+            style={
+              exitDialogAnchorTop !== null
+                ? ({
+                    position: 'fixed',
+                    top: `${exitDialogAnchorTop}px`,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: 'calc(100% - 1.5rem)',
+                    maxWidth: '24rem',
+                  } as React.CSSProperties)
+                : undefined
+            }
+          >
             <h2 id="exit-booking-title" className="booking-exit-dialog-title">
               Exit Booking?
             </h2>

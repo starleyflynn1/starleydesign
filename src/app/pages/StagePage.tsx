@@ -40,6 +40,12 @@ export function StagePage({
   setBookingStep,
 }: StagePageProps) {
   const bookingStepPanelRef = useRef<HTMLDivElement | null>(null);
+  const stagePinchTargetRef = useRef<HTMLDivElement | null>(null);
+  const stagePinchStartDistanceRef = useRef<number | null>(null);
+  const stagePinchStartScaleRef = useRef(1);
+  const isStagePinchingRef = useRef(false);
+  const gestureStartScaleRef = useRef(1);
+  const [stageScale, setStageScale] = useState(1);
   const isComponentFocusMode = currentView === 'booking';
   const isBookingNoScrollMode = currentView === 'booking';
   const showTitles = useMemo(() => bookingShows.map((show) => show.title), [bookingShows]);
@@ -202,6 +208,79 @@ export function StagePage({
     setBookingStep(Math.max(1, bookingStep - 1));
     repositionBookingStepViewport();
   };
+  const isMobileViewport = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
+  const getTouchDistance = (touches: TouchList) => {
+    if (touches.length < 2) return null;
+    const first = touches[0];
+    const second = touches[1];
+    const deltaX = second.clientX - first.clientX;
+    const deltaY = second.clientY - first.clientY;
+    return Math.hypot(deltaX, deltaY);
+  };
+  useEffect(() => {
+    const target = stagePinchTargetRef.current;
+    if (!target || !isMobileViewport) return;
+
+    const handleNativeTouchStart = (event: TouchEvent) => {
+      if (event.touches.length < 2) {
+        stagePinchStartDistanceRef.current = null;
+        isStagePinchingRef.current = false;
+        return;
+      }
+      const distance = getTouchDistance(event.touches);
+      if (!distance) return;
+      stagePinchStartDistanceRef.current = distance;
+      stagePinchStartScaleRef.current = stageScale;
+      isStagePinchingRef.current = true;
+      event.preventDefault();
+    };
+
+    const handleNativeTouchMove = (event: TouchEvent) => {
+      const startDistance = stagePinchStartDistanceRef.current;
+      if (!startDistance || event.touches.length < 2) return;
+      const nextDistance = getTouchDistance(event.touches);
+      if (!nextDistance) return;
+      event.preventDefault();
+      const ratio = nextDistance / startDistance;
+      const nextScale = stagePinchStartScaleRef.current * ratio;
+      setStageScale(Math.max(0.68, Math.min(1.12, nextScale)));
+    };
+
+    const handleNativeTouchEnd = () => {
+      stagePinchStartDistanceRef.current = null;
+      isStagePinchingRef.current = false;
+    };
+
+    // iOS Safari exposes pinch zoom as GestureEvents.
+    const handleGestureStart = (event: Event) => {
+      const gesture = event as Event & { scale?: number; preventDefault: () => void };
+      gestureStartScaleRef.current = stageScale;
+      gesture.preventDefault();
+    };
+
+    const handleGestureChange = (event: Event) => {
+      const gesture = event as Event & { scale?: number; preventDefault: () => void };
+      const scaleDelta = typeof gesture.scale === 'number' ? gesture.scale : 1;
+      const nextScale = gestureStartScaleRef.current * scaleDelta;
+      setStageScale(Math.max(0.68, Math.min(1.12, nextScale)));
+      gesture.preventDefault();
+    };
+
+    target.addEventListener('touchstart', handleNativeTouchStart, { passive: false });
+    target.addEventListener('touchmove', handleNativeTouchMove, { passive: false });
+    target.addEventListener('touchend', handleNativeTouchEnd);
+    target.addEventListener('touchcancel', handleNativeTouchEnd);
+    target.addEventListener('gesturestart', handleGestureStart as EventListener, { passive: false });
+    target.addEventListener('gesturechange', handleGestureChange as EventListener, { passive: false });
+    return () => {
+      target.removeEventListener('touchstart', handleNativeTouchStart);
+      target.removeEventListener('touchmove', handleNativeTouchMove);
+      target.removeEventListener('touchend', handleNativeTouchEnd);
+      target.removeEventListener('touchcancel', handleNativeTouchEnd);
+      target.removeEventListener('gesturestart', handleGestureStart as EventListener);
+      target.removeEventListener('gesturechange', handleGestureChange as EventListener);
+    };
+  }, [isMobileViewport, stageScale]);
   const handleComponentTabChange = (view: 'booking' | 'seating' | 'calendar') => {
     if (currentView === 'booking' && view !== 'booking' && confirmExitNavigation) {
       const destination = view === 'seating' ? '/#seating' : '/#calendar';
@@ -221,6 +300,15 @@ export function StagePage({
     <main className={`app-main ${isBookingNoScrollMode ? 'app-main-booking' : ''}`}>
       {!isComponentFocusMode && (
         <section id="stage" className="hero-section">
+          <div
+            ref={stagePinchTargetRef}
+            style={{
+              transform: `scale(${stageScale})`,
+              transformOrigin: 'top center',
+              transition: stagePinchStartDistanceRef.current ? 'none' : 'transform 160ms ease-out',
+              touchAction: isMobileViewport ? 'none' : undefined,
+            }}
+          >
           <div className="hero-badge">
             <Sparkles className="icon-sm" />
             <span>Theater Design System</span>
@@ -235,6 +323,7 @@ export function StagePage({
             <kbd className="hero-shortcut">
               <span className="spotlight-text">⌘ K</span> to open Global Usher
             </kbd>
+          </div>
           </div>
         </section>
       )}

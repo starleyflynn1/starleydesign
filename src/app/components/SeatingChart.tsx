@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { Accessibility, Bug, Code2, Copy, Network, Settings2, X } from 'lucide-react';
 
 type SeatStatus = 'available' | 'unavailable' | 'vip' | 'accessible' | 'selected';
@@ -53,6 +53,8 @@ export function SeatingChart({
   suggestRequestKey,
   resetRequestKey,
 }: SeatingChartProps) {
+  const fitViewportRef = useRef<HTMLDivElement | null>(null);
+  const fitContentRef = useRef<HTMLDivElement | null>(null);
   const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
   const [seatLiveMessage, setSeatLiveMessage] = useState('');
   const [isToolsOpen, setIsToolsOpen] = useState(false);
@@ -76,6 +78,14 @@ export function SeatingChart({
   const [sectionTypes, setSectionTypes] = useState<{ left: SectionType; center: SectionType; right: SectionType }>(
     DEFAULT_SECTION_TYPES
   );
+  const [isMobileViewport, setIsMobileViewport] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 768px)').matches : false
+  );
+  const [isFitOverview, setIsFitOverview] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 768px)').matches : false
+  );
+  const [fitScale, setFitScale] = useState(1);
+  const recalcFitScaleRef = useRef<() => void>(() => {});
   const ticketCount = controlledTicketCount ?? ticketCountState;
   const updateTicketCount = (count: number) => {
     if (typeof controlledTicketCount === 'number') {
@@ -151,6 +161,89 @@ export function SeatingChart({
       };
     });
   }, [generatedSeats, seatOverrides]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const handleChange = () => {
+      const mobile = mediaQuery.matches;
+      setIsMobileViewport(mobile);
+      if (mobile) setIsFitOverview(true);
+      else {
+        setIsFitOverview(false);
+        setFitScale(1);
+      }
+    };
+    handleChange();
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobileViewport || !isFitOverview) {
+      setFitScale(1);
+      return;
+    }
+
+    const recalc = () => {
+      const viewport = fitViewportRef.current;
+      const content = fitContentRef.current;
+      if (!viewport || !content) return;
+      const availableWidth = Math.max(0, viewport.clientWidth - 8);
+      const stageTopbar = content.querySelector('.seating-stage-topbar') as HTMLElement | null;
+      const grid = content.querySelector('.seating-grid') as HTMLElement | null;
+      const legend = content.querySelector('.seating-legend') as HTMLElement | null;
+      const contentWidth = Math.max(
+        content.scrollWidth,
+        stageTopbar?.scrollWidth ?? 0,
+        grid?.scrollWidth ?? 0,
+        legend?.scrollWidth ?? 0
+      );
+      if (!contentWidth || !availableWidth) {
+        setFitScale(1);
+        return;
+      }
+      // Keep a little horizontal breathing room so content stays visually
+      // inside the card edge on narrow mobile viewports.
+      const fittedScale = (availableWidth / contentWidth) * 0.95;
+      setFitScale(Math.max(0.62, Math.min(0.95, fittedScale)));
+    };
+    recalcFitScaleRef.current = recalc;
+
+    recalc();
+    window.addEventListener('resize', recalc);
+    return () => window.removeEventListener('resize', recalc);
+  }, [isMobileViewport, isFitOverview, rowCount, seatsPerRow, compactMode, sectionTypes]);
+  useEffect(() => {
+    if (!isMobileViewport || !isFitOverview) return;
+    if (typeof ResizeObserver === 'undefined') return;
+    const viewport = fitViewportRef.current;
+    const content = fitContentRef.current;
+    if (!viewport || !content) return;
+
+    const observer = new ResizeObserver(() => {
+      recalcFitScaleRef.current();
+    });
+    observer.observe(viewport);
+    observer.observe(content);
+    return () => observer.disconnect();
+  }, [isMobileViewport, isFitOverview]);
+  useEffect(() => {
+    if (!isMobileViewport || !isFitOverview) return;
+    requestAnimationFrame(() => {
+      recalcFitScaleRef.current();
+      requestAnimationFrame(() => {
+        recalcFitScaleRef.current();
+      });
+    });
+  }, [isMobileViewport, isFitOverview, rowCount, seatsPerRow, sectionTypes]);
+  useEffect(() => {
+    if (!isMobileViewport || !isFitOverview) return;
+    const viewport = fitViewportRef.current;
+    if (!viewport) return;
+    // Reset any prior horizontal scroll offset from interactive mode.
+    viewport.scrollLeft = 0;
+  }, [isMobileViewport, isFitOverview]);
 
   useEffect(() => {
     setSelectedSeats((prev) => {
@@ -447,7 +540,7 @@ try {
     }
   };
 
-  const handleSeatKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, seat: Seat) => {
+  const handleSeatKeyDown = (event: ReactKeyboardEvent<HTMLButtonElement>, seat: Seat) => {
     const key = event.key;
     if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', ' '].includes(key)) return;
 
@@ -485,6 +578,41 @@ try {
       onMouseLeave={() => setIsDragSelecting(false)}
     >
       <div className="seating-main-column">
+      {isMobileViewport && isFitOverview && (
+        <div className="seating-fit-banner" role="status" aria-live="polite">
+          <span>Theater formatted to fit your screen.</span>
+          <button
+            type="button"
+            className="seating-fit-primary-btn"
+            onClick={() => setIsFitOverview(false)}
+          >
+            Select Seats
+          </button>
+        </div>
+      )}
+      <div
+        ref={fitViewportRef}
+        className={`seating-fit-viewport ${
+          isMobileViewport && isFitOverview
+            ? 'seating-fit-viewport-overview'
+            : isMobileViewport
+            ? 'seating-fit-viewport-scroll'
+            : ''
+        }`}
+      >
+      <div
+        ref={fitContentRef}
+        className="seating-fit-content"
+        style={
+          isMobileViewport && isFitOverview
+            ? {
+                transform: `scale(${fitScale})`,
+                transformOrigin: 'top center',
+                pointerEvents: 'none',
+              }
+            : undefined
+        }
+      >
       <div className="seating-stage-wrap">
         {!hideTools && !isToolsOpen && (
           <div className="seating-tools-row">
@@ -637,6 +765,19 @@ try {
           <span className="seating-legend-label">Selected</span>
         </div>
       </div>
+      </div>
+      </div>
+      {isMobileViewport && !isFitOverview && (
+        <div className="seating-fit-actions">
+          <button
+            type="button"
+            className="seating-fit-secondary-btn"
+            onClick={() => setIsFitOverview(true)}
+          >
+            View Entire Theater
+          </button>
+        </div>
+      )}
       </div>
 
       {!hideTools && (

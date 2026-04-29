@@ -30,15 +30,14 @@ export function DirectorPage() {
             </p>
             <p className="feature-copy">
               <strong>Technical Architecture:</strong> Engineering for <em>Scalability</em>. 
-              Building enterprise-grade systems that thrive under heavy data and complex state management.
+              Building enterprise-grade systems for large audiences that thrive under heavy data usage with high-concurrency state management.
             </p>  
             <p className="feature-copy">
               <strong>UX Engineering:</strong> <em>Performance</em> as an Aesthetic. 
               Translating Figma visions into zero-latency, production-ready code with pixel-perfect fidelity.
             </p>
             <p className="feature-copy">
-              <strong>Human-Centric Design:</strong> A relentless commitment to accessibility,
-              ensuring every performance is inclusive and intuitive for all.
+              <strong>Responsible AI Tooling:</strong> Accelerating development cycle from high-fidelity prototypes to production-ready code.
             </p>
           </article>
           <article className="feature-item">

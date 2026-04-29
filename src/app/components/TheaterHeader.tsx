@@ -135,7 +135,10 @@ export function TheaterHeader({ onSearchClick, onNavigate }: TheaterHeaderProps)
               <StylePicker />
 
               <button
-                onClick={toggleMode}
+                onClick={() => {
+                  toggleMode();
+                  closeMobileMenu();
+                }}
                 className="theater-icon-btn"
                 aria-label="Toggle dark mode"
                 type="button"
@@ -143,7 +146,10 @@ export function TheaterHeader({ onSearchClick, onNavigate }: TheaterHeaderProps)
                 {mode === 'dark' ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}
               </button>
               <button
-                onClick={toggleMotion}
+                onClick={() => {
+                  toggleMotion();
+                  closeMobileMenu();
+                }}
                 className="theater-icon-btn"
                 aria-label={motionEnabled ? 'Reduce motion' : 'Enable animations'}
                 aria-pressed={motionEnabled}
