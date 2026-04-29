@@ -16,10 +16,29 @@
   
   --card: var(--cad-gray);
   --card-foreground: var(--ink-black);
+  --seating-panel-bg: color-mix(in oklab, #ffffff 94%, #dbeafe 6%);
+  --seating-panel-border: color-mix(in oklab, var(--blueprint-blue) 26%, #cbd5e1 74%);
+  --seating-panel-fg: var(--ink-black);
+  --seating-panel-title-fg: color-mix(in oklab, var(--blueprint-blue) 76%, #0f172a 24%);
+  --seating-panel-subtitle-fg: #334155;
+  --seating-subpanel-bg: color-mix(in oklab, #f8fafc 92%, #dbeafe 8%);
+  --seating-subpanel-border: color-mix(in oklab, var(--blueprint-blue) 22%, #cbd5e1 78%);
+  --seating-subpanel-list-bg: color-mix(in oklab, #f1f5f9 90%, #dbeafe 10%);
+  --seating-control-bg: #ffffff;
+  --seating-control-border: color-mix(in oklab, var(--blueprint-blue) 30%, #94a3b8 70%);
+  --seating-control-fg: #0f172a;
+  --seating-control-hover-bg: color-mix(in oklab, var(--blueprint-blue) 16%, #ffffff 84%);
+  --seating-control-hover-fg: #0b2d5e;
+  --seating-accent-bg: color-mix(in oklab, var(--blueprint-blue) 24%, #ffffff 76%);
+  --seating-accent-border: color-mix(in oklab, var(--blueprint-blue) 56%, #64748b 44%);
+  --seating-accent-fg: #082f49;
+  --seating-accent-hover-bg: color-mix(in oklab, var(--blueprint-blue) 32%, #ffffff 68%);
+  --seating-accent-hover-fg: #06203f;
   
   --primary: var(--blueprint-blue);
   --primary-foreground: #ffffff;
   --velvet: var(--safety-orange);
+  --selection-accent: var(--velvet);
   --spotlight: var(--blueprint-blue);
   --accent: var(--safety-orange);
   --border: #cbd5e1;
@@ -121,7 +140,7 @@
 }
 
 /* --- Buttons --- */
-.theme-blueprint button {
+.theme-blueprint button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.usher-action-btn):not(.usher-close-btn) {
   background: transparent;
   color: var(--blueprint-blue);
   border: 2px solid var(--blueprint-blue);
@@ -132,7 +151,7 @@
   position: relative;
 }
 
-.theme-blueprint button:hover {
+.theme-blueprint button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.usher-action-btn):not(.usher-close-btn):hover {
   background: var(--blueprint-blue);
   color: #ffffff;
 }
@@ -145,10 +164,29 @@
   --foreground: #f8fafc;
   --blueprint-blue: #38bdf8; /* Brighter Sky Blue for dark contrast */
   --safety-orange: #fb923c;
+  --selection-accent: var(--safety-orange);
   
   --card: #0f172a;
   --border: #1e293b;
   --stage-base: var(--blueprint-blue);
+  --seating-panel-bg: color-mix(in oklab, #0b1220 88%, #0f172a 12%);
+  --seating-panel-border: color-mix(in oklab, #7dd3fc 30%, transparent);
+  --seating-panel-fg: #e6f4ff;
+  --seating-panel-title-fg: #7dd3fc;
+  --seating-panel-subtitle-fg: #c8def2;
+  --seating-subpanel-bg: color-mix(in oklab, #0f172a 86%, #1e293b 14%);
+  --seating-subpanel-border: color-mix(in oklab, #7dd3fc 24%, transparent);
+  --seating-subpanel-list-bg: color-mix(in oklab, #0f172a 82%, #1e293b 18%);
+  --seating-control-bg: color-mix(in oklab, #0f172a 78%, #38bdf8 22%);
+  --seating-control-border: color-mix(in oklab, #7dd3fc 36%, transparent);
+  --seating-control-fg: #f8fbff;
+  --seating-control-hover-bg: color-mix(in oklab, #38bdf8 24%, #0f172a 76%);
+  --seating-control-hover-fg: #ffffff;
+  --seating-accent-bg: color-mix(in oklab, #38bdf8 34%, #0f172a 66%);
+  --seating-accent-border: color-mix(in oklab, #7dd3fc 58%, transparent);
+  --seating-accent-fg: #ffffff;
+  --seating-accent-hover-bg: color-mix(in oklab, #38bdf8 38%, #0f172a 62%);
+  --seating-accent-hover-fg: #ffffff;
   --btn-disabled-bg: color-mix(in oklab, #0f172a 80%, #e2e8f0 20%);
   --btn-disabled-border: color-mix(in oklab, #e2e8f0 32%, transparent);
   --btn-disabled-fg: color-mix(in oklab, #f8fafc 90%, transparent);
@@ -239,13 +277,6 @@
   color: #f8fafc !important;
 }
 
-/* Style picker dropdown readability in blueprint, especially dark mode. */
-.theme-blueprint .ui-dropdown-content.style-picker-menu {
-  background: var(--card);
-  color: var(--foreground);
-  border-color: color-mix(in oklab, var(--blueprint-blue) 28%, var(--border) 72%);
-}
-
 .theme-blueprint .style-picker-title {
   color: var(--foreground);
 }
@@ -258,34 +289,28 @@
   color: var(--safety-orange);
 }
 
-.theme-blueprint .style-picker-item[data-highlighted],
-.theme-blueprint .style-picker-item:hover {
+.theme-blueprint .style-picker-item:hover,
+.theme-blueprint .style-picker-item:focus-visible {
   background: color-mix(in oklab, var(--safety-orange) 88%, white 12%);
   color: #ffffff !important;
 }
 
-.theme-blueprint .style-picker-item[data-highlighted] .style-picker-title,
 .theme-blueprint .style-picker-item:hover .style-picker-title,
-.theme-blueprint .style-picker-item[data-highlighted] .style-picker-description,
-.theme-blueprint .style-picker-item:hover .style-picker-description {
+.theme-blueprint .style-picker-item:focus-visible .style-picker-title,
+.theme-blueprint .style-picker-item:hover .style-picker-description,
+.theme-blueprint .style-picker-item:focus-visible .style-picker-description {
   color: #ffffff !important;
 }
 
-.theme-blueprint .style-picker-item[data-highlighted] .style-picker-check,
-.theme-blueprint .style-picker-item:hover .style-picker-check {
+.theme-blueprint .style-picker-item:hover .style-picker-check,
+.theme-blueprint .style-picker-item:focus-visible .style-picker-check {
   color: #ffffff !important;
 }
 
-.theme-blueprint .style-picker-item[data-highlighted] .style-picker-swatch,
-.theme-blueprint .style-picker-item:hover .style-picker-swatch {
+.theme-blueprint .style-picker-item:hover .style-picker-swatch,
+.theme-blueprint .style-picker-item:focus-visible .style-picker-swatch {
   border-color: rgba(255, 255, 255, 0.9) !important;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
-}
-
-.dark.theme-blueprint .ui-dropdown-content.style-picker-menu {
-  background: color-mix(in oklab, var(--card) 92%, #0b1220 8%);
-  color: #e2ecff;
-  border-color: color-mix(in oklab, var(--blueprint-blue) 36%, var(--border) 64%);
 }
 
 .dark.theme-blueprint .style-picker-title {
@@ -296,17 +321,57 @@
   color: color-mix(in oklab, #c7d8ff 76%, transparent);
 }
 
-.dark.theme-blueprint .style-picker-item[data-highlighted],
-.dark.theme-blueprint .style-picker-item:hover {
+/* Light-mode hover consistency baseline (shared ratios across themes). */
+.theme-blueprint:not(.dark) .theater-icon-btn:hover,
+.theme-blueprint:not(.dark) .theater-mobile-search-btn:hover,
+.theme-blueprint:not(.dark) .theater-mobile-menu-btn:hover,
+.theme-blueprint:not(.dark) .style-picker-trigger:hover {
+  background: color-mix(in oklab, var(--primary) 12%, var(--card) 88%) !important;
+  color: var(--foreground) !important;
+  border-color: color-mix(in oklab, var(--primary) 46%, var(--border) 54%) !important;
+}
+
+.theme-blueprint:not(.dark) .segment-btn:hover:not(.segment-btn-active),
+.theme-blueprint:not(.dark) .btn-prev:hover,
+.theme-blueprint:not(.dark) .show-card-btn:hover {
+  background: color-mix(in oklab, var(--primary) 14%, var(--card) 86%) !important;
+  color: var(--foreground) !important;
+  border-color: color-mix(in oklab, var(--primary) 48%, var(--border) 52%) !important;
+}
+
+.theme-blueprint:not(.dark) .btn-next:hover {
+  background: color-mix(in oklab, var(--primary) 78%, black 22%) !important;
+  border-color: color-mix(in oklab, var(--primary) 84%, black 16%) !important;
+  color: #ffffff !important;
+}
+
+.theme-blueprint:not(.dark) .calendar-time-btn.calendar-time-enabled:hover {
+  background: color-mix(in oklab, var(--primary) 16%, var(--card) 84%) !important;
+  border-color: color-mix(in oklab, var(--primary) 56%, var(--border) 44%) !important;
+  color: var(--foreground) !important;
+}
+
+.theme-blueprint:not(.dark) .usher-action-hover:hover {
+  background: color-mix(in oklab, var(--primary) 12%, var(--background) 88%) !important;
+}
+
+.theme-blueprint:not(.dark) .usher-action-hover:hover .usher-action-title,
+.theme-blueprint:not(.dark) .usher-action-hover:hover .icon-md-muted,
+.theme-blueprint:not(.dark) .usher-action-hover:hover .usher-action-meta {
+  color: var(--foreground) !important;
+}
+
+.dark.theme-blueprint .style-picker-item:hover,
+.dark.theme-blueprint .style-picker-item:focus-visible {
   background: color-mix(in oklab, var(--safety-orange) 72%, #1e293b 28%);
   color: #f8fafc;
 }
 
-.dark.theme-blueprint .style-picker-item[data-highlighted] .style-picker-title,
 .dark.theme-blueprint .style-picker-item:hover .style-picker-title,
-.dark.theme-blueprint .style-picker-item[data-highlighted] .style-picker-description,
+.dark.theme-blueprint .style-picker-item:focus-visible .style-picker-title,
 .dark.theme-blueprint .style-picker-item:hover .style-picker-description,
-.dark.theme-blueprint .style-picker-item[data-highlighted] .style-picker-check,
-.dark.theme-blueprint .style-picker-item:hover .style-picker-check {
+.dark.theme-blueprint .style-picker-item:focus-visible .style-picker-description,
+.dark.theme-blueprint .style-picker-item:hover .style-picker-check,
+.dark.theme-blueprint .style-picker-item:focus-visible .style-picker-check {
   color: #f8fafc !important;
 }

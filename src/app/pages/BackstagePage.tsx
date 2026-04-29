@@ -18,44 +18,40 @@ export function BackstagePage() {
         </p>
         <div className="feature-grid">
           <article className="feature-item">
-            <h4 className="spotlight-text">State Management</h4>
+            <h4 className="spotlight-text">Theatrical State Management</h4>
             <p className="feature-copy">
-              Global themes are managed via a centralized store, while localized interactions
-              (like hovers or selections) use custom synchronization hooks to ensure transient
-              states remain harmonized across the system.
+              Global themes are orchestrated via a centralized store, while localized interactions -
+              such as seat hovers or selection states - utilize custom synchronization hooks. This
+              dual-layered architecture is designed to keep transient states harmonized across the
+              entire site without sacrificing performance.
             </p>
           </article>
           <article id="recursive-component-logic" className="feature-item">
-            <h4 className="spotlight-text">Recursive &amp; Scalable Rendering</h4>
+            <h4 className="spotlight-text">Recursive &amp; Scalable Venue Logic</h4>
             <p className="feature-copy">
-              The system employs recursive mapping and decoupled primitives to scale layouts
-              dynamically, allowing the same logic to handle everything from 7-column calendars to
-              complex, high-density seating grids.
+              By decoupling rendering primitives from venue geometry, the system is designed to
+              support recursive-style mapping patterns that scale dynamically. The same
+              architectural logic is intended to handle
+              everything from 7-column calendars to complex, high-density theater grids, preserving
+              consistent interaction rules regardless of footprint.
             </p>
           </article>
           <article className="feature-item">
-            <h4 className="spotlight-text">Modular Data Schema</h4>
+            <h4 className="spotlight-text">Modular Data &amp; Introspection</h4>
             <p className="feature-copy">
-              Seats and UI nodes are treated as modular objects containing metadata for
-              positioning, pricing, and accessibility, supported by an integrated debugger for
-              real-time JSON state introspection.
+              UI nodes and seating inventory are treated as modular objects rich with metadata for
+              positioning, pricing, and accessibility. This schema is supported by an integrated
+              developer console designed to enable real-time JSON state introspection and live
+              debugging of the system&apos;s &quot;backstage&quot; data.
             </p>
           </article>
           <article className="feature-item">
             <h4 className="spotlight-text">Optimistic UI &amp; Resilience</h4>
             <p className="feature-copy">
-              Designed for zero-latency, the interface reflects user actions instantaneously while
-              utilizing robust rollback semantics to handle potential asynchronous API conflicts or
-              reservation errors.
-            </p>
-          </article>
-          <article id="scalable-venue-logic" className="feature-item">
-            <h4 className="spotlight-text">Scalable Venue Logic</h4>
-            <p className="feature-copy">
-              Venue modeling is structured to scale with configurable rows, seats-per-row, aisle
-              boundaries, and section types. This lets the same rendering primitives support
-              different venue footprints while preserving consistent interaction rules and
-              accessibility behavior.
+              Engineered for zero-latency, the interface reflects audience actions
+              instantaneously. The intended implementation is designed to support robust rollback
+              semantics and optimistic hold/release logic for asynchronous API conflicts, ensuring a
+              fluid experience even during high-traffic reservation windows.
             </p>
           </article>
         </div>
@@ -73,8 +69,8 @@ export function BackstagePage() {
             <p className="feature-copy">
               The system uses a robust token-based approach. Atmospheric modes like Coastal Misty
               are not just hex codes; they are sets of semantic tokens (for example, --background,
-              --foreground, --card, --muted, --border, --spotlight, and --velvet) that allow for
-              instant, system-wide re-skinning without CSS bloat.
+              --foreground, and --spotlight) that allow for instant, system-wide re-skinning
+              without CSS bloat.
             </p>
           </article>
           <article className="feature-item">

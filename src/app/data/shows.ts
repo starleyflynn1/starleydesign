@@ -3,7 +3,9 @@ import { Show } from './types';
 export const SHOWS: Show[] = [
   {
     title: 'The Design System',
-    image: 'https://images.unsplash.com/photo-1514306191717-452ec28c7814?w=400',
+    image: '/images/shows/design-system-320.jpg',
+    imageSrcSet: '/images/shows/design-system-320.jpg 320w, /images/shows/design-system-480.jpg 480w, /images/shows/design-system-768.jpg 768w, /images/shows/design-system-1200.jpg 1200w',
+    imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
     date: '2026',
     scope: 'User Experience Architecture',
     stack: 'React · TypeScript · Figma',
@@ -12,8 +14,9 @@ export const SHOWS: Show[] = [
   },
   {
     title: 'Salesforce',
-    image:
-      'https://images.unsplash.com/photo-1721553710744-e02e98f2cbfb?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    image: '/images/shows/salesforce-320.jpg',
+    imageSrcSet: '/images/shows/salesforce-320.jpg 320w, /images/shows/salesforce-480.jpg 480w, /images/shows/salesforce-768.jpg 768w, /images/shows/salesforce-1200.jpg 1200w',
+    imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
     date: '2022 — 2026',
     scope: 'Digital Campus at Scale',
     stack: 'Javascript · GraphQL · Java',
@@ -22,8 +25,9 @@ export const SHOWS: Show[] = [
   },
   {
     title: 'Google',
-    image:
-      'https://images.unsplash.com/photo-1593940256067-fb4acd831804?q=80&w=776&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    image: '/images/shows/google-320.jpg',
+    imageSrcSet: '/images/shows/google-320.jpg 320w, /images/shows/google-480.jpg 480w, /images/shows/google-768.jpg 768w, /images/shows/google-1200.jpg 1200w',
+    imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
     date: '2021 — 2022',
     scope: 'Lead Management Engine',
     stack: 'Javascript · LWC · Java',
@@ -32,8 +36,9 @@ export const SHOWS: Show[] = [
   },
   {
     title: 'BFA Theater',
-    image:
-      'https://images.unsplash.com/photo-1503095396549-807759245b35?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    image: '/images/shows/bfa-theater-320.jpg',
+    imageSrcSet: '/images/shows/bfa-theater-320.jpg 320w, /images/shows/bfa-theater-480.jpg 480w, /images/shows/bfa-theater-768.jpg 768w, /images/shows/bfa-theater-1200.jpg 1200w',
+    imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
     date: '2004 — 2026',
     scope: 'Collaborative Production',
     stack: 'Narrative & User Psychology',

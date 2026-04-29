@@ -187,7 +187,6 @@ export function PerformanceCalendar({
                       onSelectPerformance?.(selectedDate!, performance.time, performance.type);
                     }}
                     disabled={performance.available === 0}
-                    title={timeSelectionHint}
                     aria-label={`${performance.type} ${performance.time}. ${timeSelectionHint}`}
                     className={`calendar-time-btn ${
                       performance.available === 0

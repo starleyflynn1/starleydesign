@@ -16,10 +16,31 @@
   --card-foreground: var(--matrix-green);
   --stage-base: var(--matrix-green);
   --stage-depth: #d1d5db;
+  --seating-panel-bg: color-mix(in oklab, #f3f4f6 94%, #d1d5db 6%);
+  --seating-panel-border: color-mix(in oklab, #064e3b 24%, #9ca3af 76%);
+  --seating-panel-fg: #064e3b;
+  --seating-panel-title-fg: #065f46;
+  --seating-panel-subtitle-fg: #0f3f31;
+  --seating-subpanel-bg: color-mix(in oklab, #f9fafb 92%, #d1d5db 8%);
+  --seating-subpanel-border: color-mix(in oklab, #064e3b 20%, #9ca3af 80%);
+  --seating-subpanel-list-bg: color-mix(in oklab, #f3f4f6 90%, #d1d5db 10%);
+  --seating-control-bg: #f9fafb;
+  --seating-control-border: color-mix(in oklab, #064e3b 28%, #6b7280 72%);
+  --seating-control-fg: #064e3b;
+  --seating-control-hover-bg: color-mix(in oklab, #065f46 16%, #f9fafb 84%);
+  --seating-control-hover-fg: #053f30;
+  --seating-accent-bg: color-mix(in oklab, #065f46 20%, #f9fafb 80%);
+  --seating-accent-border: color-mix(in oklab, #065f46 46%, #6b7280 54%);
+  --seating-accent-fg: #053f30;
+  --seating-accent-hover-bg: color-mix(in oklab, #065f46 28%, #f9fafb 72%);
+  --seating-accent-hover-fg: #042f24;
   
   --primary: var(--matrix-green);
   --primary-foreground: var(--terminal-bg);
   --velvet: var(--amber-warning);
+  --selection-accent: var(--velvet);
+  --segment-active-bg: var(--selection-accent);
+  --segment-active-fg: var(--terminal-bg);
   --spotlight: var(--glitch-cyan);
   --accent: var(--amber-warning);
   --border: #9ca3af;
@@ -69,12 +90,36 @@
   --card-foreground: var(--matrix-green);
   --stage-base: var(--matrix-green);
   --stage-depth: #0d0e11;
+  --seating-panel-bg: color-mix(in oklab, #0d1117 90%, #15171c 10%);
+  --seating-panel-border: color-mix(in oklab, #00ff41 30%, transparent);
+  --seating-panel-fg: #ccffe0;
+  --seating-panel-title-fg: #7bffab;
+  --seating-panel-subtitle-fg: #a7f7c5;
+  --seating-subpanel-bg: color-mix(in oklab, #11151b 88%, #0d1117 12%);
+  --seating-subpanel-border: color-mix(in oklab, #00ff41 24%, transparent);
+  --seating-subpanel-list-bg: color-mix(in oklab, #11151b 84%, #0d1117 16%);
+  --seating-control-bg: color-mix(in oklab, #15171c 74%, #00ff41 26%);
+  --seating-control-border: color-mix(in oklab, #00ff41 34%, transparent);
+  --seating-control-fg: #d7ffe8;
+  --seating-control-hover-bg: color-mix(in oklab, #00ff41 24%, #15171c 76%);
+  --seating-control-hover-fg: #ffffff;
+  --seating-accent-bg: color-mix(in oklab, #00ff41 34%, #15171c 66%);
+  --seating-accent-border: color-mix(in oklab, #00ff41 58%, transparent);
+  --seating-accent-fg: #ffffff;
+  --seating-accent-hover-bg: color-mix(in oklab, #00ff41 38%, #15171c 62%);
+  --seating-accent-hover-fg: #ffffff;
 
   --primary: var(--matrix-green);
   --primary-foreground: var(--terminal-bg);
-  --velvet: var(--amber-warning);
+  --velvet: var(--glitch-cyan);
+  --selection-accent: var(--velvet);
+  --segment-active-bg: var(--selection-accent);
+  --segment-active-fg: var(--terminal-bg);
   --spotlight: var(--glitch-cyan);
   --border: #30363d;
+  --seating-selected-ring: color-mix(in oklab, var(--glitch-cyan) 74%, transparent);
+  --seating-selected-glow: color-mix(in oklab, var(--glitch-cyan) 66%, transparent);
+  --seating-selected-inset: color-mix(in oklab, #ffffff 24%, transparent);
   --btn-disabled-bg: color-mix(in oklab, #15171c 74%, #00ff41 26%);
   --btn-disabled-border: color-mix(in oklab, #00ff41 30%, transparent);
   --btn-disabled-fg: color-mix(in oklab, #00ff41 88%, transparent);
@@ -161,6 +206,11 @@
   animation: terminal-cursor-blink 1s steps(2, start) infinite;
 }
 
+/* VIP marker must stay high-contrast on amber seats in Terminal themes. */
+.theme-terminal .seating-seat-vip .seating-seat-symbol {
+  color: #111827 !important;
+}
+
 /* Terminal calendar hover/readability isolation. */
 .theme-terminal .calendar-time-btn.calendar-time-enabled:hover {
   background: color-mix(in oklab, var(--foreground) 12%, var(--background) 88%) !important;
@@ -234,7 +284,7 @@
 }
 
 /* --- Buttons --- */
-.theme-terminal button {
+.theme-terminal button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.usher-action-btn):not(.usher-close-btn) {
   font-family: inherit;
   border: 1px solid var(--foreground);
   background: transparent;
@@ -245,10 +295,25 @@
   transition: all 0.1s steps(2);
 }
 
-.theme-terminal button:hover {
+.theme-terminal button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.usher-action-btn):not(.usher-close-btn):hover {
   background: var(--foreground);
   color: var(--background);
   box-shadow: 0 0 15px var(--foreground);
+}
+
+.theme-terminal .style-picker-menu .style-picker-item {
+  text-transform: none;
+  letter-spacing: normal;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--foreground);
+}
+
+.theme-terminal .style-picker-menu .style-picker-item:hover,
+.theme-terminal .style-picker-menu .style-picker-item:focus-visible {
+  background: var(--picker-hover-bg);
+  color: var(--picker-hover-fg);
+  box-shadow: none;
 }
 
 /* --- Global Usher terminal readability and hover behavior --- */
@@ -286,5 +351,44 @@
   color: color-mix(in oklab, var(--foreground) 86%, transparent);
 }
 
+/* Light-mode hover consistency baseline (shared ratios across themes). */
+.theme-terminal:not(.dark) .theater-icon-btn:hover,
+.theme-terminal:not(.dark) .theater-mobile-search-btn:hover,
+.theme-terminal:not(.dark) .theater-mobile-menu-btn:hover,
+.theme-terminal:not(.dark) .style-picker-trigger:hover {
+  background: color-mix(in oklab, var(--primary) 12%, var(--card) 88%) !important;
+  color: var(--foreground) !important;
+  border-color: color-mix(in oklab, var(--primary) 46%, var(--border) 54%) !important;
+}
+
+.theme-terminal:not(.dark) .segment-btn:hover:not(.segment-btn-active),
+.theme-terminal:not(.dark) .btn-prev:hover,
+.theme-terminal:not(.dark) .show-card-btn:hover {
+  background: color-mix(in oklab, var(--primary) 14%, var(--card) 86%) !important;
+  color: var(--foreground) !important;
+  border-color: color-mix(in oklab, var(--primary) 48%, var(--border) 52%) !important;
+}
+
+.theme-terminal:not(.dark) .btn-next:hover {
+  background: color-mix(in oklab, var(--primary) 78%, black 22%) !important;
+  border-color: color-mix(in oklab, var(--primary) 84%, black 16%) !important;
+  color: #ffffff !important;
+}
+
+.theme-terminal:not(.dark) .calendar-time-btn.calendar-time-enabled:hover {
+  background: color-mix(in oklab, var(--primary) 16%, var(--card) 84%) !important;
+  border-color: color-mix(in oklab, var(--primary) 56%, var(--border) 44%) !important;
+  color: var(--foreground) !important;
+}
+
+.theme-terminal:not(.dark) .usher-action-hover:hover {
+  background: color-mix(in oklab, var(--primary) 12%, var(--background) 88%) !important;
+}
+
+.theme-terminal:not(.dark) .usher-action-hover:hover .usher-action-title,
+.theme-terminal:not(.dark) .usher-action-hover:hover .icon-md-muted,
+.theme-terminal:not(.dark) .usher-action-hover:hover .usher-action-meta {
+  color: var(--foreground) !important;
+}
+
 /* --- Card --- */
-.theme

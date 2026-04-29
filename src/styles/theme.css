@@ -50,6 +50,7 @@
   --color-stage-depth: var(--stage-depth);
   --color-deep-midnight: var(--stage-depth);
   --color-velvet: var(--velvet);
+  --color-selection-accent: var(--selection-accent);
   --color-spotlight: var(--spotlight);
   --color-marquee-surface: var(--marquee-surface);
   --color-marquee-white: var(--marquee-surface);
@@ -64,8 +65,16 @@
 
 /* Cross-theme accessibility tokens (AA-oriented defaults). */
 :root {
+  --selection-accent: var(--velvet);
+  --seat-vip-symbol-color: #111827;
+  /* Fallback seating tokens so non-Stage themes always render seat states. */
+  --seat-available: #5e8a4f;
+  --seat-taken: #64748b;
+  --seat-vip: #d4af37;
+  --seat-accessible: #4a90e2;
   --text-muted-aa: color-mix(in oklab, var(--foreground) 92%, transparent);
   --text-subtle-aa: color-mix(in oklab, var(--foreground) 82%, transparent);
+  --text-accent-aa: color-mix(in oklab, var(--foreground) 74%, var(--spotlight) 26%);
   --stepper-track-bg: color-mix(in oklab, var(--foreground) 30%, transparent);
   --stepper-fill-bg: var(--spotlight);
   --stepper-pending-bg: color-mix(in oklab, var(--card) 92%, var(--foreground) 8%);
@@ -83,6 +92,16 @@
   --script-modal-close-hover-bg: color-mix(in oklab, var(--spotlight) 22%, var(--card) 78%);
   --script-modal-close-hover-fg: color-mix(in oklab, var(--foreground) 98%, black 2%);
   --script-modal-close-hover-border: color-mix(in oklab, var(--spotlight) 56%, transparent);
+}
+
+.dark {
+  --selection-accent: var(--velvet);
+  --seat-vip-symbol-color: #0b1020;
+  /* Dark fallback variants keep seat states readable on deep surfaces. */
+  --seat-available: #7aa25f;
+  --seat-taken: #7185a1;
+  --seat-vip: #e0c25a;
+  --seat-accessible: #78aee8;
 }
 
 @layer base {

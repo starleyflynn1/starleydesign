@@ -1,10 +1,18 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Info, Theater, Sparkles } from 'lucide-react';
+import React, { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
+import { Sparkles } from 'lucide-react';
+import { InfoIcon, TheaterIcon } from '../components/AppIcons';
 import { ShowCard } from '../components/ShowCard';
-import { SeatingChart } from '../components/SeatingChart';
-import { BookingProgress } from '../components/BookingProgress';
-import { PerformanceCalendar } from '../components/PerformanceCalendar';
 import { BookingStep, Performance, Show } from '../data/types';
+
+const SeatingChart = lazy(() =>
+  import('../components/SeatingChart').then((module) => ({ default: module.SeatingChart }))
+);
+const BookingProgress = lazy(() =>
+  import('../components/BookingProgress').then((module) => ({ default: module.BookingProgress }))
+);
+const PerformanceCalendar = lazy(() =>
+  import('../components/PerformanceCalendar').then((module) => ({ default: module.PerformanceCalendar }))
+);
 
 interface StagePageProps {
   shows: Show[];
@@ -14,6 +22,7 @@ interface StagePageProps {
   currentView: 'home' | 'booking' | 'seating' | 'calendar';
   bookingStep: number;
   initialBookingShow?: string;
+  confirmExitNavigation?: (href: string) => boolean;
   setCurrentView: (view: 'home' | 'booking' | 'seating' | 'calendar') => void;
   setBookingStep: (step: number) => void;
 }
@@ -26,10 +35,13 @@ export function StagePage({
   currentView,
   bookingStep,
   initialBookingShow,
+  confirmExitNavigation,
   setCurrentView,
   setBookingStep,
 }: StagePageProps) {
-  const isBookingOnlyMode = currentView !== 'home';
+  const bookingStepPanelRef = useRef<HTMLDivElement | null>(null);
+  const isComponentFocusMode = currentView === 'booking';
+  const isBookingNoScrollMode = currentView === 'booking';
   const showTitles = useMemo(() => bookingShows.map((show) => show.title), [bookingShows]);
   const defaultBookingShow =
     initialBookingShow && showTitles.includes(initialBookingShow)
@@ -45,6 +57,8 @@ export function StagePage({
   const [selectedSeatTotal, setSelectedSeatTotal] = useState(0);
   const [seatBalanceDue, setSeatBalanceDue] = useState(0);
   const [totalPaid, setTotalPaid] = useState(0);
+  const [nextStepHint, setNextStepHint] = useState<string | null>(null);
+  const nextStepHintTimeoutRef = useRef<number | null>(null);
   const [bookingTicketCount, setBookingTicketCount] = useState(2);
   const [suggestRequestKey, setSuggestRequestKey] = useState(0);
   const [resetRequestKey, setResetRequestKey] = useState(0);
@@ -67,6 +81,13 @@ export function StagePage({
     setSuggestRequestKey(0);
     setResetRequestKey(0);
   }, [selectedShowTitle]);
+  useEffect(() => {
+    return () => {
+      if (nextStepHintTimeoutRef.current) {
+        window.clearTimeout(nextStepHintTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const canAdvanceFromStep =
     bookingStep === 1
@@ -139,38 +160,86 @@ export function StagePage({
     return performances.filter((performance) => performance.date.getTime() >= minDate.getTime());
   }, [performances, selectedShow]);
   const firstBookingPerformanceDate = bookingCalendarPerformances[0]?.date ?? null;
+  const showNextStepHint = (message: string) => {
+    setNextStepHint(message);
+    if (nextStepHintTimeoutRef.current) {
+      window.clearTimeout(nextStepHintTimeoutRef.current);
+    }
+    nextStepHintTimeoutRef.current = window.setTimeout(() => {
+      setNextStepHint(null);
+      nextStepHintTimeoutRef.current = null;
+    }, 2200);
+  };
 
+  const repositionBookingStepViewport = () => {
+    if (typeof window === 'undefined') return;
+    requestAnimationFrame(() => {
+      document.getElementById('booking-flow')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+      bookingStepPanelRef.current?.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    });
+  };
   const goToNextStep = () => {
-    if (!canAdvanceFromStep) return;
+    if (!canAdvanceFromStep) {
+      if (bookingStep === 1) showNextStepHint('Select a show to continue.');
+      else if (bookingStep === 2) showNextStepHint('Choose a date and time to continue.');
+      else if (bookingStep === 3) showNextStepHint('Select at least one seat to continue.');
+      else showNextStepHint('Complete the required action to continue.');
+      return;
+    }
     if (bookingStep === 4) {
       setTotalPaid(seatBalanceDue);
     }
     setBookingStep(Math.min(bookingSteps.length, bookingStep + 1));
+    repositionBookingStepViewport();
+  };
+  const goToPreviousStep = () => {
+    setBookingStep(Math.max(1, bookingStep - 1));
+    repositionBookingStepViewport();
+  };
+  const handleComponentTabChange = (view: 'booking' | 'seating' | 'calendar') => {
+    if (currentView === 'booking' && view !== 'booking' && confirmExitNavigation) {
+      const destination = view === 'seating' ? '/#seating' : '/#calendar';
+      if (!confirmExitNavigation(destination)) return;
+    }
+    setCurrentView(view);
+    if (typeof window === 'undefined') return;
+    requestAnimationFrame(() => {
+      document.getElementById('booking-flow')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    });
   };
 
   return (
-    <main className={`app-main ${isBookingOnlyMode ? 'app-main-booking' : ''}`}>
-      {!isBookingOnlyMode && (
-      <section id="stage" className="hero-section">
-        <div className="hero-badge">
-          <Sparkles className="icon-sm" />
-          <span>Theater Design System</span>
-        </div>
-        <h2 className="main-header-title hero-title">
-          The Designed Stage
-        </h2>
-        <p className="hero-subtitle">Where Performance Theater Meets the Technical Stack</p>
-        <p className="hero-description"><span><span>A technical showcase of a Design System engineered for complex state management and high-fidelity interaction—featuring a command-driven "Global Usher," accessible spacial mapping, and seamless booking flows.</span></span></p>
+    <main className={`app-main ${isBookingNoScrollMode ? 'app-main-booking' : ''}`}>
+      {!isComponentFocusMode && (
+        <section id="stage" className="hero-section">
+          <div className="hero-badge">
+            <Sparkles className="icon-sm" />
+            <span>Theater Design System</span>
+          </div>
+          <h2 className="main-header-title hero-title">
+            The Designed Stage
+          </h2>
+          <p className="hero-subtitle">Where Performance Theater Meets the Technical Stack</p>
+          <p className="hero-description"><span><span>A technical showcase of a Design System engineered for complex state management and high-fidelity interaction—featuring a command-driven "Global Usher," accessible spacial mapping, and seamless booking flows.</span></span></p>
 
-        <div className="hero-shortcut-wrap">
-          <kbd className="hero-shortcut">
-            <span className="spotlight-text">⌘ K</span> to open Global Usher
-          </kbd>
-        </div>
-      </section>
+          <div className="hero-shortcut-wrap">
+            <kbd className="hero-shortcut">
+              <span className="spotlight-text">⌘ K</span> to open Global Usher
+            </kbd>
+          </div>
+        </section>
       )}
 
-      {!isBookingOnlyMode && (
+      {!isComponentFocusMode && (
       <section id="now-playing" className="section-stack">
         <div className="section-header-row">
           <h3 className="section-title">
@@ -183,6 +252,15 @@ export function StagePage({
             <ShowCard
               key={show.title}
               {...show}
+              scriptHref={
+                show.title === 'The Design System'
+                  ? '/script#technical-documentation'
+                  : show.title === 'Salesforce'
+                    ? '/script#education-cloud-design-doc'
+                    : show.title === 'Google'
+                      ? '/script#google-engineering-process'
+                      : '/script'
+              }
               onClick={() => setCurrentView('calendar')}
             />
           ))}
@@ -192,15 +270,15 @@ export function StagePage({
 
       <section
         id="booking-flow"
-        className={`component-panel ${isBookingOnlyMode ? 'component-panel-booking' : ''}`}
+        className={`component-panel ${isBookingNoScrollMode ? 'component-panel-booking' : ''}`}
       >
         <div className="panel-header">
-          <h3 className="section-title">
+          <h2 className="section-title">
             Design System Components
-          </h3>
+          </h2>
           <div className="segment-control">
             <button
-              onClick={() => setCurrentView('booking')}
+              onClick={() => handleComponentTabChange('booking')}
               className={`segment-btn ${
                 currentView === 'booking' ? 'segment-btn-active' : ''
               }`}
@@ -208,7 +286,7 @@ export function StagePage({
               Booking Flow
             </button>
             <button
-              onClick={() => setCurrentView('seating')}
+              onClick={() => handleComponentTabChange('seating')}
               className={`segment-btn ${
                 currentView === 'seating' ? 'segment-btn-active' : ''
               }`}
@@ -216,7 +294,7 @@ export function StagePage({
               Seating Chart
             </button>
             <button
-              onClick={() => setCurrentView('calendar')}
+              onClick={() => handleComponentTabChange('calendar')}
               className={`segment-btn ${
                 currentView === 'calendar' ? 'segment-btn-active' : ''
               }`}
@@ -227,26 +305,30 @@ export function StagePage({
         </div>
 
         {currentView === 'calendar' && (
-          <PerformanceCalendar
-            performances={performances}
-            onSelectPerformance={(date, time, type) => {
-              console.log('Selected performance:', { date, time, type });
-              if (typeof window !== 'undefined') {
-                window.location.assign('/backstage#recursive-component-logic');
-                return;
-              }
-              setCurrentView('seating');
-            }}
-          />
+          <Suspense fallback={null}>
+            <PerformanceCalendar
+              performances={performances}
+              onSelectPerformance={(date, time, type) => {
+                console.log('Selected performance:', { date, time, type });
+                if (typeof window !== 'undefined') {
+                  window.location.assign('/backstage#recursive-component-logic');
+                  return;
+                }
+                setCurrentView('seating');
+              }}
+            />
+          </Suspense>
         )}
 
         {currentView === 'booking' && (
           <div className="booking-view booking-view-no-scroll">
-            <BookingProgress currentStep={bookingStep} steps={bookingProgressSteps} />
-            <div className="booking-step-panel booking-step-panel-scroll">
+            <Suspense fallback={null}>
+              <BookingProgress currentStep={bookingStep} steps={bookingProgressSteps} />
+            </Suspense>
+            <div ref={bookingStepPanelRef} className="booking-step-panel booking-step-panel-scroll">
               {bookingStep === 1 && (
                 <div className="booking-step-content booking-step-content-seat">
-                  <h4 className="booking-step-heading">Step 1: Select Show</h4>
+                  <h3 className="booking-step-heading">Step 1: Select Show</h3>
                   <p className="booking-step-copy">Choose a performance to begin your reservation.</p>
                   <label className="booking-field-label" htmlFor="booking-show-select">
                     Production
@@ -276,53 +358,57 @@ export function StagePage({
 
               {bookingStep === 2 && (
                 <div className="booking-step-content booking-step-calendar">
-                  <h4 className="booking-step-heading">Step 2: Select Date &amp; Time</h4>
-                  <PerformanceCalendar
-                    performances={bookingCalendarPerformances}
-                    interactionHint="Select this performance time for booking."
-                    initialSelectedDate={firstBookingPerformanceDate}
-                    onSelectPerformance={(date, time, type) => {
-                      const dayPerformances = bookingCalendarPerformances.find(
-                        (performance) =>
-                          performance.date.getDate() === date.getDate() &&
-                          performance.date.getMonth() === date.getMonth() &&
-                          performance.date.getFullYear() === date.getFullYear()
-                      );
-                      const slot = dayPerformances?.times.find(
-                        (performance) => performance.time === time && performance.type === type
-                      );
-                      setSelectedPerformance({
-                        date,
-                        time,
-                        type,
-                      });
-                    }}
-                  />
+                  <h3 className="booking-step-heading">Step 2: Select Date &amp; Time</h3>
+                  <Suspense fallback={null}>
+                    <PerformanceCalendar
+                      performances={bookingCalendarPerformances}
+                      interactionHint="Select this performance time for booking."
+                      initialSelectedDate={firstBookingPerformanceDate}
+                      onSelectPerformance={(date, time, type) => {
+                        const dayPerformances = bookingCalendarPerformances.find(
+                          (performance) =>
+                            performance.date.getDate() === date.getDate() &&
+                            performance.date.getMonth() === date.getMonth() &&
+                            performance.date.getFullYear() === date.getFullYear()
+                        );
+                        const slot = dayPerformances?.times.find(
+                          (performance) => performance.time === time && performance.type === type
+                        );
+                        setSelectedPerformance({
+                          date,
+                          time,
+                          type,
+                        });
+                      }}
+                    />
+                  </Suspense>
                 </div>
               )}
 
               {bookingStep === 3 && (
                 <div className="booking-step-content">
-                  <h4 className="booking-step-heading">Step 3: Select Seats</h4>
+                  <h3 className="booking-step-heading">Step 3: Select Seats</h3>
                   <div className="booking-seat-layout">
                     <div className="booking-seat-main">
-                      <SeatingChart
-                        section="Orchestra"
-                        onSeatSelect={(seats) => {
-                          const total = seats.reduce((sum, seat) => sum + (seat.price ?? 0), 0);
-                          setSelectedSeatIds(seats.map((seat) => seat.id));
-                          setSelectedSeatTotal(total);
-                          setSeatBalanceDue(total);
-                        }}
-                        hideTools
-                        hideSummary
-                        compactMode
-                        hideQuickControls
-                        ticketCount={bookingTicketCount}
-                        onTicketCountChange={setBookingTicketCount}
-                        suggestRequestKey={suggestRequestKey}
-                        resetRequestKey={resetRequestKey}
-                      />
+                      <Suspense fallback={null}>
+                        <SeatingChart
+                          section="Orchestra"
+                          onSeatSelect={(seats) => {
+                            const total = seats.reduce((sum, seat) => sum + (seat.price ?? 0), 0);
+                            setSelectedSeatIds(seats.map((seat) => seat.id));
+                            setSelectedSeatTotal(total);
+                            setSeatBalanceDue(total);
+                          }}
+                          hideTools
+                          hideSummary
+                          compactMode
+                          hideQuickControls
+                          ticketCount={bookingTicketCount}
+                          onTicketCountChange={setBookingTicketCount}
+                          suggestRequestKey={suggestRequestKey}
+                          resetRequestKey={resetRequestKey}
+                        />
+                      </Suspense>
                     </div>
                     <aside className="booking-seat-sidebar">
                       <div className="booking-seat-sidebar-controls">
@@ -370,7 +456,7 @@ export function StagePage({
 
               {bookingStep === 4 && (
                 <div className="booking-step-content">
-                  <h4 className="booking-step-heading">Step 4: Payment Details</h4>
+                  <h3 className="booking-step-heading">Step 4: Payment Details</h3>
                   <div className="booking-payment-balance">
                     <span>Total to Pay</span>
                     <strong>${seatBalanceDue.toFixed(2)}</strong>
@@ -394,7 +480,7 @@ export function StagePage({
                     </div>
                   </div>
                   <p className="booking-mock-note">
-                    <Info className="booking-mock-note-icon" aria-hidden="true" />
+                    <InfoIcon className="booking-mock-note-icon" aria-hidden="true" />
                     Payment details shown here are for demo purposes.
                   </p>
                 </div>
@@ -417,7 +503,7 @@ export function StagePage({
                   </div>
                   <div className="booking-confirmation-summary">
                     <div className="booking-confirmation-header">
-                      <h4 className="booking-step-heading">Step 5: Booking Review</h4>
+                      <h3 className="booking-step-heading">Step 5: Booking Review</h3>
                     </div>
                     <div className="booking-summary-row">
                       <span>Show</span>
@@ -452,7 +538,7 @@ export function StagePage({
             {bookingStep < bookingSteps.length && (
               <div className="booking-nav">
                 <button
-                  onClick={() => setBookingStep(Math.max(1, bookingStep - 1))}
+                  onClick={goToPreviousStep}
                   disabled={bookingStep === 1}
                   className="btn-prev"
                 >
@@ -460,30 +546,44 @@ export function StagePage({
                 </button>
                 <button
                   onClick={goToNextStep}
-                  disabled={!canAdvanceFromStep}
-                  className="btn-next"
+                  aria-disabled={!canAdvanceFromStep}
+                  className={`btn-next ${!canAdvanceFromStep ? 'btn-next-disabled' : ''}`}
                 >
                   Next Step
                 </button>
+                {nextStepHint && (
+                  <p className="booking-next-hint-popover" role="status" aria-live="polite">
+                    {nextStepHint}
+                  </p>
+                )}
               </div>
             )}
+            <p className="booking-exit-hint booking-exit-hint-footer" aria-live="polite">
+              Press Esc to exit booking
+            </p>
           </div>
         )}
 
         {currentView === 'seating' && (
-          <SeatingChart
-            section="Orchestra"
-            onSeatSelect={(seats) => {
-              console.log('Selected seats:', seats);
-            }}
-          />
+          <div id="seating">
+            <div id="seating-chart">
+              <Suspense fallback={null}>
+                <SeatingChart
+                  section="Orchestra"
+                  onSeatSelect={(seats) => {
+                    console.log('Selected seats:', seats);
+                  }}
+                />
+              </Suspense>
+            </div>
+          </div>
         )}
       </section>
 
-      {!isBookingOnlyMode && (
+      {!isComponentFocusMode && (
       <section className="feature-banner">
         <div className="feature-banner-inner">
-          <Theater className="icon-xl" />
+          <TheaterIcon className="icon-xl" />
           <h3 className="section-title">
             Theater Design System Features
           </h3>
@@ -491,49 +591,49 @@ export function StagePage({
             <div className="feature-item">
               <h4 className="spotlight-text">Global Usher (⌘K)</h4>
               <p className="feature-copy">
-                Keyboard-first command palette with spotlight animations and theater-themed states
+                An atmospheric, keyboard-first command palette that utilizes spotlight transitions and theater-themed state management to guide the audience through complex inventory.
               </p>
             </div>
             <div className="feature-item">
               <h4 className="spotlight-text">Seating Chart</h4>
               <p className="feature-copy">
-                Interactive seat selection with VIP, accessible, and real-time availability states
+              An interactive spatial engine featuring real-time state management for VIP, accessible, and standard inventory.
               </p>
             </div>
             <div className="feature-item">
               <h4 className="spotlight-text">Booking Progress</h4>
               <p className="feature-copy">
-                4-step checkout flow with visual progress indicators and gold spotlight accents
+              A 5-act narrative journey utilizing visual progress indicators to transform a standard checkout into a guided performance.
               </p>
             </div>
             <div className="feature-item">
               <h4 className="spotlight-text">Performance Calendar</h4>
               <p className="feature-copy">
-                Custom date picker with matinee vs. evening shows and live availability
+              A custom temporal interface engineered for real-time synchronization between matinee and evening show availability.
               </p>
             </div>
             <div className="feature-item">
               <h4 className="spotlight-text">Dark Mode Toggle</h4>
               <p className="feature-copy">
-                Low-glare UI optimized for checking on phones in dim theaters
+              A low-glare optimization engine specifically calibrated for discreet device usage in light-sensitive theater environments.
               </p>
             </div>
             <div className="feature-item">
               <h4 className="spotlight-text">Motion Pause</h4>
               <p className="feature-copy">
-                Static mode for sensitive viewers, silencing background transitions and ambient animations.
+              A global override that silences the "Stage," providing a static mode for sensitive viewers by halting all background transitions and ambient animations.
               </p>
             </div>
             <div className="feature-item">
               <h4 className="spotlight-text">Theme Toggles</h4>
               <p className="feature-copy">
-                Dynamic environment presets that transition the Stage between high-visibility utility and ambient, atmospheric environments.
+              Dynamic environmental presets that transition the UI between high-visibility utility and immersive, atmospheric "Misty" or "Midnight" states.
               </p>
             </div>
             <div className="feature-item">
               <h4 className="spotlight-text">Show Cards</h4>
               <p className="feature-copy">
-                Modular media components designed for high-density theater metadata and production specs.
+              Modular data primitives designed to harmonize high-density production metadata with a premium aesthetic finish.
               </p>
             </div>
           </div>

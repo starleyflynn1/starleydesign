@@ -13,6 +13,7 @@
   --marquee-surface: var(--paper);
   --stage-depth: #292524;
   --velvet: var(--rust);
+  --selection-accent: var(--velvet);
   --spotlight: var(--warm-tan);
 
   /* --- Core Semantic Tokens --- */
@@ -30,14 +31,22 @@
   --accent-foreground: var(--paper);
   --border: rgba(28, 25, 23, 0.15);
   --ring: var(--spotlight);
-  --picker-hover-bg: color-mix(in oklab, var(--velvet) 24%, var(--card) 76%);
+  --picker-hover-bg: color-mix(in oklab, var(--spotlight) 28%, var(--card) 72%);
   --picker-hover-fg: var(--stage-base);
-  --picker-hover-muted: color-mix(in oklab, var(--stage-base) 82%, transparent);
+  --picker-hover-muted: color-mix(in oklab, var(--stage-base) 90%, transparent);
   --seating-control-bg: color-mix(in oklab, var(--foreground) 8%, transparent);
   --seating-control-border: color-mix(in oklab, var(--foreground) 28%, transparent);
   --seating-control-fg: var(--foreground);
   --seating-control-hover-bg: color-mix(in oklab, var(--foreground) 16%, transparent);
   --seating-control-hover-fg: var(--foreground);
+  --seating-panel-bg: color-mix(in oklab, var(--paper) 94%, #ffffff 6%);
+  --seating-panel-border: color-mix(in oklab, var(--stage-base) 24%, #a8a29e 76%);
+  --seating-panel-fg: var(--stage-base);
+  --seating-panel-title-fg: color-mix(in oklab, var(--velvet) 70%, var(--stage-base) 30%);
+  --seating-panel-subtitle-fg: color-mix(in oklab, var(--stage-base) 76%, transparent);
+  --seating-subpanel-bg: color-mix(in oklab, var(--paper) 90%, #ffffff 10%);
+  --seating-subpanel-border: color-mix(in oklab, var(--stage-base) 22%, #a8a29e 78%);
+  --seating-subpanel-list-bg: color-mix(in oklab, var(--paper) 88%, #ffffff 12%);
   --seating-accent-bg: var(--seating-control-bg);
   --seating-accent-border: var(--seating-control-border);
   --seating-accent-fg: var(--seating-control-fg);
@@ -80,7 +89,7 @@
 }
 
 /* --- The Archive Button --- */
-.theme-archive button {
+.theme-archive button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.usher-action-btn):not(.usher-close-btn) {
   font-family: 'Playfair Display', serif;
   text-transform: uppercase;
   border: 4px double var(--stage-base);
@@ -90,7 +99,7 @@
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.theme-archive button:hover {
+.theme-archive button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.usher-action-btn):not(.usher-close-btn):hover {
   background: var(--stage-base);
   color: var(--marquee-surface);
   transform: translateY(-2px);
@@ -161,12 +170,6 @@
   color: var(--marquee-surface);
 }
 
-.theme-archive .ui-dropdown-content.style-picker-menu {
-  background: color-mix(in oklab, var(--paper) 92%, #ffffff 8%);
-  color: var(--stage-base);
-  border-color: color-mix(in oklab, var(--stage-base) 24%, transparent);
-}
-
 .theme-archive .style-picker-title {
   color: var(--stage-base);
 }
@@ -175,21 +178,23 @@
   color: color-mix(in oklab, var(--stage-base) 70%, transparent);
 }
 
-.dark.theme-archive .ui-dropdown-content.style-picker-menu {
-  background: color-mix(in oklab, var(--card) 90%, #181310 10%);
-  color: var(--foreground);
-  border-color: color-mix(in oklab, var(--spotlight) 28%, transparent);
-}
-
 .dark.theme-archive {
-  --picker-hover-bg: color-mix(in oklab, var(--velvet) 30%, var(--card) 70%);
-  --picker-hover-fg: var(--foreground);
-  --picker-hover-muted: color-mix(in oklab, var(--foreground) 84%, transparent);
+  --picker-hover-bg: color-mix(in oklab, var(--velvet) 46%, var(--card) 54%);
+  --picker-hover-fg: #fff7ea;
+  --picker-hover-muted: #fff7ea;
   --seating-control-bg: color-mix(in oklab, var(--foreground) 10%, transparent);
   --seating-control-border: color-mix(in oklab, var(--foreground) 35%, transparent);
   --seating-control-fg: var(--foreground);
   --seating-control-hover-bg: color-mix(in oklab, var(--foreground) 22%, transparent);
   --seating-control-hover-fg: var(--foreground);
+  --seating-panel-bg: color-mix(in oklab, var(--card) 90%, black 10%);
+  --seating-panel-border: color-mix(in oklab, var(--foreground) 24%, transparent);
+  --seating-panel-fg: var(--foreground);
+  --seating-panel-title-fg: color-mix(in oklab, var(--spotlight) 74%, white 26%);
+  --seating-panel-subtitle-fg: color-mix(in oklab, var(--foreground) 84%, transparent);
+  --seating-subpanel-bg: color-mix(in oklab, var(--card) 88%, black 12%);
+  --seating-subpanel-border: color-mix(in oklab, var(--foreground) 22%, transparent);
+  --seating-subpanel-list-bg: color-mix(in oklab, var(--card) 84%, black 16%);
   --seating-accent-bg: var(--seating-control-bg);
   --seating-accent-border: var(--seating-control-border);
   --seating-accent-fg: var(--seating-control-fg);
@@ -271,6 +276,46 @@
   text-shadow: 1px 1px 0px rgba(0,0,0,0.1);
 }
 
+/* Light-mode hover consistency baseline (shared ratios across themes). */
+.theme-archive:not(.dark) .theater-icon-btn:hover,
+.theme-archive:not(.dark) .theater-mobile-search-btn:hover,
+.theme-archive:not(.dark) .theater-mobile-menu-btn:hover,
+.theme-archive:not(.dark) .style-picker-trigger:hover {
+  background: color-mix(in oklab, var(--primary) 12%, var(--card) 88%) !important;
+  color: var(--foreground) !important;
+  border-color: color-mix(in oklab, var(--primary) 46%, var(--border) 54%) !important;
+}
+
+.theme-archive:not(.dark) .segment-btn:hover:not(.segment-btn-active),
+.theme-archive:not(.dark) .btn-prev:hover,
+.theme-archive:not(.dark) .show-card-btn:hover {
+  background: color-mix(in oklab, var(--primary) 14%, var(--card) 86%) !important;
+  color: var(--foreground) !important;
+  border-color: color-mix(in oklab, var(--primary) 48%, var(--border) 52%) !important;
+}
+
+.theme-archive:not(.dark) .btn-next:hover {
+  background: color-mix(in oklab, var(--primary) 78%, black 22%) !important;
+  border-color: color-mix(in oklab, var(--primary) 84%, black 16%) !important;
+  color: #ffffff !important;
+}
+
+.theme-archive:not(.dark) .calendar-time-btn.calendar-time-enabled:hover {
+  background: color-mix(in oklab, var(--primary) 16%, var(--card) 84%) !important;
+  border-color: color-mix(in oklab, var(--primary) 56%, var(--border) 44%) !important;
+  color: var(--foreground) !important;
+}
+
+.theme-archive:not(.dark) .usher-action-hover:hover {
+  background: color-mix(in oklab, var(--primary) 12%, var(--background) 88%) !important;
+}
+
+.theme-archive:not(.dark) .usher-action-hover:hover .usher-action-title,
+.theme-archive:not(.dark) .usher-action-hover:hover .icon-md-muted,
+.theme-archive:not(.dark) .usher-action-hover:hover .usher-action-meta {
+  color: var(--foreground) !important;
+}
+
 /* ============================================================
    ARCHIVE THEME: DARK TOKENS
    ============================================================ */
@@ -296,6 +341,7 @@
   --deep-rust: #fca5a5;
   
   --velvet: var(--deep-rust);
+  --selection-accent: var(--velvet);
   --spotlight: var(--gold-glow);
   
   /* 4. Semantic Update */

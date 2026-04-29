@@ -1,6 +1,8 @@
 export interface Show {
   title: string;
   image: string;
+  imageSrcSet?: string;
+  imageSizes?: string;
   date: string;
   scope: string;
   stack: string;

@@ -1,0 +1,64 @@
+
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="icon" type="image/png" sizes="256x256" href="/favicon.png" />
+      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+      <meta name="description" content="Senior Engineer specializing in high-performance architecture and inclusive design. Explore interactive components engineered for the digital stage." />
+      <meta property="og:type" content="website" />
+      <meta property="og:site_name" content="The Designed Stage" />
+      <meta property="og:title" content="Starley Flynn | Engineering Experiences, Directing Outcomes" />
+      <meta property="og:description" content="Senior Engineer specializing in high-performance architecture and inclusive design. Explore interactive components engineered for the digital stage." />
+      <meta property="og:url" content="https://starleyflynn.great-site.net/" />
+      <meta property="og:image" content="https://starleyflynn.great-site.net/og-stage-preview.png" />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content="Starley Flynn | Engineering Experiences, Directing Outcomes" />
+      <meta name="twitter:description" content="Senior Engineer specializing in high-performance architecture and inclusive design. Explore interactive components engineered for the digital stage." />
+      <meta name="twitter:image" content="https://starleyflynn.great-site.net/og-stage-preview.png" />
+      <script>
+        (function () {
+          try {
+            var THEME_KEY = 'theater-theme';
+            var MODE_KEY = 'theater-mode';
+            var validThemes = ['stage', 'archive', 'coastal', 'blueprint', 'neon', 'terminal'];
+            var defaultModes = {
+              stage: 'dark',
+              archive: 'light',
+              coastal: 'light',
+              blueprint: 'light',
+              neon: 'dark',
+              terminal: 'dark',
+            };
+            var storedTheme = localStorage.getItem(THEME_KEY);
+            var theme = validThemes.indexOf(storedTheme) >= 0 ? storedTheme : 'stage';
+            var storedMode = localStorage.getItem(MODE_KEY);
+            var mode = storedMode === 'light' || storedMode === 'dark' ? storedMode : defaultModes[theme];
+            var root = document.documentElement;
+            for (var i = 0; i < validThemes.length; i += 1) {
+              root.classList.remove('theme-' + validThemes[i]);
+            }
+            root.classList.add('theme-' + theme);
+            if (mode === 'dark') root.classList.add('dark');
+            else root.classList.remove('dark');
+            root.style.colorScheme = mode;
+          } catch (e) {
+            // no-op: fall back to app bootstrapping
+          }
+        })();
+      </script>
+      <title>Starley Flynn | Engineering Experiences, Directing Outcomes</title>
+      <style>html, body { height: 100%; margin: 0; } #root { height: 100%; }</style>
+      <script type="module" crossorigin src="/assets/index-XEhN-lOW.js"></script>
+      <link rel="stylesheet" crossorigin href="/assets/index-C_-xKpzA.css">
+    </head>
+
+    <body>
+      <div id="root"></div>
+    </body>
+  </html>
+  

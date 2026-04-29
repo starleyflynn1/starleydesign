@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Accessibility, Bug, Settings2, X } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Accessibility, Bug, Code2, Copy, Network, Settings2, X } from 'lucide-react';
 
 type SeatStatus = 'available' | 'unavailable' | 'vip' | 'accessible' | 'selected';
 type SectionType = 'standard' | 'vip' | 'accessible' | 'mixed';
@@ -57,10 +57,16 @@ export function SeatingChart({
   const [seatLiveMessage, setSeatLiveMessage] = useState('');
   const [isToolsOpen, setIsToolsOpen] = useState(false);
   const [isDebugMode, setIsDebugMode] = useState(false);
+  const [isLogicOpen, setIsLogicOpen] = useState(false);
+  const [isArchitectureOpen, setIsArchitectureOpen] = useState(false);
+  const [copyToastMessage, setCopyToastMessage] = useState<string | null>(null);
+  const [applyHint, setApplyHint] = useState<string | null>(null);
+  const applyHintTimeoutRef = useRef<number | null>(null);
   const [motionTooltipSeat, setMotionTooltipSeat] = useState<Seat | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [focusedSeatId, setFocusedSeatId] = useState<string | null>(null);
   const [isDragSelecting, setIsDragSelecting] = useState(false);
+  const [isSuggesting, setIsSuggesting] = useState(false);
   const [suggestedSeatIds, setSuggestedSeatIds] = useState<string[]>([]);
   const [ticketCountState, setTicketCountState] = useState(2);
   const [rowCount, setRowCount] = useState(10);
@@ -258,6 +264,24 @@ export function SeatingChart({
         const minSeat = group[0].number;
         const maxSeat = group[group.length - 1].number;
         const crossesAisle = aisleBreaks.some((breakSeat) => breakSeat >= minSeat && breakSeat < maxSeat);
+        const pickedSeatIds = new Set(group.map((seat) => seat.id));
+        const remainingSeatNumbers = rowSeats
+          .filter((seat) => !pickedSeatIds.has(seat.id))
+          .map((seat) => seat.number)
+          .sort((a, b) => a - b);
+
+        // Dead-seat prevention:
+        // Penalize recommendations that strand isolated single seats in a row,
+        // because those are much harder to sell later.
+        let deadSeatSingles = 0;
+        for (let idx = 0; idx < remainingSeatNumbers.length; idx++) {
+          const current = remainingSeatNumbers[idx];
+          const previous = remainingSeatNumbers[idx - 1];
+          const next = remainingSeatNumbers[idx + 1];
+          const hasLeftNeighbor = typeof previous === 'number' && current - previous === 1;
+          const hasRightNeighbor = typeof next === 'number' && next - current === 1;
+          if (!hasLeftNeighbor && !hasRightNeighbor) deadSeatSingles += 1;
+        }
 
         const groupCenterSeat = group[Math.floor(group.length / 2)].number;
         const centerDistance = Math.abs(groupCenterSeat - centerSeat);
@@ -276,7 +300,8 @@ export function SeatingChart({
           - rowDistance * 9
           + vipCount * 12
           - accessibleCount * 3
-          - (crossesAisle ? 60 : 0);
+          - (crossesAisle ? 60 : 0)
+          - deadSeatSingles * 18;
 
         const candidate = { ids: group.map((seat) => seat.id), score };
         if (!bestAny || score > bestAny.score) {
@@ -291,7 +316,7 @@ export function SeatingChart({
     return (bestNonAisle ?? bestAny)?.ids ?? [];
   };
 
-  const handleSuggestBest = () => {
+  const runSuggestBestNow = () => {
     const suggested = findSuggestedSeatIds(ticketCount);
     setSuggestedSeatIds(suggested);
     if (suggested.length === 0) return;
@@ -300,9 +325,27 @@ export function SeatingChart({
     setSeatLiveMessage(`Suggested ${nextSelection.length} seat${nextSelection.length === 1 ? '' : 's'} and selected them.`);
     onSeatSelect?.(nextSelection);
   };
+  const handleSuggestBest = () => {
+    if (isSuggesting) return;
+    setIsSuggesting(true);
+    window.setTimeout(() => {
+      runSuggestBestNow();
+      setIsSuggesting(false);
+    }, 320);
+  };
 
   const applyAssignmentType = () => {
-    if (selectedSeats.length === 0) return;
+    if (selectedSeats.length === 0) {
+      setApplyHint('Select seat(s) on the chart to enable Apply.');
+      if (applyHintTimeoutRef.current) {
+        window.clearTimeout(applyHintTimeoutRef.current);
+      }
+      applyHintTimeoutRef.current = window.setTimeout(() => {
+        setApplyHint(null);
+        applyHintTimeoutRef.current = null;
+      }, 2200);
+      return;
+    }
     setSeatOverrides((prev) => {
       const next = { ...prev };
       selectedSeats.forEach((seat) => {
@@ -327,13 +370,82 @@ export function SeatingChart({
 
   useEffect(() => {
     if (typeof suggestRequestKey !== 'number' || suggestRequestKey <= 0) return;
-    handleSuggestBest();
+    runSuggestBestNow();
   }, [suggestRequestKey]);
 
   useEffect(() => {
     if (typeof resetRequestKey !== 'number' || resetRequestKey <= 0) return;
     resetAssignments();
   }, [resetRequestKey]);
+
+  useEffect(() => {
+    if (!isArchitectureOpen && !isLogicOpen && !isDebugMode) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      setIsArchitectureOpen(false);
+      setIsLogicOpen(false);
+      setIsDebugMode(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isArchitectureOpen, isLogicOpen, isDebugMode]);
+  useEffect(() => {
+    return () => {
+      if (applyHintTimeoutRef.current) {
+        window.clearTimeout(applyHintTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const logicCodePlain = `const previous = selectedSeatIds;
+setSelectedSeatIds(nextSeatIds); // optimistic
+const holdId = crypto.randomUUID();
+try {
+  await reservationApi.holdSeats({ holdId, seatIds: nextSeatIds });
+  bookingStore.commitHold({ holdId, seatIds: nextSeatIds });
+} catch (error) {
+  setSelectedSeatIds(previous); // rollback
+  bookingStore.markConflict(nextSeatIds, error);
+}`;
+
+  const debugSnapshot = useMemo(
+    () =>
+      JSON.stringify(
+        {
+          section,
+          selectedSeatIds: selectedSeats.map((seat) => seat.id),
+          focusedSeatId,
+          suggestedSeatIds,
+          rowCount,
+          seatsPerRow,
+          sectionTypes,
+          pointerTooltip: motionTooltipSeat ? motionTooltipSeat.id : null,
+          assignmentType,
+          seatOverrides,
+          coordinates: seats.slice(0, 12).map((seat) => ({
+            id: seat.id,
+            row: seat.row,
+            colIndex: seat.colIndex,
+          })),
+        },
+        null,
+        2
+      ),
+    [assignmentType, focusedSeatId, motionTooltipSeat, rowCount, seatOverrides, section, sectionTypes, seats, seatsPerRow, selectedSeats, suggestedSeatIds]
+  );
+
+  const handleCopyPanel = async (content: string) => {
+    if (typeof navigator === 'undefined' || !navigator.clipboard) return;
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopyToastMessage('Copied');
+      window.setTimeout(() => {
+        setCopyToastMessage((prev) => (prev === 'Copied' ? null : prev));
+      }, 1200);
+    } catch {
+      // Ignore clipboard failures in restricted environments.
+    }
+  };
 
   const handleSeatKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, seat: Seat) => {
     const key = event.key;
@@ -368,10 +480,11 @@ export function SeatingChart({
 
   return (
     <div
-      className={`seating-root ${compactMode ? 'seating-root-compact' : ''}`}
+      className={`seating-root ${compactMode ? 'seating-root-compact' : ''} ${!hideTools && isToolsOpen ? 'seating-root-tools-open' : ''}`}
       onMouseUp={() => setIsDragSelecting(false)}
       onMouseLeave={() => setIsDragSelecting(false)}
     >
+      <div className="seating-main-column">
       <div className="seating-stage-wrap">
         {!hideTools && !isToolsOpen && (
           <div className="seating-tools-row">
@@ -404,8 +517,10 @@ export function SeatingChart({
         {rows.map((row, rowIndex) => {
           return (
             <div key={row} className="seating-row" role="row" aria-label={`Row ${row}`}>
-              <div className="seating-row-label">{row}</div>
-              <div className="seating-row-seats" role="row">
+              <div className="seating-row-label" role="rowheader">
+                {row}
+              </div>
+              <div className="seating-row-seats" role="presentation">
                 {seats
                   .filter((s) => s.row === row)
                   .sort((a, b) => a.number - b.number)
@@ -450,7 +565,6 @@ export function SeatingChart({
                         }}
                         disabled={isUnavailable && !isToolsOpen}
                         className={`seating-seat-btn ${seatColors[displayStatus]} ${isSuggested ? 'seating-seat-suggested' : ''} ${focusedSeatId === seat.id ? 'seating-seat-focused' : ''}`}
-                        title={`${getSeatLocationLabel(seat)} - $${seat.price} - ${displayStatus}`}
                         aria-label={`${getSeatLocationLabel(seat)}, ${displayStatus}, $${seat.price}`}
                         role="gridcell"
                         aria-selected={displayStatus === 'selected'}
@@ -473,7 +587,9 @@ export function SeatingChart({
                   );
                 })}
               </div>
-              <div className="seating-row-label">{row}</div>
+              <div className="seating-row-label" aria-hidden="true">
+                {row}
+              </div>
             </div>
           );
         })}
@@ -521,22 +637,13 @@ export function SeatingChart({
           <span className="seating-legend-label">Selected</span>
         </div>
       </div>
+      </div>
 
       {!hideTools && (
-      <aside className={`seating-tools-sidebar ${isToolsOpen ? 'seating-tools-sidebar-open' : 'seating-tools-sidebar-closed'}`}>
+      <div className={`seating-tools-sidebar ${isToolsOpen ? 'seating-tools-sidebar-open' : 'seating-tools-sidebar-closed'}`}>
           <div className="seating-tools-header">
-            <div className="seating-tools-title">Seating Tools</div>
+            <div className="seating-tools-title">Tools</div>
             <div className="seating-tools-actions">
-              <button
-                className={`seating-debug-toggle ${isDebugMode ? 'seating-debug-toggle-on' : ''}`}
-                type="button"
-                onClick={() => setIsDebugMode((prev) => !prev)}
-                aria-pressed={isDebugMode}
-                title="Toggle debug mode"
-              >
-                <Bug className="w-4 h-4" />
-                Debug
-              </button>
               <button
                 type="button"
                 className="seating-tools-close"
@@ -548,7 +655,9 @@ export function SeatingChart({
               </button>
             </div>
           </div>
-          <div className="seating-tools-grid">
+          <section className="seating-tools-group" aria-label="Seating tools">
+            <div className="seating-tools-group-title">Seating Tools</div>
+            <div className="seating-tools-grid">
             <label className="seating-ticket-count-label">
               Rows
               <select
@@ -646,11 +755,16 @@ export function SeatingChart({
                 type="button"
                 className={`seating-assign-btn ${selectedSeats.length === 0 ? 'seating-assign-btn-disabled' : ''}`}
                 onClick={applyAssignmentType}
-                disabled={selectedSeats.length === 0}
+                aria-disabled={selectedSeats.length === 0}
                 title={selectedSeats.length === 0 ? 'Select seat(s) to enable assignment' : `Apply to ${selectedSeats.length} selected seat(s)`}
               >
                 Apply
               </button>
+              {applyHint && (
+                <p className="seating-apply-hint-popover" role="status" aria-live="polite">
+                  {applyHint}
+                </p>
+              )}
               {selectedSeats.length > 0 && (
                 <div className="seating-tools-selected-list">
                   {selectedSeats.map((seat) => seat.id).join(', ')}
@@ -660,34 +774,45 @@ export function SeatingChart({
             <button type="button" className="seating-reset-btn" onClick={resetAssignments}>
               Reset Assignments
             </button>
-          </div>
+            </div>
+          </section>
+          <section className="seating-tools-group" aria-label="Developer insights">
+            <div className="seating-tools-group-title">Developer Insights</div>
+            <div className="seating-tools-stack-list">
+              <button
+                className={`seating-reset-btn seating-tools-stack-btn ${isLogicOpen ? 'seating-tools-stack-btn-on' : ''}`}
+                type="button"
+                onClick={() => setIsLogicOpen((prev) => !prev)}
+                aria-pressed={isLogicOpen}
+                title="Show seat grid logic snippet"
+              >
+                <Code2 className="w-4 h-4" />
+                View Logic
+              </button>
+              <button
+                className={`seating-reset-btn seating-tools-stack-btn ${isArchitectureOpen ? 'seating-tools-stack-btn-on' : ''}`}
+                type="button"
+                onClick={() => setIsArchitectureOpen((prev) => !prev)}
+                aria-pressed={isArchitectureOpen}
+                title="Show planned centralized-store architecture"
+              >
+                <Network className="w-4 h-4" />
+                Planned System Architecture
+              </button>
+              <button
+                className={`seating-reset-btn seating-tools-stack-btn ${isDebugMode ? 'seating-tools-stack-btn-on' : ''}`}
+                type="button"
+                onClick={() => setIsDebugMode((prev) => !prev)}
+                aria-pressed={isDebugMode}
+                title="Toggle debug mode"
+              >
+                <Bug className="w-4 h-4" />
+                Debug
+              </button>
+            </div>
+          </section>
 
-          {isDebugMode && (
-            <pre className="seating-debug-panel">
-              {JSON.stringify(
-                {
-                  section,
-                  selectedSeatIds: selectedSeats.map((seat) => seat.id),
-                  focusedSeatId,
-                  suggestedSeatIds,
-                  rowCount,
-                  seatsPerRow,
-                  sectionTypes,
-                  pointerTooltip: motionTooltipSeat ? motionTooltipSeat.id : null,
-                  assignmentType,
-                  seatOverrides,
-                  coordinates: seats.slice(0, 12).map((seat) => ({
-                    id: seat.id,
-                    row: seat.row,
-                    colIndex: seat.colIndex,
-                  })),
-                },
-                null,
-                2
-              )}
-            </pre>
-          )}
-      </aside>
+      </div>
       )}
 
       {!hideQuickControls && (
@@ -718,8 +843,13 @@ export function SeatingChart({
             ))}
           </select>
         </label>
-        <button className="seating-suggest-btn" type="button" onClick={handleSuggestBest}>
-          Suggest Best Seats
+        <button
+          className={`seating-suggest-btn ${isSuggesting ? 'seating-suggest-btn-loading' : ''}`}
+          type="button"
+          onClick={handleSuggestBest}
+          disabled={isSuggesting}
+        >
+          {isSuggesting ? 'Calculating...' : 'Suggest Best Seats'}
         </button>
         <button className="seating-reset-btn" type="button" onClick={resetAssignments}>
           Reset
@@ -747,6 +877,155 @@ export function SeatingChart({
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {isArchitectureOpen && (
+        <div
+          className="seating-architecture-modal-wrap"
+          role="presentation"
+          onClick={() => setIsArchitectureOpen(false)}
+        >
+          <div className="seating-architecture-modal-backdrop" onClick={() => setIsArchitectureOpen(false)} />
+          <section
+            className="seating-architecture-modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Planned system architecture"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="seating-architecture-modal-header">
+              <div className="seating-architecture-title">Planned System Architecture</div>
+              <button
+                type="button"
+                className="seating-tools-close"
+                onClick={() => setIsArchitectureOpen(false)}
+                aria-label="Close architecture diagram"
+                title="Close architecture diagram"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="seating-architecture-divider" />
+            <div className="seating-architecture-diagram-wrap">
+              <div className="seating-architecture-legend seating-architecture-legend-overlay" aria-hidden="true">
+                <span className="seating-architecture-chip seating-architecture-chip-ui">UI</span>
+                <span className="seating-architecture-chip seating-architecture-chip-store">Store</span>
+                <span className="seating-architecture-chip seating-architecture-chip-api">API</span>
+                <span className="seating-architecture-chip seating-architecture-chip-process">Process</span>
+              </div>
+              <img
+                className="seating-architecture-image"
+                src="/architecture-diagram.svg"
+                alt="System architecture showing UI flows to booking store, process step, and reservation API"
+              />
+            </div>
+            <p className="seating-architecture-explainer">
+              The Global Usher and booking interfaces publish intent into a centralized Booking Store, which coordinates
+              seat inventory, pricing totals, and route state. Seat actions run through an optimistic hold/release
+              process so the UI responds instantly, then commit against the Reservation API for final server-side
+              validation and conflict resolution.
+            </p>
+          </section>
+        </div>
+      )}
+
+      {isLogicOpen && (
+        <div className="seating-architecture-modal-wrap" role="presentation" onClick={() => setIsLogicOpen(false)}>
+          <div className="seating-architecture-modal-backdrop" onClick={() => setIsLogicOpen(false)} />
+          <section
+            className="seating-architecture-modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Seat grid logic snippet"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="seating-architecture-modal-header">
+              <div className="seating-architecture-title">Seat Grid Logic</div>
+              <div className="seating-modal-header-actions">
+                <button
+                  type="button"
+                  className="seating-modal-copy-btn"
+                  onClick={() => handleCopyPanel(logicCodePlain)}
+                  aria-label="Copy logic snippet"
+                  title="Copy logic snippet"
+                >
+                  <Copy className="w-3.5 h-3.5" aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  className="seating-tools-close"
+                  onClick={() => setIsLogicOpen(false)}
+                  aria-label="Close logic snippet"
+                  title="Close logic snippet"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            <div className="seating-architecture-divider" />
+            <pre className="seating-logic-panel">
+              <code className="seating-code">
+                <span className="seating-code-line"><span className="seating-code-keyword">const</span> previous = selectedSeatIds;</span>
+                <span className="seating-code-line"><span className="seating-code-fn">setSelectedSeatIds</span>(nextSeatIds); <span className="seating-code-comment">// optimistic</span></span>
+                <span className="seating-code-line"><span className="seating-code-keyword">const</span> holdId = crypto.<span className="seating-code-fn">randomUUID</span>();</span>
+                <span className="seating-code-line"><span className="seating-code-keyword">try</span> {'{'}</span>
+                <span className="seating-code-line">  <span className="seating-code-keyword">await</span> reservationApi.<span className="seating-code-fn">holdSeats</span>({'{'} holdId, seatIds: nextSeatIds {'}'});</span>
+                <span className="seating-code-line">  bookingStore.<span className="seating-code-fn">commitHold</span>({'{'} holdId, seatIds: nextSeatIds {'}'});</span>
+                <span className="seating-code-line">{'}'} <span className="seating-code-keyword">catch</span> (error) {'{'}</span>
+                <span className="seating-code-line">  <span className="seating-code-fn">setSelectedSeatIds</span>(previous); <span className="seating-code-comment">// rollback</span></span>
+                <span className="seating-code-line">  bookingStore.<span className="seating-code-fn">markConflict</span>(nextSeatIds, error);</span>
+                <span className="seating-code-line">{'}'}</span>
+              </code>
+            </pre>
+            <p className="seating-logic-explainer">
+              This flow updates the UI instantly when seats are selected, then attempts a server hold. If the API confirms, the hold is committed to shared booking state; if it fails (for example, seats were just claimed elsewhere), the UI rolls back to the previous selection and marks a conflict for recovery messaging.
+            </p>
+          </section>
+        </div>
+      )}
+
+      {isDebugMode && (
+        <div className="seating-architecture-modal-wrap" role="presentation" onClick={() => setIsDebugMode(false)}>
+          <div className="seating-architecture-modal-backdrop" onClick={() => setIsDebugMode(false)} />
+          <section
+            className="seating-architecture-modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Debug snapshot"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="seating-architecture-modal-header">
+              <div className="seating-architecture-title">Debug Snapshot</div>
+              <div className="seating-modal-header-actions">
+                <button
+                  type="button"
+                  className="seating-modal-copy-btn"
+                  onClick={() => handleCopyPanel(debugSnapshot)}
+                  aria-label="Copy debug snapshot"
+                  title="Copy debug snapshot"
+                >
+                  <Copy className="w-3.5 h-3.5" aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  className="seating-tools-close"
+                  onClick={() => setIsDebugMode(false)}
+                  aria-label="Close debug snapshot"
+                  title="Close debug snapshot"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            <div className="seating-architecture-divider" />
+            <pre className="seating-debug-panel">{debugSnapshot}</pre>
+          </section>
+        </div>
+      )}
+      {copyToastMessage && (
+        <div className="seating-copy-toast" role="status" aria-live="polite">
+          {copyToastMessage}
         </div>
       )}
     </div>

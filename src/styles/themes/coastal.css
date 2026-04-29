@@ -19,6 +19,7 @@
   --primary: var(--sea-glass);
   --primary-foreground: #ffffff;
   --velvet: var(--sea-glass);
+  --selection-accent: var(--velvet);
   --seat-available: #5e8a4f;
   --spotlight: #94a3b8;
   --card: rgba(255, 255, 255, 0.7);
@@ -35,6 +36,23 @@
   --calendar-time-disabled-hover-fg: color-mix(in oklab, var(--stage-base) 84%, black 16%);
   --calendar-soldout-color: color-mix(in oklab, #8b4513 78%, #111827 22%);
   --calendar-soldout-color-dark: color-mix(in oklab, #ffd59e 82%, #ffffff 18%);
+  --seating-panel-bg: #f8fcff;
+  --seating-panel-border: color-mix(in oklab, #1f3345 22%, #94a3b8 78%);
+  --seating-panel-fg: #1f3345;
+  --seating-panel-title-fg: #0f4f4a;
+  --seating-panel-subtitle-fg: #334e68;
+  --seating-subpanel-bg: color-mix(in oklab, #ffffff 92%, #cbd5e1 8%);
+  --seating-subpanel-border: color-mix(in oklab, #1f3345 20%, #94a3b8 80%);
+  --seating-control-bg: #ffffff;
+  --seating-control-border: color-mix(in oklab, #1f3345 24%, #94a3b8 76%);
+  --seating-control-fg: #1f3345;
+  --seating-control-hover-bg: color-mix(in oklab, #0b6f68 16%, #ffffff 84%);
+  --seating-control-hover-fg: #0f4f4a;
+  --seating-accent-bg: color-mix(in oklab, #0b6f68 22%, #ffffff 78%);
+  --seating-accent-border: color-mix(in oklab, #0b6f68 52%, #64748b 48%);
+  --seating-accent-fg: #0f4f4a;
+  --seating-accent-hover-bg: color-mix(in oklab, #0b6f68 30%, #ffffff 70%);
+  --seating-accent-hover-fg: #083a37;
   --script-modal-header-bg: color-mix(in oklab, #1f3345 88%, #0f172a 12%);
   --script-modal-header-fg: #eef8ff;
   --script-modal-title-fg: #1f3345;
@@ -77,6 +95,7 @@
   
   --card: rgba(30, 41, 59, 0.7);
   --velvet: #229e8f;
+  --selection-accent: var(--velvet);
   --picker-hover-bg: color-mix(in oklab, #67e8f9 24%, var(--card) 76%);
   --picker-hover-fg: #f0fdfa;
   --picker-hover-muted: color-mix(in oklab, #f0fdfa 84%, transparent);
@@ -99,6 +118,23 @@
   --stepper-current-bg: color-mix(in oklab, #103842 70%, #d7e4f2 30%);
   --stepper-current-fg: #ecfeff;
   --stepper-current-border: color-mix(in oklab, #8cebe4 64%, #0f172a 36%);
+  --seating-panel-bg: color-mix(in oklab, #0f172a 70%, #1e293b 30%);
+  --seating-panel-border: color-mix(in oklab, #8cebe4 36%, transparent);
+  --seating-panel-fg: #eefbff;
+  --seating-panel-title-fg: #8cebe4;
+  --seating-panel-subtitle-fg: #d7e4f2;
+  --seating-subpanel-bg: color-mix(in oklab, #132733 84%, #0f172a 16%);
+  --seating-subpanel-border: color-mix(in oklab, #8cebe4 28%, transparent);
+  --seating-control-bg: color-mix(in oklab, #1e293b 74%, #d7e4f2 26%);
+  --seating-control-border: color-mix(in oklab, #d7e4f2 30%, transparent);
+  --seating-control-fg: #eefbff;
+  --seating-control-hover-bg: color-mix(in oklab, #8cebe4 24%, #1e293b 76%);
+  --seating-control-hover-fg: #ffffff;
+  --seating-accent-bg: color-mix(in oklab, #8cebe4 30%, #1e293b 70%);
+  --seating-accent-border: color-mix(in oklab, #8cebe4 56%, transparent);
+  --seating-accent-fg: #f0fdff;
+  --seating-accent-hover-bg: color-mix(in oklab, #8cebe4 40%, #1e293b 60%);
+  --seating-accent-hover-fg: #ffffff;
   --btn-disabled-bg: color-mix(in oklab, #1e293b 74%, #d7e4f2 26%);
   --btn-disabled-border: color-mix(in oklab, #d7e4f2 28%, transparent);
   --btn-disabled-fg: #eaf5ff;
@@ -158,6 +194,29 @@
   color: var(--marquee-surface);
 }
 
+/* Re-stabilize Coastal button polish for primary app controls. */
+.theme-coastal .segment-btn,
+.theme-coastal .btn-prev,
+.theme-coastal .btn-next,
+.theme-coastal .show-card-btn {
+  font-family: 'Outfit', sans-serif;
+  border: 1px solid color-mix(in oklab, var(--foreground) 24%, transparent);
+  background: color-mix(in oklab, var(--card) 92%, var(--background) 8%);
+  color: var(--foreground);
+  box-shadow: none;
+}
+
+.theme-coastal .segment-btn:hover,
+.theme-coastal .btn-prev:hover,
+.theme-coastal .btn-next:hover,
+.theme-coastal .show-card-btn:hover {
+  background: var(--picker-hover-bg);
+  color: var(--picker-hover-fg);
+  border-color: color-mix(in oklab, var(--picker-hover-fg) 36%, transparent);
+  transform: none;
+  filter: none;
+}
+
 .theme-coastal .show-card-meta-primary {
   flex-wrap: nowrap;
   min-width: 0;
@@ -171,7 +230,7 @@
 }
 
 /* --- Buttons --- */
-.theme-coastal button {
+.theme-coastal button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.usher-action-btn):not(.usher-close-btn) {
   font-family: 'Outfit', sans-serif;
   font-weight: 500;
   border-radius: var(--radius);
@@ -184,10 +243,64 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.theme-coastal button:hover {
+.theme-coastal button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.usher-action-btn):not(.usher-close-btn):hover {
   transform: translateY(-3px);
   filter: brightness(1.05);
   box-shadow: 0 12px 25px -5px rgba(13, 148, 136, 0.4);
+}
+
+/* Keep seating tools/modal controls readable and not overridden by global button chrome. */
+.theme-coastal .seating-tools-sidebar button,
+.theme-coastal .seating-architecture-modal-card button {
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  box-shadow: none !important;
+  transform: none !important;
+  filter: none !important;
+  border-style: solid !important;
+  border-width: 2px !important;
+}
+
+.theme-coastal .seating-tools-sidebar .seating-reset-btn,
+.theme-coastal .seating-tools-sidebar .seating-tools-close,
+.theme-coastal .seating-tools-sidebar .seating-ticket-count-select,
+.theme-coastal .seating-architecture-modal-card .seating-modal-copy-btn {
+  background: var(--seating-control-bg) !important;
+  color: var(--seating-control-fg) !important;
+  border-color: var(--seating-control-border) !important;
+}
+
+.theme-coastal .seating-tools-sidebar .seating-tools-close,
+.theme-coastal .seating-architecture-modal-card .seating-modal-copy-btn {
+  border-width: 1px !important;
+}
+
+.theme-coastal .seating-tools-sidebar .seating-reset-btn:hover,
+.theme-coastal .seating-tools-sidebar .seating-tools-close:hover,
+.theme-coastal .seating-architecture-modal-card .seating-modal-copy-btn:hover {
+  background: var(--seating-control-hover-bg) !important;
+  color: var(--seating-control-hover-fg) !important;
+}
+
+.theme-coastal .seating-tools-sidebar .seating-assign-btn,
+.theme-coastal .seating-tools-sidebar .seating-tools-stack-btn-on {
+  background: var(--seating-accent-bg) !important;
+  color: var(--seating-accent-fg) !important;
+  border-color: var(--seating-accent-border) !important;
+}
+
+.theme-coastal .seating-tools-sidebar .seating-assign-btn:hover,
+.theme-coastal .seating-tools-sidebar .seating-tools-stack-btn-on:hover {
+  background: var(--seating-accent-hover-bg) !important;
+  color: var(--seating-accent-hover-fg) !important;
+}
+
+/* Match heavier action button weight in Coastal tools/modal surfaces. */
+.theme-coastal .seating-tools-sidebar .seating-reset-btn,
+.theme-coastal .seating-tools-sidebar .seating-tools-stack-btn,
+.theme-coastal .seating-architecture-modal-card .seating-modal-copy-btn {
+  border-width: 2px !important;
+  font-weight: 600 !important;
 }
 
 /* --- Keyboard Trigger / Kbd --- */
@@ -308,6 +421,13 @@
   color: #ffffff !important;
 }
 
+/* Coastal day dots need stronger contrast against mist/light cards. */
+.theme-coastal .calendar-dot {
+  background: color-mix(in oklab, var(--sea-glass) 78%, #0f172a 22%) !important;
+  border: 1px solid color-mix(in oklab, #ffffff 72%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--sea-glass) 24%, transparent);
+}
+
 .theme-coastal .calendar-time-btn.calendar-time-enabled:hover {
   background: color-mix(in oklab, var(--sea-glass) 22%, white 78%) !important;
   border-color: color-mix(in oklab, var(--sea-glass) 44%, var(--border) 56%) !important;
@@ -359,6 +479,12 @@
 
 .dark.theme-coastal .calendar-day-selected .calendar-day-number {
   color: #ffffff !important;
+}
+
+.dark.theme-coastal .calendar-dot {
+  background: color-mix(in oklab, #67e8f9 74%, var(--sea-glass) 26%) !important;
+  border: 1px solid color-mix(in oklab, #0b1220 58%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in oklab, #67e8f9 28%, transparent);
 }
 
 .dark.theme-coastal .calendar-time-btn {
@@ -491,4 +617,44 @@
   background: color-mix(in oklab, var(--sea-glass) 30%, var(--background) 70%);
   color: #eaffff;
   border-color: color-mix(in oklab, var(--sea-glass) 70%, transparent);
+}
+
+/* Light-mode hover consistency baseline (shared ratios across themes). */
+.theme-coastal:not(.dark) .theater-icon-btn:hover,
+.theme-coastal:not(.dark) .theater-mobile-search-btn:hover,
+.theme-coastal:not(.dark) .theater-mobile-menu-btn:hover,
+.theme-coastal:not(.dark) .style-picker-trigger:hover {
+  background: color-mix(in oklab, var(--primary) 12%, var(--card) 88%) !important;
+  color: var(--foreground) !important;
+  border-color: color-mix(in oklab, var(--primary) 46%, var(--border) 54%) !important;
+}
+
+.theme-coastal:not(.dark) .segment-btn:hover:not(.segment-btn-active),
+.theme-coastal:not(.dark) .btn-prev:hover,
+.theme-coastal:not(.dark) .show-card-btn:hover {
+  background: color-mix(in oklab, var(--primary) 14%, var(--card) 86%) !important;
+  color: var(--foreground) !important;
+  border-color: color-mix(in oklab, var(--primary) 48%, var(--border) 52%) !important;
+}
+
+.theme-coastal:not(.dark) .btn-next:hover {
+  background: color-mix(in oklab, var(--primary) 78%, black 22%) !important;
+  border-color: color-mix(in oklab, var(--primary) 84%, black 16%) !important;
+  color: #ffffff !important;
+}
+
+.theme-coastal:not(.dark) .calendar-time-btn.calendar-time-enabled:hover {
+  background: color-mix(in oklab, var(--primary) 16%, var(--card) 84%) !important;
+  border-color: color-mix(in oklab, var(--primary) 56%, var(--border) 44%) !important;
+  color: var(--foreground) !important;
+}
+
+.theme-coastal:not(.dark) .usher-action-hover:hover {
+  background: color-mix(in oklab, var(--primary) 12%, var(--background) 88%) !important;
+}
+
+.theme-coastal:not(.dark) .usher-action-hover:hover .usher-action-title,
+.theme-coastal:not(.dark) .usher-action-hover:hover .icon-md-muted,
+.theme-coastal:not(.dark) .usher-action-hover:hover .usher-action-meta {
+  color: var(--foreground) !important;
 }

@@ -5,8 +5,9 @@ export const BOOKING_SHOWS_CATEGORY = 'shows-theater';
 export const BOOKING_SHOWS: Show[] = [
   {
     title: 'Hamilton',
-    image:
-      'https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?q=80&w=1200&auto=format&fit=crop',
+    image: '/images/shows/hamilton-320.jpg',
+    imageSrcSet: '/images/shows/hamilton-320.jpg 320w, /images/shows/hamilton-480.jpg 480w, /images/shows/hamilton-768.jpg 768w, /images/shows/hamilton-1200.jpg 1200w',
+    imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
     date: 'Current Run',
     scope: 'Outdoor Amphitheater',
     stack: 'Live Orchestra · Rotating Stage',
@@ -15,8 +16,9 @@ export const BOOKING_SHOWS: Show[] = [
   },
   {
     title: 'The Phantom of the Opera',
-    image:
-      'https://images.unsplash.com/photo-1503095396549-807759245b35?q=80&w=1200&auto=format&fit=crop',
+    image: '/images/shows/phantom-320.jpg',
+    imageSrcSet: '/images/shows/phantom-320.jpg 320w, /images/shows/phantom-480.jpg 480w, /images/shows/phantom-768.jpg 768w, /images/shows/phantom-1200.jpg 1200w',
+    imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
     date: 'Current Run',
     scope: 'Main Stage',
     stack: 'Practical Effects · Full Chorus',
@@ -25,8 +27,9 @@ export const BOOKING_SHOWS: Show[] = [
   },
   {
     title: 'Wicked',
-    image:
-      'https://images.unsplash.com/photo-1516280440614-37939bbacd81?q=80&w=1200&auto=format&fit=crop',
+    image: '/images/shows/wicked-320.jpg',
+    imageSrcSet: '/images/shows/wicked-320.jpg 320w, /images/shows/wicked-480.jpg 480w, /images/shows/wicked-768.jpg 768w, /images/shows/wicked-1200.jpg 1200w',
+    imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
     date: 'Current Run',
     scope: 'Family Night Series',
     stack: 'Flying Rig · Ensemble Cast',
@@ -35,8 +38,9 @@ export const BOOKING_SHOWS: Show[] = [
   },
   {
     title: 'Les Misérables',
-    image:
-      'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=1200&auto=format&fit=crop',
+    image: '/images/shows/les-miserables-320.jpg',
+    imageSrcSet: '/images/shows/les-miserables-320.jpg 320w, /images/shows/les-miserables-480.jpg 480w, /images/shows/les-miserables-768.jpg 768w, /images/shows/les-miserables-1200.jpg 1200w',
+    imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
     date: 'Coming Soon',
     scope: 'Limited Engagement',
     stack: 'Large Ensemble · Live Strings',
@@ -45,8 +49,9 @@ export const BOOKING_SHOWS: Show[] = [
   },
   {
     title: 'The Lion King',
-    image:
-      'https://images.unsplash.com/photo-1513351105278-8f2f3b5f6f4f?q=80&w=1200&auto=format&fit=crop',
+    image: '/images/shows/lion-king-320.jpg',
+    imageSrcSet: '/images/shows/lion-king-320.jpg 320w, /images/shows/lion-king-480.jpg 480w, /images/shows/lion-king-768.jpg 768w, /images/shows/lion-king-1200.jpg 1200w',
+    imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
     date: 'Coming Soon',
     scope: 'Main Stage',
     stack: 'Puppetry · Percussion Ensemble',

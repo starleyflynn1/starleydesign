@@ -1,10 +1,12 @@
 import React from 'react';
-import { Calendar, Star } from 'lucide-react';
+import { CalendarIcon, StarIcon } from './AppIcons';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface ShowCardProps {
   title: string;
   image: string;
+  imageSrcSet?: string;
+  imageSizes?: string;
   date: string;
   scope: string;
   stack: string;
@@ -13,6 +15,7 @@ interface ShowCardProps {
   badge?: 'Selling Fast' | 'Last Seats' | 'New' | 'Starting Soon';
   rating?: number;
   onClick?: () => void;
+  scriptHref?: string;
 }
 
 const badgeStyles = {
@@ -22,9 +25,16 @@ const badgeStyles = {
   'Starting Soon': 'show-badge-starting-soon',
 };
 
+function toWebpSrcSet(srcSet?: string) {
+  if (!srcSet) return undefined;
+  return srcSet.replace(/\.jpe?g(\s+\d+w)/gi, '.webp$1');
+}
+
 export function ShowCard({
   title,
   image,
+  imageSrcSet,
+  imageSizes,
   date,
   scope,
   stack,
@@ -33,19 +43,29 @@ export function ShowCard({
   badge,
   rating,
   onClick,
+  scriptHref,
 }: ShowCardProps) {
+  const webpSrcSet = toWebpSrcSet(imageSrcSet);
+
   return (
     <div
       onClick={onClick}
       className="show-card group"
     >
       <div className="show-card-media">
-        <ImageWithFallback
-          src={image}
-          alt={title}
-          className="show-card-image"
-        />
-        <div className="show-card-media-tint"></div>
+        <picture className="show-card-picture">
+          {webpSrcSet && <source type="image/webp" srcSet={webpSrcSet} sizes={imageSizes} />}
+          <ImageWithFallback
+            src={image}
+            srcSet={imageSrcSet}
+            sizes={imageSizes}
+            alt={title}
+            className="show-card-image"
+            loading="lazy"
+            decoding="async"
+            fetchPriority="low"
+          />
+        </picture>
 
         {badge && (
           <div className="show-card-badge-wrap">
@@ -57,12 +77,11 @@ export function ShowCard({
 
         {rating && (
           <div className="show-card-rating">
-            <Star className="show-card-rating-icon" />
+            <StarIcon className="show-card-rating-icon" />
             <span className="show-card-rating-text">{rating.toFixed(1)}</span>
           </div>
         )}
 
-        <div className="show-card-media-gradient"></div>
       </div>
 
       <div className="show-card-body">
@@ -72,7 +91,7 @@ export function ShowCard({
 
         <div className="show-card-meta">
           <div className="show-card-meta-row show-card-meta-primary">
-            <Calendar className="show-card-icon-sm" />
+            <CalendarIcon className="show-card-icon-sm" />
             <span className="show-card-meta-value">{date}</span>
             <span className="show-card-meta-divider" aria-hidden="true"></span>
             <span className="show-card-meta-value">{scope}</span>
@@ -83,27 +102,22 @@ export function ShowCard({
         </div>
 
         <div className="show-card-footer">
-          <div className="show-card-impact">
-            <div className="show-card-price-label">{role}</div>
-            <div className="show-card-price">{impact}</div>
-          </div>
-
-          <div className="show-card-action-row">
-            <button
-              type="button"
-              className="show-card-btn"
-              onClick={(event) => {
-                event.stopPropagation();
-                if (typeof window !== 'undefined') {
-                  window.location.assign('/script');
-                  return;
-                }
-                onClick?.();
-              }}
-            >
-              View Script
-            </button>
-          </div>
+          <div className="show-card-price-label">{role}</div>
+          <div className="show-card-price">{impact}</div>
+          <button
+            type="button"
+            className="show-card-btn"
+            onClick={(event) => {
+              event.stopPropagation();
+              if (typeof window !== 'undefined') {
+                window.location.assign(scriptHref || '/script');
+                return;
+              }
+              onClick?.();
+            }}
+          >
+            View Script
+          </button>
         </div>
       </div>
     </div>

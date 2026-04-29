@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="300" viewBox="12 24 590 272" fill="none">
+  <defs>
+    <style>
+      .node-text { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 13px; fill: #24364f; }
+      .line { stroke: #2b3f57; stroke-width: 1.6; fill: none; }
+      .edge-text { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 10px; fill: #4b607a; }
+    </style>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#2b3f57"/>
+    </marker>
+  </defs>
+
+  <!-- Top flow -->
+  <rect x="20" y="30" width="118" height="32" rx="14" fill="#dcebff" stroke="#86b8ff"/>
+  <text x="79" y="50" text-anchor="middle" class="node-text">Global Usher</text>
+
+  <rect x="170" y="30" width="132" height="32" rx="14" fill="#ffe8c9" stroke="#efb666"/>
+  <text x="236" y="50" text-anchor="middle" class="node-text">Booking Store</text>
+
+  <rect x="330" y="30" width="106" height="32" rx="14" fill="#dcebff" stroke="#86b8ff"/>
+  <text x="383" y="50" text-anchor="middle" class="node-text">Calendar</text>
+
+  <path class="line" d="M138 46 H168" marker-end="url(#arrow)"/>
+  <path class="line" d="M330 46 H304" marker-end="url(#arrow)"/>
+
+  <!-- Store branches -->
+  <rect x="456" y="74" width="138" height="32" rx="14" fill="#ffe8c9" stroke="#efb666"/>
+  <text x="525" y="94" text-anchor="middle" class="node-text">Pricing/Totals</text>
+  <rect x="456" y="116" width="138" height="32" rx="14" fill="#ffe8c9" stroke="#efb666"/>
+  <text x="525" y="136" text-anchor="middle" class="node-text">Seat Inventory</text>
+
+  <path class="line" d="M236 62 V90 H454" marker-end="url(#arrow)"/>
+  <path class="line" d="M248 62 V132 H454" marker-end="url(#arrow)"/>
+
+  <!-- Mid row -->
+  <rect x="20" y="146" width="154" height="32" rx="14" fill="#dcebff" stroke="#86b8ff"/>
+  <text x="97" y="166" text-anchor="middle" class="node-text">Route + Deep Link</text>
+
+  <rect x="206" y="146" width="132" height="32" rx="14" fill="#dcebff" stroke="#86b8ff"/>
+  <text x="272" y="166" text-anchor="middle" class="node-text">Seating Chart</text>
+
+  <path class="line" d="M79 62 V144" marker-end="url(#arrow)"/>
+  <path class="line" d="M272 62 V144" marker-end="url(#arrow)"/>
+
+  <!-- Process + API -->
+  <rect x="150" y="208" width="228" height="32" rx="14" fill="#efe5ff" stroke="#b89bff"/>
+  <text x="264" y="228" text-anchor="middle" class="node-text">optimistic seat hold/release</text>
+  <path class="line" d="M272 178 V206" marker-end="url(#arrow)"/>
+
+  <rect x="150" y="258" width="124" height="32" rx="14" fill="#dcf9ea" stroke="#83d8b0"/>
+  <text x="212" y="278" text-anchor="middle" class="node-text">Reservation API</text>
+  <path class="line" d="M264 240 V256" marker-end="url(#arrow)"/>
+  <text x="278" y="252" text-anchor="start" class="edge-text">commits</text>
+</svg>

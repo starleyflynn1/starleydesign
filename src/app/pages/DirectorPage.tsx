@@ -2,12 +2,13 @@ import React from 'react';
 
 export function DirectorPage() {
   return (
-    <main className="app-main">
+    <main className="app-main director-page">
       <section className="component-panel section-stack">
         <h2 className="section-title">Engineering Experiences, Directing Outcomes</h2>
         <div className="feature-grid director-feature-grid">
           <article className="feature-item">
-            <h3 className="spotlight-text">The Vision</h3>
+            <h3 className="
+            ">The Vision</h3>
             <p className="feature-copy">
               For over a decade, I&apos;ve operated at the intersection of robust logic and
               human-centric design. My approach to technology is much like a director&apos;s
@@ -28,16 +29,16 @@ export function DirectorPage() {
               experimentation.
             </p>
             <p className="feature-copy">
-              <strong>Technical Architecture:</strong> Building enterprise-grade systems with a
-              focus on high-performance logic and scalable state management.
+              <strong>Technical Architecture:</strong> Engineering for <em>Scalability</em>. 
+              Building enterprise-grade systems that thrive under heavy data and complex state management.
+            </p>  
+            <p className="feature-copy">
+              <strong>UX Engineering:</strong> <em>Performance</em> as an Aesthetic. 
+              Translating Figma visions into zero-latency, production-ready code with pixel-perfect fidelity.
             </p>
             <p className="feature-copy">
-              <strong>UX Engineering:</strong> Translating Figma visions into production-ready
-              code, ensuring pixel-perfect fidelity across the browser.
-            </p>
-            <p className="feature-copy">
-              <strong>Human-Centric Design:</strong> A relentless commitment to a11y, ensuring
-              every performance is inclusive and intuitive for all.
+              <strong>Human-Centric Design:</strong> A relentless commitment to accessibility,
+              ensuring every performance is inclusive and intuitive for all.
             </p>
           </article>
           <article className="feature-item">

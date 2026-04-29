@@ -92,13 +92,22 @@ const mixRgb = (
 
 const rgbToCss = ([r, g, b]: [number, number, number]) => `rgb(${r} ${g} ${b})`;
 
+const themeStyleLoaders: Record<ThemeName, () => Promise<unknown>> = {
+  archive: () => import('../../styles/themes/archive.css'),
+  stage: () => import('../../styles/themes/stage.css'),
+  blueprint: () => import('../../styles/themes/blueprint.css'),
+  coastal: () => import('../../styles/themes/coastal.css'),
+  neon: () => import('../../styles/themes/neon.css'),
+  terminal: () => import('../../styles/themes/terminal.css'),
+};
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [currentTheme, setCurrentTheme] = useState<ThemeName>(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem(THEME_STORAGE_KEY);
-      return (stored as ThemeName) || 'archive';
+      return (stored as ThemeName) || 'stage';
     }
-    return 'archive';
+    return 'stage';
   });
 
   const [mode, setModeState] = useState<Mode>(() => {
@@ -106,10 +115,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       const stored = localStorage.getItem(MODE_STORAGE_KEY);
       if (stored) return stored as Mode;
 
-      const storedTheme = (localStorage.getItem(THEME_STORAGE_KEY) as ThemeName) || 'archive';
+      const storedTheme = (localStorage.getItem(THEME_STORAGE_KEY) as ThemeName) || 'stage';
       return themeConfigs[storedTheme].defaultMode;
     }
-    return themeConfigs.archive.defaultMode;
+    return themeConfigs.stage.defaultMode;
   });
   const [reduceMotionEnabled, setReduceMotionEnabled] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
@@ -122,6 +131,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   });
 
   const lastPointerRef = useRef<{ x: number; y: number } | null>(null);
+  // Start empty: all theme styles (including Stage) are loaded via dynamic imports.
+  // Marking Stage as preloaded prevents its CSS chunk from ever being requested.
+  const loadedThemeStylesRef = useRef<Set<ThemeName>>(new Set());
+  const hasRunInitialGuardrailsRef = useRef(false);
+
+  const ensureThemeStylesLoaded = useCallback(async (theme: ThemeName) => {
+    if (loadedThemeStylesRef.current.has(theme)) return;
+    await themeStyleLoaders[theme]();
+    loadedThemeStylesRef.current.add(theme);
+  }, []);
 
   const getTransitionKind = useCallback((theme: ThemeName): TransitionKind => {
     if (theme === 'stage' || theme === 'neon' || theme === 'archive') return 'spotlight';
@@ -144,22 +163,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const resolveVariableRgb = useCallback((variableName: string): [number, number, number] | null => {
-    const probe = document.createElement('div');
-    probe.style.position = 'fixed';
-    probe.style.inset = '0';
-    probe.style.opacity = '0';
-    probe.style.pointerEvents = 'none';
-    probe.style.visibility = 'hidden';
-    probe.style.color = `var(${variableName})`;
-    document.body.appendChild(probe);
-    const resolved = window.getComputedStyle(probe).color;
-    document.body.removeChild(probe);
+    const resolved = window.getComputedStyle(document.documentElement).getPropertyValue(variableName);
     return parseColorToRgb(resolved);
   }, []);
 
   const applySemanticContrastGuardrails = useCallback(() => {
     if (typeof window === 'undefined') return;
     const root = document.documentElement;
+
+    // Preserve Stage's art-directed palette: do not runtime-adjust primary/accent tokens.
+    if (currentTheme === 'stage' || root.classList.contains('theme-stage')) {
+      root.style.removeProperty('--primary');
+      root.style.removeProperty('--accent');
+      return;
+    }
 
     // Reset previous runtime overrides so we always calculate from theme defaults.
     root.style.removeProperty('--primary');
@@ -198,7 +215,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     root.style.setProperty('--primary', rgbToCss(adjustedPrimary));
     root.style.setProperty('--accent', rgbToCss(adjustedAccent));
-  }, [resolveVariableRgb]);
+  }, [currentTheme, resolveVariableRgb]);
 
   const runThemeTransition = useCallback(
     (nextTheme: ThemeName, nextMode: Mode) => {
@@ -346,8 +363,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           setCurrentTheme(nextTheme);
           setModeState(nextMode);
         });
-        applyRootTheme(nextTheme, nextMode);
-        applySemanticContrastGuardrails();
+        ensureThemeStylesLoaded(nextTheme)
+          .catch(() => undefined)
+          .finally(() => {
+            applyRootTheme(nextTheme, nextMode);
+            applySemanticContrastGuardrails();
+          });
         if (kind === 'crt') {
           requestAnimationFrame(() => restoreScrollPosition());
         }
@@ -361,7 +382,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       applyLuminosityCap(fromLuminance, toLuminance);
       animateRootFallback();
     },
-    [applyRootTheme, applySemanticContrastGuardrails, currentTheme, getTransitionKind, mode, reduceMotionEnabled]
+    [applyRootTheme, applySemanticContrastGuardrails, currentTheme, ensureThemeStylesLoaded, getTransitionKind, mode, reduceMotionEnabled]
   );
 
   useEffect(() => {
@@ -376,13 +397,41 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const root = document.documentElement;
-    applyRootTheme(currentTheme, mode);
-    applySemanticContrastGuardrails();
+    let cancelled = false;
+    ensureThemeStylesLoaded(currentTheme)
+      .catch(() => undefined)
+      .finally(() => {
+        if (cancelled) return;
+        applyRootTheme(currentTheme, mode);
+        const runGuardrails = () => {
+          if (cancelled) return;
+          applySemanticContrastGuardrails();
+        };
+        const schedule = () => {
+          if ('requestIdleCallback' in window) {
+            (window as Window & { requestIdleCallback: (cb: IdleRequestCallback) => number }).requestIdleCallback(
+              () => runGuardrails()
+            );
+          } else {
+            window.setTimeout(runGuardrails, 0);
+          }
+        };
+
+        if (!hasRunInitialGuardrailsRef.current) {
+          hasRunInitialGuardrailsRef.current = true;
+          window.setTimeout(schedule, 1800);
+          return;
+        }
+        schedule();
+      });
 
     localStorage.setItem(THEME_STORAGE_KEY, currentTheme);
     localStorage.setItem(MODE_STORAGE_KEY, mode);
     localStorage.setItem(REDUCE_MOTION_STORAGE_KEY, String(reduceMotionEnabled));
-  }, [currentTheme, mode, reduceMotionEnabled, applyRootTheme, applySemanticContrastGuardrails]);
+    return () => {
+      cancelled = true;
+    };
+  }, [currentTheme, mode, reduceMotionEnabled, applyRootTheme, applySemanticContrastGuardrails, ensureThemeStylesLoaded]);
 
   const setTheme = (theme: ThemeName) => {
     runThemeTransition(theme, themeConfigs[theme].defaultMode);

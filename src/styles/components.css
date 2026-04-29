@@ -2,6 +2,8 @@
   .main-header-title {
     font-size: clamp(2.5rem, 8vw, 4.6875rem);
     font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
     background: linear-gradient(
       to right,
       var(--velvet) 0%,
@@ -27,16 +29,48 @@
   .hero-badge { @apply inline-flex items-center gap-2 px-4 py-2 bg-velvet/10 border border-velvet/30 rounded-full text-sm text-velvet mb-4; }
   .icon-sm { @apply w-4 h-4; }
   .hero-title { font-family: var(--font-display); }
-  .hero-subtitle { @apply text-xl text-muted-foreground max-w-2xl mx-auto; }
-  .hero-description { @apply text-base text-muted-foreground max-w-2xl mx-auto; }
+  .hero-subtitle {
+    @apply text-xl text-muted-foreground max-w-2xl mx-auto;
+    min-height: calc(1.75rem * 1.3);
+  }
+  .hero-description {
+    @apply text-base text-muted-foreground;
+    text-align: left;
+    width: 100%;
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+    min-height: calc(1.5rem * 2.4);
+  }
+  #stage .hero-description {
+    @apply max-w-2xl mx-auto;
+    text-align: center;
+    width: auto;
+    padding-left: 0;
+    padding-right: 0;
+  }
   .hero-shortcut-wrap { @apply flex items-center justify-center gap-4 pt-4; }
-  .hero-shortcut { @apply px-3 py-2 bg-card border border-spotlight/30 rounded-lg text-sm; }
-  .spotlight-text { @apply text-spotlight; }
+  .hero-shortcut {
+    @apply px-3 py-2 bg-card border border-spotlight/30 rounded-lg text-sm;
+    color: var(--text-subtle-aa);
+  }
+  .hero-shortcut .spotlight-text {
+    color: color-mix(in oklab, var(--spotlight) 72%, #f4d58a 28%);
+    font-weight: 700;
+  }
+  .spotlight-text {
+    color: color-mix(in oklab, var(--spotlight) 74%, #f4d58a 26%);
+    font-weight: 700;
+  }
   .section-stack { @apply space-y-6; }
   .section-header-row { @apply flex items-center justify-between; }
   .section-title { @apply text-2xl; font-family: var(--font-display); }
-  .link-button { @apply text-sm text-spotlight hover:underline; }
-  .shows-grid { @apply grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4; }
+  .link-button {
+    @apply text-sm hover:underline;
+    color: var(--text-accent-aa, color-mix(in oklab, var(--foreground) 90%, var(--spotlight) 10%));
+    font-weight: 600;
+  }
+  .shows-grid { @apply grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4; grid-auto-rows: 1fr; }
   .component-panel {
     @apply rounded-2xl p-8;
     background: color-mix(in oklab, var(--card) 90%, var(--background) 10%);
@@ -65,13 +99,13 @@
     border-color: color-mix(in oklab, var(--foreground) 30%, transparent);
   }
   .segment-btn.segment-btn-active {
-    background-color: var(--segment-active-bg, var(--velvet)) !important;
+    background-color: var(--segment-active-bg, var(--selection-accent, var(--velvet))) !important;
     color: var(--segment-active-fg, var(--marquee-surface)) !important;
-    border-color: var(--segment-active-bg, var(--velvet)) !important;
+    border-color: var(--segment-active-bg, var(--selection-accent, var(--velvet))) !important;
     border-width: 2px !important;
     border-style: solid !important;
     font-weight: 700;
-    box-shadow: 0 0 0 1px color-mix(in oklab, var(--velvet) 45%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--selection-accent, var(--velvet)) 45%, transparent);
   }
   .segment-btn.segment-btn-active::after {
     content: "";
@@ -209,12 +243,12 @@
   .booking-seat-sidebar-btn { @apply w-full; }
   .booking-seat-sidebar-suggest {
     @apply font-semibold;
-    background: color-mix(in oklab, var(--velvet) 90%, black 10%);
+    background: color-mix(in oklab, var(--selection-accent, var(--velvet)) 90%, black 10%);
     color: white;
-    border-color: color-mix(in oklab, var(--velvet) 68%, transparent);
+    border-color: color-mix(in oklab, var(--selection-accent, var(--velvet)) 68%, transparent);
   }
   .booking-seat-sidebar-suggest:hover {
-    background: color-mix(in oklab, var(--velvet) 82%, black 18%);
+    background: color-mix(in oklab, var(--selection-accent, var(--velvet)) 82%, black 18%);
   }
   .booking-seat-sidebar-reset {
     @apply text-sm;
@@ -276,24 +310,125 @@
   }
   @media (min-width: 1024px) {
     .booking-seat-layout {
-      grid-template-columns: minmax(0, 1fr) 280px;
+      grid-template-columns: fit-content(100%) 280px;
       align-items: start;
+      justify-content: center;
+      column-gap: 0.75rem;
+    }
+    .booking-seat-main {
+      width: fit-content;
+      max-width: 100%;
+      justify-self: center;
     }
     .booking-seat-sidebar { @apply sticky top-20; }
   }
   .booking-nav {
     @apply flex items-center justify-center gap-4;
+    flex-wrap: wrap;
     position: sticky;
     bottom: 0;
     z-index: 3;
     padding-top: 0.5rem;
     background: color-mix(in oklab, var(--card) 95%, transparent);
   }
+  .booking-exit-hint {
+    @apply text-xs text-center;
+    color: var(--text-muted-aa);
+    opacity: 0.78;
+    margin-top: 0.1rem;
+    margin-bottom: 0.2rem;
+    letter-spacing: 0.01em;
+  }
+  .booking-exit-hint-footer {
+    width: 100%;
+    margin-top: 0.1rem;
+    margin-bottom: 0;
+  }
+  .booking-next-hint-popover {
+    @apply w-full text-center text-xs font-medium rounded-md px-3 py-2;
+    margin-top: 0.35rem;
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--spotlight) 22%, var(--card) 78%);
+    border: 1px solid color-mix(in oklab, var(--spotlight) 48%, transparent);
+  }
+  .booking-exit-dialog-wrap {
+    @apply fixed inset-0 z-50 flex justify-center p-3 sm:p-4;
+    align-items: center;
+    padding-top: 0;
+    overflow: hidden;
+  }
+  .booking-exit-dialog-backdrop {
+    @apply absolute inset-0;
+    background: color-mix(in oklab, var(--stage-base) 70%, black 30%);
+    backdrop-filter: blur(2px);
+  }
+  .booking-exit-dialog-card {
+    @apply relative w-full max-w-sm rounded-xl border p-4 sm:p-5;
+    background: color-mix(in oklab, var(--card) 96%, var(--background) 4%);
+    border-color: color-mix(in oklab, var(--foreground) 22%, transparent);
+    color: var(--foreground);
+    box-shadow: 0 18px 44px -24px color-mix(in oklab, var(--stage-base) 70%, black 30%);
+    margin-top: 0;
+    margin-bottom: 0;
+    max-height: min(86dvh, 28rem);
+    overflow: hidden;
+  }
+  .booking-exit-dialog-title { @apply text-base font-semibold; }
+  .booking-exit-dialog-copy {
+    @apply mt-1 text-sm;
+    color: var(--text-muted-aa);
+  }
+  .booking-exit-dialog-actions {
+    @apply sticky bottom-0 mt-4 flex items-center justify-end gap-2 pt-2;
+    background: color-mix(in oklab, var(--card) 96%, var(--background) 4%);
+  }
+  .booking-exit-dialog-btn {
+    @apply rounded-md px-4 py-2 text-sm font-semibold;
+    border: 1px solid transparent;
+    min-width: 84px;
+  }
+  .booking-exit-dialog-btn-secondary {
+    background: color-mix(in oklab, var(--foreground) 10%, transparent);
+    border-color: color-mix(in oklab, var(--foreground) 20%, transparent);
+    color: var(--foreground);
+  }
+  .booking-exit-dialog-btn-secondary:hover {
+    background: color-mix(in oklab, var(--foreground) 14%, transparent);
+  }
+  .booking-exit-dialog-btn-primary {
+    background: var(--selection-accent, var(--velvet));
+    border-color: color-mix(in oklab, var(--selection-accent, var(--velvet)) 72%, black 28%);
+    color: white;
+  }
+  .booking-exit-dialog-btn-primary:hover {
+    background: color-mix(in oklab, var(--selection-accent, var(--velvet)) 84%, black 16%);
+  }
+  .booking-exit-dialog-btn:focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--spotlight) 72%, white 28%);
+    outline-offset: 2px;
+  }
   .btn-prev {
     @apply px-6 py-2 border rounded-lg hover:bg-secondary disabled:cursor-not-allowed;
     border-color: color-mix(in oklab, var(--foreground) 28%, transparent);
   }
-  .btn-next { @apply px-6 py-2 bg-velvet hover:bg-velvet/80 text-white rounded-lg disabled:cursor-not-allowed; }
+  .btn-next {
+    @apply px-6 py-2 text-white rounded-lg disabled:cursor-not-allowed;
+    background: var(--selection-accent, var(--velvet));
+    border: 1px solid color-mix(in oklab, var(--selection-accent, var(--velvet)) 70%, transparent);
+  }
+  .btn-next:hover {
+    background: color-mix(in oklab, var(--selection-accent, var(--velvet)) 82%, black 18%);
+  }
+  .btn-next[aria-disabled='true'],
+  .btn-next.btn-next-disabled {
+    cursor: not-allowed;
+    opacity: 1 !important;
+    background: var(--btn-disabled-bg) !important;
+    border-color: var(--btn-disabled-border) !important;
+    color: var(--btn-disabled-fg) !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
   .btn-prev:disabled,
   .btn-next:disabled {
     opacity: 1 !important;
@@ -356,7 +491,10 @@
     margin-right: auto;
   }
   .booking-step-title { @apply text-sm; }
-  .booking-step-title-current { @apply text-spotlight; }
+  .booking-step-title-current {
+    color: var(--text-accent-aa, color-mix(in oklab, var(--foreground) 90%, var(--spotlight) 10%));
+    font-weight: 700;
+  }
   .booking-step-title-completed { @apply text-foreground; }
   .booking-step-title-pending { color: var(--text-subtle-aa); }
   .booking-step-desc {
@@ -371,20 +509,81 @@
   .app-main-booking .booking-step-copy { @apply text-xs; }
   .app-main-booking .panel-header { @apply mb-3; }
 
-  .theater-header { @apply sticky top-0 z-40 w-full border-b border-border bg-background/80 backdrop-blur-lg; }
+  .theater-header {
+    @apply sticky top-0 w-full border-b border-border bg-background/80 backdrop-blur-lg;
+    z-index: 45;
+  }
   .theater-header-container { @apply container mx-auto px-4; }
   .theater-header-row { @apply flex items-start justify-between py-2 md:h-16 md:items-center md:py-0; }
   .theater-brand { @apply flex items-center gap-3; }
   .theater-brand-icon { @apply w-8 h-8 text-velvet; }
-  .theater-brand-title { @apply text-xl; font-family: var(--font-display); }
+  .theater-brand-title {
+    @apply text-xl;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+  }
   .theater-nav-desktop { @apply hidden lg:flex items-center gap-6; }
   .theater-nav-link { @apply text-sm hover:text-spotlight transition-colors relative; }
-  .theater-nav-link-underline { @apply absolute -bottom-1 left-0 w-0 h-0.5 bg-spotlight transition-all group-hover:w-full; }
+  .theater-nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.25rem;
+    width: 0;
+    height: 2px;
+    background: var(--spotlight);
+    transition: width 200ms ease;
+  }
+  .theater-nav-link:hover::after,
+  .theater-nav-link:focus-visible::after {
+    width: 100%;
+  }
   .theater-actions { @apply flex items-center gap-2; }
   .theater-action-stack-desktop { @apply hidden md:flex md:items-center md:gap-2; }
-  .theater-icon-btn { @apply p-2 hover:bg-spotlight/10 rounded-lg transition-colors; }
-  .theater-mobile-search-btn { @apply md:hidden p-2 hover:bg-spotlight/10 rounded-lg transition-colors; }
-  .theater-mobile-menu-btn { @apply lg:hidden p-2 hover:bg-spotlight/10 rounded-lg transition-colors; }
+  .theater-icon-btn {
+    @apply inline-flex items-center justify-center p-2 hover:bg-spotlight/10 rounded-lg transition-colors;
+    line-height: 1;
+  }
+  .theater-mobile-search-btn {
+    @apply md:hidden inline-flex items-center justify-center p-2 hover:bg-spotlight/10 rounded-lg transition-colors;
+    line-height: 1;
+  }
+  .theater-mobile-menu-btn {
+    @apply lg:hidden inline-flex items-center justify-center p-2 hover:bg-spotlight/10 rounded-lg transition-colors;
+    line-height: 1;
+  }
+  .theater-icon-btn svg,
+  .theater-mobile-search-btn svg,
+  .theater-mobile-menu-btn svg {
+    display: block;
+  }
+  /* Isolate header controls from broad theme button hover overrides. */
+  .theater-actions .theater-icon-btn,
+  .theater-actions .theater-mobile-search-btn,
+  .theater-actions .theater-mobile-menu-btn,
+  .theater-nav-mobile-controls .theater-icon-btn {
+    color: var(--foreground);
+    background: transparent;
+    border: 1px solid transparent;
+  }
+  .theater-actions .theater-icon-btn:hover,
+  .theater-actions .theater-mobile-search-btn:hover,
+  .theater-actions .theater-mobile-menu-btn:hover,
+  .theater-nav-mobile-controls .theater-icon-btn:hover {
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--spotlight) 14%, transparent);
+    border-color: color-mix(in oklab, var(--foreground) 24%, transparent);
+  }
+  .theater-actions .theater-icon-btn:focus-visible,
+  .theater-actions .theater-mobile-search-btn:focus-visible,
+  .theater-actions .theater-mobile-menu-btn:focus-visible,
+  .theater-nav-mobile-controls .theater-icon-btn:focus-visible {
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--spotlight) 18%, transparent);
+    border-color: color-mix(in oklab, var(--foreground) 28%, transparent);
+  }
   .theater-nav-mobile { @apply lg:hidden py-4 space-y-2 border-t border-border; }
   .theater-nav-mobile-controls {
     @apply flex items-center justify-end gap-2 px-4 pb-2 mb-2 border-b border-border/70;
@@ -418,8 +617,14 @@
   }
 
   .style-picker-trigger { @apply p-2 hover:bg-accent/10 rounded-lg transition-colors; }
+  .style-picker-root { @apply relative; }
   .style-picker-menu { @apply w-64; }
-  .style-picker-item { @apply cursor-pointer; }
+  .style-picker-item {
+    @apply cursor-pointer w-full text-left rounded-md px-2 py-1.5;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--foreground);
+  }
   .style-picker-item-row { @apply flex items-center gap-3 w-full; }
   .style-picker-swatch-row { @apply flex gap-1; }
   .style-picker-swatch { @apply w-3 h-3 rounded-full border border-border; }
@@ -428,38 +633,55 @@
   .style-picker-description { @apply text-xs text-muted-foreground; }
   .style-picker-check { @apply w-4 h-4 text-primary; }
   .style-picker-menu {
+    @apply absolute right-0 mt-2 rounded-lg border p-2 shadow-xl;
+    z-index: 60;
     background: var(--card);
     color: var(--foreground);
     border-color: color-mix(in oklab, var(--border) 80%, transparent);
   }
+  .style-picker-menu-label { @apply px-2 py-1 text-xs font-semibold tracking-wide uppercase; }
+  .style-picker-menu-separator {
+    @apply my-1 h-px;
+    background: color-mix(in oklab, var(--border) 78%, transparent);
+  }
   .style-picker-menu .style-picker-item[data-highlighted],
-  .style-picker-menu .style-picker-item:hover {
+  .style-picker-menu .style-picker-item:hover,
+  .style-picker-menu .style-picker-item:focus-visible {
     background: var(--picker-hover-bg, color-mix(in oklab, var(--spotlight) 28%, var(--card) 72%));
     color: var(--picker-hover-fg, var(--foreground));
+    outline: none;
   }
   .style-picker-menu .style-picker-item[data-highlighted] .style-picker-title,
   .style-picker-menu .style-picker-item:hover .style-picker-title,
+  .style-picker-menu .style-picker-item:focus-visible .style-picker-title,
   .style-picker-menu .style-picker-item[data-highlighted] .style-picker-description,
   .style-picker-menu .style-picker-item:hover .style-picker-description,
+  .style-picker-menu .style-picker-item:focus-visible .style-picker-description,
   .style-picker-menu .style-picker-item[data-highlighted] .style-picker-check,
-  .style-picker-menu .style-picker-item:hover .style-picker-check {
+  .style-picker-menu .style-picker-item:hover .style-picker-check,
+  .style-picker-menu .style-picker-item:focus-visible .style-picker-check {
     color: var(--picker-hover-fg, var(--foreground)) !important;
   }
   .style-picker-menu .style-picker-item[data-highlighted] .style-picker-description,
-  .style-picker-menu .style-picker-item:hover .style-picker-description {
-    color: var(--picker-hover-muted, color-mix(in oklab, var(--picker-hover-fg, var(--foreground)) 86%, transparent)) !important;
+  .style-picker-menu .style-picker-item:hover .style-picker-description,
+  .style-picker-menu .style-picker-item:focus-visible .style-picker-description {
+    color: var(--picker-hover-fg, var(--foreground)) !important;
   }
   .style-picker-menu .style-picker-item[data-highlighted] .style-picker-swatch,
-  .style-picker-menu .style-picker-item:hover .style-picker-swatch {
+  .style-picker-menu .style-picker-item:hover .style-picker-swatch,
+  .style-picker-menu .style-picker-item:focus-visible .style-picker-swatch {
     border-color: color-mix(in oklab, var(--picker-hover-fg, var(--foreground)) 40%, transparent) !important;
   }
 
-  .usher-overlay-wrap { @apply fixed inset-0 z-50 flex items-start justify-center pt-[15vh]; }
+  .usher-overlay-wrap { @apply fixed inset-0 z-50 flex items-start justify-center pt-[8vh] pb-4; }
   .usher-backdrop { @apply absolute inset-0 bg-background/72 backdrop-blur-sm; }
   .usher-panel {
     @apply relative w-full max-w-2xl mx-4 bg-card rounded-xl shadow-2xl overflow-hidden;
     color: var(--foreground);
     border: 1px solid color-mix(in oklab, var(--border) 85%, transparent);
+    max-height: min(82vh, calc(100dvh - 2rem));
+    display: flex;
+    flex-direction: column;
   }
   /* Isolate Global Usher controls from theme-level generic button styling. */
   .usher-panel button {
@@ -511,7 +733,12 @@
     color: color-mix(in oklab, var(--foreground) 72%, transparent);
     border: 0;
   }
-  .usher-results { @apply max-h-[60vh] overflow-y-auto; }
+  .usher-results {
+    @apply overflow-y-auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding-bottom: 0.5rem;
+  }
   .usher-no-results {
     @apply p-8 text-center;
     color: color-mix(in oklab, var(--foreground) 68%, transparent);
@@ -554,7 +781,7 @@
   }
 
   .calendar-root { @apply space-y-4; }
-  .calendar-layout { @apply grid grid-cols-1 lg:grid-cols-[minmax(0,0.72fr)_minmax(260px,1fr)] gap-4 items-start; }
+  .calendar-layout { @apply grid grid-cols-1 xl:grid-cols-[minmax(0,0.72fr)_minmax(260px,1fr)] gap-4 items-start; }
   .calendar-main { @apply space-y-3; }
   .calendar-head { @apply flex items-center justify-between; }
   .calendar-title { @apply text-lg; font-family: var(--font-display); }
@@ -562,8 +789,8 @@
   .calendar-nav-btn { @apply p-1.5 hover:bg-spotlight/10 rounded-md transition-colors; }
   .calendar-week-grid { @apply grid grid-cols-7 gap-1.5; }
   .calendar-weekday { @apply text-center text-xs text-muted-foreground py-1; }
-  .calendar-empty-day { @apply h-9; }
-  .calendar-day-btn { @apply h-9 rounded-md relative transition-all; }
+  .calendar-empty-day { @apply h-11; }
+  .calendar-day-btn { @apply h-11 rounded-md relative transition-all; }
   .calendar-day-selected {
     @apply ring-2 ring-spotlight;
     background: color-mix(in oklab, var(--spotlight) 34%, transparent);
@@ -624,8 +851,8 @@
     transform: none !important;
     filter: none !important;
     overflow: visible !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
+    min-width: 2.75rem !important;
+    min-height: 2.75rem !important;
   }
   .calendar-root .calendar-day-btn,
   .calendar-root .calendar-nav-btn,
@@ -637,7 +864,7 @@
   .calendar-root .calendar-day-btn {
     padding: 0 !important;
     width: 100%;
-    height: 2.25rem;
+    height: 2.75rem;
   }
   .calendar-root .calendar-nav-btn {
     padding: 0 !important;
@@ -696,7 +923,11 @@
   .calendar-time-value { @apply text-lg; color: var(--foreground); }
   .calendar-time-availability { @apply text-right; }
   .calendar-seats { @apply text-sm; color: color-mix(in oklab, var(--foreground) 82%, transparent); }
-  .calendar-available { @apply text-xs text-seat-available; }
+  .calendar-available {
+    @apply text-xs;
+    color: color-mix(in oklab, var(--foreground) 82%, var(--seat-available) 18%);
+    font-weight: 600;
+  }
   .calendar-soldout { @apply text-xs text-accent-primary; }
   .calendar-time-disabled .calendar-time-type,
   .calendar-time-disabled .calendar-time-value,
@@ -729,7 +960,8 @@
     color: var(--foreground);
   }
 
-  .seating-root { @apply relative space-y-6; }
+  .seating-root { @apply relative; }
+  .seating-main-column { @apply space-y-6; min-width: 0; }
   .seating-stage-wrap { @apply text-center; }
   .seating-tools-row { @apply flex justify-end w-full px-2 sm:px-4 pb-2; }
   .seating-stage-topbar { @apply flex items-center justify-center gap-3 w-full px-2 sm:px-4; }
@@ -777,10 +1009,11 @@
   .seating-seat-vip { @apply bg-seat-vip hover:bg-seat-vip/85 cursor-pointer ring-2 ring-seat-vip/70; }
   .seating-seat-accessible { @apply bg-seat-accessible hover:bg-seat-accessible/85 cursor-pointer; }
   .seating-seat-selected {
-    @apply bg-velvet text-white ring-2 ring-velvet cursor-pointer scale-[1.03];
+    @apply text-white cursor-pointer scale-[1.03];
+    background: var(--selection-accent, var(--velvet));
     box-shadow:
-      0 0 0 2px var(--seating-selected-ring, color-mix(in oklab, var(--velvet) 55%, transparent)),
-      0 0 12px var(--seating-selected-glow, color-mix(in oklab, var(--velvet) 70%, transparent)),
+      0 0 0 2px var(--seating-selected-ring, color-mix(in oklab, var(--selection-accent, var(--velvet)) 55%, transparent)),
+      0 0 12px var(--seating-selected-glow, color-mix(in oklab, var(--selection-accent, var(--velvet)) 70%, transparent)),
       inset 0 0 0 1px var(--seating-selected-inset, color-mix(in oklab, white 35%, transparent));
     transform: scale(var(--seating-selected-scale, 1.03)) !important;
     filter: var(--seating-selected-filter, saturate(1.08));
@@ -799,7 +1032,9 @@
   }
   .seating-accessible-icon { @apply w-4 h-4 absolute inset-0 m-auto text-white; }
   .seating-seat-symbol { @apply absolute inset-0 grid place-items-center text-[10px] font-bold text-white; }
-  .seating-seat-vip .seating-seat-symbol { @apply text-stage-base; }
+  .seating-seat-vip .seating-seat-symbol {
+    color: var(--seat-vip-symbol-color, #111827) !important;
+  }
   .seating-seat-taken .seating-seat-symbol { @apply line-through; }
   /* Ensure global theme button rules never flatten seat states. */
   .seating-seat-btn.seating-seat-available { background-color: var(--seat-available) !important; border-color: transparent !important; }
@@ -809,7 +1044,10 @@
     border: 0 !important;
   }
   .seating-seat-btn.seating-seat-accessible { background-color: var(--seat-accessible) !important; border-color: transparent !important; }
-  .seating-seat-btn.seating-seat-selected { background-color: var(--velvet) !important; border-color: color-mix(in oklab, var(--velvet) 70%, transparent) !important; }
+  .seating-seat-btn.seating-seat-selected {
+    background-color: var(--selection-accent, var(--velvet)) !important;
+    border-color: color-mix(in oklab, var(--selection-accent, var(--velvet)) 70%, transparent) !important;
+  }
   .seating-legend { @apply flex items-center justify-center gap-6 pt-4 border-t border-spotlight/20; }
   .seating-legend-item { @apply flex items-center gap-2; }
   .seating-legend-dot { @apply w-4 h-4 rounded; }
@@ -817,11 +1055,13 @@
   .seating-legend-dot-symbol {
     @apply text-[10px] leading-none font-bold text-white;
   }
-  .seating-legend-dot-symbol-vip { @apply text-stage-base; }
+  .seating-legend-dot-symbol-vip {
+    color: var(--seat-vip-symbol-color, #111827) !important;
+  }
   .seating-legend-dot-accessible { @apply relative grid place-items-center; }
   .seating-legend-accessible-icon { @apply w-3 h-3 text-white; }
   .seating-legend-label { @apply text-sm; }
-  .seating-controls { @apply flex flex-wrap items-center justify-center gap-3; }
+  .seating-controls { @apply flex flex-wrap items-center justify-center gap-3 mt-2; }
   .seating-tools-btn {
     @apply inline-flex items-center justify-center gap-1 rounded-full px-3 py-1.5 text-xs;
     color: var(--seating-control-fg, var(--foreground));
@@ -856,6 +1096,11 @@
     background: var(--seating-accent-bg, color-mix(in oklab, var(--spotlight) 20%, var(--card) 80%));
     border: 1px solid var(--seating-accent-border, color-mix(in oklab, var(--spotlight) 50%, transparent));
   }
+  @media (min-width: 1025px) {
+    .seating-controls .seating-suggest-btn {
+      margin-left: 0.2rem;
+    }
+  }
   .seating-suggest-btn:hover {
     background: var(--seating-accent-hover-bg, color-mix(in oklab, var(--spotlight) 30%, var(--card) 70%));
     color: var(--seating-accent-hover-fg, var(--seating-accent-fg, var(--foreground)));
@@ -869,25 +1114,66 @@
   }
   .seating-debug-toggle-on { @apply border-spotlight/70 bg-spotlight/20 text-spotlight; }
   .seating-tools-sidebar {
-    @apply absolute right-2 sm:right-4 top-14 z-40 w-[min(92vw,360px)] rounded-lg border border-border p-3 space-y-3 shadow-2xl transition-all duration-300 ease-out transform-gpu origin-top-right;
+    @apply absolute right-2 sm:right-4 top-0 z-40 w-[min(94vw,440px)] rounded-lg border border-border px-4 pt-4 pb-4 space-y-4 shadow-2xl transition-all duration-300 ease-out transform-gpu origin-top-right;
     color: var(--seating-panel-fg, var(--foreground));
     background: var(--seating-panel-bg, color-mix(in oklab, var(--card) 82%, var(--foreground) 18%));
     border-color: var(--seating-panel-border, color-mix(in oklab, var(--foreground) 26%, transparent));
+    max-height: none;
+    overflow: visible;
   }
-  .seating-tools-sidebar-open { @apply opacity-100 translate-x-0 pointer-events-auto; }
+  /* Shared hardening: prevent theme-wide button styles from breaking tools a11y states. */
+  .seating-tools-sidebar button,
+  .seating-architecture-modal-card button {
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    transform: none !important;
+    filter: none !important;
+    box-shadow: none !important;
+    font-family: inherit !important;
+  }
+  .seating-tools-sidebar-open {
+    @apply opacity-100 translate-x-0 pointer-events-auto;
+    max-height: none;
+    overflow: visible;
+  }
   .seating-tools-sidebar-closed { @apply opacity-0 translate-x-6 pointer-events-none; }
   .seating-tools-header { @apply flex items-center justify-between gap-2; }
   .seating-tools-actions { @apply flex items-center gap-2; }
-  .seating-tools-title { @apply text-sm font-medium; color: var(--seating-panel-title-fg, var(--spotlight)); }
+  .seating-tools-stack-list { @apply grid gap-2 mt-1; }
+  .seating-tools-stack-btn {
+    @apply w-full justify-center gap-2;
+    min-height: 3.25rem;
+    max-height: 3.25rem;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.15;
+    border-width: 2px;
+    border-color: color-mix(in oklab, var(--foreground) 44%, transparent);
+  }
+  .seating-tools-stack-btn-on {
+    color: var(--seating-accent-fg, var(--foreground));
+    background: var(--seating-accent-bg, color-mix(in oklab, var(--spotlight) 20%, var(--card) 80%));
+    border-color: var(--seating-accent-border, color-mix(in oklab, var(--spotlight) 50%, transparent));
+  }
+  .seating-tools-title {
+    @apply text-sm font-medium;
+    color: var(--seating-panel-title-fg, var(--spotlight));
+    padding-left: 0.875rem;
+  }
+  .seating-tools-group { @apply rounded-md border border-border p-3.5 space-y-3; }
+  .seating-tools-group-title {
+    @apply text-[11px] uppercase tracking-[0.12em] font-semibold;
+    color: var(--seating-panel-title-fg, var(--spotlight));
+  }
   .seating-tools-subtitle { @apply text-xs font-medium; color: var(--seating-panel-subtitle-fg, color-mix(in oklab, var(--foreground) 80%, transparent)); }
   .seating-tools-hint { @apply text-xs text-muted-foreground; }
   .seating-assignment-tools {
-    @apply mt-1 rounded-md border border-border p-2 space-y-2;
+    @apply mt-1 rounded-md border border-border p-3 space-y-3;
     background: var(--seating-subpanel-bg, color-mix(in oklab, var(--card) 88%, var(--foreground) 12%));
     border-color: var(--seating-subpanel-border, color-mix(in oklab, var(--foreground) 22%, transparent));
   }
   .seating-tools-selected-list {
-    @apply rounded-md px-2 py-1 text-xs text-muted-foreground;
+    @apply rounded-md px-2.5 py-1.5 text-xs text-muted-foreground;
     background: var(--seating-subpanel-list-bg, color-mix(in oklab, var(--card) 90%, var(--foreground) 10%));
   }
   .seating-tools-close {
@@ -903,12 +1189,39 @@
   .seating-reset-btn {
     @apply inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm min-h-[40px];
     color: var(--seating-control-fg, var(--foreground));
-    background: var(--seating-control-bg, color-mix(in oklab, var(--foreground) 8%, var(--card) 92%));
-    border: 1px solid var(--seating-control-border, color-mix(in oklab, var(--foreground) 24%, transparent));
+    background: transparent;
+    border: 2px solid color-mix(in oklab, var(--foreground) 44%, transparent);
   }
   .seating-reset-btn:hover {
-    background: var(--seating-control-hover-bg, color-mix(in oklab, var(--foreground) 14%, var(--card) 86%));
+    background: color-mix(in oklab, var(--seating-control-hover-bg, var(--foreground)) 14%, transparent);
     color: var(--seating-control-hover-fg, var(--seating-control-fg, var(--foreground)));
+  }
+
+  @media (min-width: 1025px) {
+    .seating-root.seating-root-tools-open {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+      align-items: start;
+      column-gap: 1rem;
+    }
+
+    .seating-root.seating-root-tools-open .seating-main-column {
+      min-width: 0;
+    }
+
+    .seating-root.seating-root-tools-open .seating-tools-sidebar {
+      position: sticky;
+      top: 0;
+      right: auto;
+      width: 100%;
+      max-width: 380px;
+      max-height: calc(100vh - 7rem);
+      overflow: auto;
+      transform: none;
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 20;
+    }
   }
 
   @media (max-width: 1024px) {
@@ -924,6 +1237,8 @@
       right: auto;
       top: auto;
       transform-origin: top center;
+      max-height: none;
+      overflow: visible;
     }
     .seating-tools-sidebar-open { @apply translate-x-0; }
     .seating-tools-sidebar-closed { @apply translate-x-0 max-h-0 overflow-hidden p-0 border-transparent; }
@@ -949,16 +1264,16 @@
     .app-main-booking .booking-step-calendar .calendar-title { @apply text-base; }
     .app-main-booking .booking-step-calendar .calendar-nav { @apply gap-1.5; }
     .app-main-booking .booking-step-calendar .calendar-root .calendar-nav-btn {
-      width: 2.25rem;
-      height: 2.25rem;
+      width: 2.75rem;
+      height: 2.75rem;
     }
     .app-main-booking .booking-step-calendar .calendar-week-grid { @apply gap-1; }
-    .app-main-booking .booking-step-calendar .calendar-root .calendar-day-btn { height: 2.1rem; }
+    .app-main-booking .booking-step-calendar .calendar-root .calendar-day-btn { height: 2.75rem; }
     .app-main-booking .booking-step-calendar .calendar-weekday { @apply text-[11px] py-0.5; }
-    .seating-row-seats { @apply gap-1.5; }
+    .seating-row-seats { @apply gap-1; }
     .seating-row-label { @apply w-6 text-xs; }
-    .seating-seat-btn { @apply w-7 h-7; }
-    .seating-aisle-gap { @apply w-4 h-7; }
+    .seating-seat-btn { @apply w-11 h-11; }
+    .seating-aisle-gap { @apply w-3 h-11; }
     .seating-legend { @apply flex-wrap gap-3; }
   }
   .seating-tools-grid { @apply grid gap-2; }
@@ -967,6 +1282,127 @@
     color: var(--seating-panel-fg, var(--foreground));
     background: var(--seating-subpanel-bg, color-mix(in oklab, var(--card) 90%, var(--foreground) 10%));
     border-color: var(--seating-subpanel-border, color-mix(in oklab, var(--foreground) 22%, transparent));
+  }
+  .seating-logic-panel {
+    @apply max-h-[32vh] w-full overflow-auto rounded-lg border border-border p-3 text-xs leading-relaxed;
+    color: var(--seating-panel-fg, var(--foreground));
+    background: color-mix(in oklab, var(--seating-subpanel-bg, var(--card)) 92%, var(--spotlight) 8%);
+    border-color: var(--seating-subpanel-border, color-mix(in oklab, var(--foreground) 22%, transparent));
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--spotlight) 18%, transparent);
+  }
+  .seating-code { @apply block; }
+  .seating-code-line { @apply block; }
+  .seating-code-keyword { color: #c084fc; font-weight: 700; }
+  .seating-code-fn { color: #60a5fa; }
+  .seating-code-key { color: #f59e0b; }
+  .seating-code-string { color: #34d399; }
+  .seating-code-number { color: #f97316; }
+  .seating-code-comment { color: #94a3b8; font-style: italic; }
+  .seating-logic-explainer {
+    @apply mt-3 text-xs leading-relaxed;
+    color: var(--seating-panel-subtitle-fg, color-mix(in oklab, var(--foreground) 80%, transparent));
+  }
+  .seating-architecture-card {
+    @apply rounded-lg border border-border p-3;
+    background: color-mix(in oklab, var(--seating-subpanel-bg, var(--card)) 94%, var(--spotlight) 6%);
+    border-color: var(--seating-subpanel-border, color-mix(in oklab, var(--foreground) 22%, transparent));
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--spotlight) 14%, transparent);
+  }
+  .seating-architecture-modal-wrap {
+    @apply fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-4 lg:p-6;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .seating-architecture-modal-backdrop { @apply absolute inset-0 bg-stage-base/80 backdrop-blur-sm; }
+  .seating-architecture-modal-card {
+    @apply relative w-[98%] max-w-[1320px] min-h-0 rounded-lg border border-border p-5 sm:p-6 lg:p-8 shadow-2xl;
+    color: var(--seating-panel-fg, var(--foreground));
+    background: color-mix(in oklab, var(--seating-subpanel-bg, var(--card)) 94%, var(--spotlight) 6%);
+    border-color: var(--seating-subpanel-border, color-mix(in oklab, var(--foreground) 22%, transparent));
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--spotlight) 14%, transparent);
+    margin-top: max(0.5rem, env(safe-area-inset-top));
+    margin-bottom: max(0.5rem, env(safe-area-inset-bottom));
+    max-height: calc(100dvh - 1rem);
+    overflow: auto;
+  }
+  .seating-architecture-modal-header {
+    @apply sticky top-0 flex items-center justify-between gap-3;
+    z-index: 2;
+    padding-bottom: 0.35rem;
+    background: color-mix(in oklab, var(--seating-subpanel-bg, var(--card)) 94%, var(--spotlight) 6%);
+  }
+  .seating-modal-header-actions { @apply flex items-center gap-2; }
+  .seating-modal-copy-btn {
+    @apply inline-flex items-center justify-center rounded-md p-1.5;
+    color: var(--seating-control-fg, var(--foreground));
+    background: color-mix(in oklab, var(--card) 86%, var(--foreground) 14%);
+    border: 1px solid color-mix(in oklab, var(--foreground) 24%, transparent);
+  }
+  .seating-modal-copy-btn:hover {
+    background: color-mix(in oklab, var(--foreground) 14%, var(--card) 86%);
+    color: var(--seating-control-hover-fg, var(--seating-control-fg, var(--foreground)));
+  }
+  .seating-copy-toast {
+    @apply fixed bottom-4 left-1/2 z-[70] -translate-x-1/2 rounded-full px-3 py-1 text-xs font-medium shadow-lg;
+    color: var(--seating-control-fg, var(--foreground));
+    background: color-mix(in oklab, var(--card) 88%, var(--foreground) 12%);
+    border: 1px solid color-mix(in oklab, var(--foreground) 22%, transparent);
+  }
+  .seating-architecture-title {
+    @apply text-xs uppercase tracking-[0.12em] font-semibold;
+    color: var(--seating-panel-title-fg, var(--spotlight));
+  }
+  .seating-architecture-legend { @apply mt-2 flex flex-wrap items-center gap-1.5; }
+  .seating-architecture-chip {
+    @apply inline-flex items-center rounded-full px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] font-semibold;
+    border: 1px solid color-mix(in oklab, var(--foreground) 24%, transparent);
+    color: color-mix(in oklab, var(--foreground) 88%, transparent);
+    background: color-mix(in oklab, var(--card) 84%, var(--foreground) 16%);
+  }
+  .seating-architecture-chip-ui {
+    border-color: color-mix(in oklab, #60a5fa 42%, transparent);
+    background: color-mix(in oklab, #60a5fa 18%, transparent);
+  }
+  .seating-architecture-chip-store {
+    border-color: color-mix(in oklab, #f59e0b 42%, transparent);
+    background: color-mix(in oklab, #f59e0b 18%, transparent);
+  }
+  .seating-architecture-chip-api {
+    border-color: color-mix(in oklab, #34d399 42%, transparent);
+    background: color-mix(in oklab, #34d399 18%, transparent);
+  }
+  .seating-architecture-chip-process {
+    border-color: color-mix(in oklab, #a78bfa 42%, transparent);
+    background: color-mix(in oklab, #a78bfa 18%, transparent);
+  }
+  .seating-architecture-divider {
+    @apply my-2 h-px;
+    background: color-mix(in oklab, var(--foreground) 22%, transparent);
+  }
+  .seating-architecture-diagram-wrap { @apply relative; }
+  .seating-architecture-legend-overlay {
+    @apply absolute top-2 right-2 z-10 mt-0;
+  }
+  .seating-architecture-image {
+    @apply block w-full h-auto max-h-[78vh] rounded-md border border-border;
+    background: color-mix(in oklab, var(--card) 92%, var(--background) 8%);
+  }
+  .seating-architecture-explainer {
+    @apply mt-3 text-xs leading-relaxed;
+    color: var(--seating-panel-subtitle-fg, color-mix(in oklab, var(--foreground) 80%, transparent));
+  }
+  @media (max-width: 768px) {
+    .seating-architecture-modal-card {
+      width: 96%;
+      max-width: 96vw;
+      min-height: 0;
+      padding: 0.9rem;
+      max-height: calc(100dvh - 0.75rem);
+    }
+    .seating-architecture-image {
+      max-height: 56vh;
+    }
   }
   .seating-summary { @apply p-4 bg-card rounded-lg border border-border; }
   .seating-summary-row { @apply flex items-center justify-between gap-4; }
@@ -978,11 +1414,13 @@
   .seating-total-wrap { @apply text-right min-w-[96px] p-2 rounded-md border border-border bg-card/70; }
   .seating-total-value { @apply text-2xl text-primary font-semibold leading-none mt-1; }
   .seating-assign-btn {
-    @apply px-3 py-1.5 rounded-md text-sm disabled:cursor-not-allowed;
+    @apply w-full px-3 py-1.5 rounded-md text-sm disabled:cursor-not-allowed;
     color: var(--seating-accent-fg, var(--foreground));
-    background: var(--seating-accent-bg, color-mix(in oklab, var(--spotlight) 30%, var(--card) 70%));
-    border: 1px solid var(--seating-accent-border, color-mix(in oklab, var(--spotlight) 60%, transparent));
-    box-shadow: 0 0 0 1px var(--seating-accent-shadow, color-mix(in oklab, var(--spotlight) 30%, transparent));
+    background: var(--seating-accent-bg, color-mix(in oklab, var(--spotlight) 22%, var(--card) 78%));
+    border: 2px solid var(--seating-accent-border, color-mix(in oklab, var(--spotlight) 68%, transparent));
+    box-shadow:
+      inset 0 0 0 1px color-mix(in oklab, var(--spotlight) 16%, transparent),
+      0 0 0 1px var(--seating-accent-shadow, color-mix(in oklab, var(--spotlight) 30%, transparent));
   }
   .seating-assign-btn:hover {
     background: var(--seating-accent-hover-bg, color-mix(in oklab, var(--spotlight) 40%, var(--card) 60%));
@@ -993,33 +1431,85 @@
     background: color-mix(in oklab, var(--foreground) 8%, var(--card) 92%);
     border-color: color-mix(in oklab, var(--foreground) 18%, transparent);
     box-shadow: none;
+    opacity: 0.55;
+    filter: grayscale(0.3);
+  }
+  .seating-suggest-btn-loading {
+    opacity: 0.92;
+    filter: saturate(1.06);
+    transition: background-color 300ms ease, color 300ms ease, border-color 300ms ease;
+  }
+  .seating-assign-btn-disabled:hover {
+    color: color-mix(in oklab, var(--foreground) 55%, transparent);
+    background: color-mix(in oklab, var(--foreground) 8%, var(--card) 92%);
+    border-color: color-mix(in oklab, var(--foreground) 18%, transparent);
+  }
+  .seating-apply-hint-popover {
+    @apply text-xs font-medium rounded-md px-2.5 py-2;
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--spotlight) 22%, var(--card) 78%);
+    border: 1px solid color-mix(in oklab, var(--spotlight) 46%, transparent);
   }
 
-  .show-card { @apply relative overflow-hidden rounded-xl bg-card hover:bg-card/80 border border-border transition-all cursor-pointer hover:shadow-xl hover:shadow-spotlight/10 hover:-translate-y-1; }
-  .show-card-media { @apply aspect-[2/3] overflow-hidden relative; }
+  .show-card { @apply relative h-full overflow-hidden rounded-xl bg-card hover:bg-card/80 border border-border transition-all cursor-pointer hover:shadow-xl hover:shadow-spotlight/10 hover:-translate-y-1 flex flex-col; }
+  .show-card-media { @apply aspect-[2/3] overflow-hidden relative shrink-0; }
+  .show-card-picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .show-card-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgb(0 0 0 / 0.1);
+    pointer-events: none;
+    transition: opacity 300ms;
+  }
+  .group:hover .show-card-media::after {
+    opacity: 0;
+  }
   .show-card-image { @apply w-full h-full object-cover transition-transform group-hover:scale-105; }
-  .show-card-media-tint { @apply absolute inset-0 bg-black/10 pointer-events-none transition-opacity duration-300 group-hover:opacity-0; }
   .show-card-badge-wrap { @apply absolute top-3 right-3; }
   .show-card-badge { @apply px-3 py-1 text-xs rounded-full border backdrop-blur-md; }
   .show-card-rating { @apply absolute top-3 left-3 flex items-center gap-1 px-2 py-1 bg-stage-base/80 backdrop-blur-md rounded-full; }
   .show-card-rating-icon { @apply w-3 h-3 fill-spotlight text-spotlight; }
   .show-card-rating-text { @apply text-xs text-marquee-surface; }
-  .show-card-media-gradient { @apply absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/90 to-transparent; }
-  .show-card-body { @apply p-4 space-y-3; }
-  .show-card-title { @apply text-lg line-clamp-2; font-family: var(--font-display); }
+  .show-card-media::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 8rem;
+    background: linear-gradient(to top, rgb(0 0 0 / 0.9), transparent);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .show-card-body { @apply p-4 space-y-3 flex flex-1 flex-col; }
+  .show-card-title {
+    @apply text-lg line-clamp-2;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
   .show-card-meta { @apply space-y-2 text-sm text-foreground/80; }
-  .show-card-meta-row { @apply flex items-center gap-2; line-height: 1.25; }
+  .show-card-meta-row { @apply flex items-center gap-2; }
   .show-card-meta-primary { @apply gap-3; }
-  .show-card-meta-value { @apply font-medium text-foreground/85; line-height: 1.25; padding-bottom: 1px; }
+  .show-card-meta-value { @apply font-medium text-foreground/85; }
   .show-card-meta-divider { @apply h-4 w-px bg-border/70; }
-  .show-card-stack { @apply font-mono text-foreground/80; line-height: 1.3; padding-bottom: 1px; }
+  .show-card-stack { @apply font-mono text-foreground/80; }
   .show-card-icon-sm { @apply w-4 h-4 text-spotlight; }
-  .show-card-footer { @apply pt-3 border-t border-border space-y-3; }
-  .show-card-impact { @apply space-y-1; }
+  .show-card-footer { @apply pt-3 border-t border-border space-y-3 mt-auto; }
   .show-card-price-label { @apply text-xs text-muted-foreground; }
   .show-card-price { @apply text-xl text-spotlight; }
-  .show-card-action-row { @apply w-full; }
-  .show-card-btn { @apply inline-flex items-center justify-center box-border w-full px-4 py-2 bg-accent-primary hover:bg-accent-primary/80 text-white rounded-lg transition-colors; }
+  .show-card-btn {
+    @apply inline-flex items-center justify-center box-border w-full px-4 py-2 mt-2 bg-accent-primary hover:bg-accent-primary/80 text-white rounded-lg transition-colors;
+    text-transform: uppercase;
+    letter-spacing: 0.035em;
+  }
+  html.theme-stage .show-card .show-card-btn {
+    font-family: var(--font-display) !important;
+  }
   .show-badge-selling-fast { @apply bg-accent-primary/20 text-accent-primary border-accent-primary/30; }
   .show-badge-last-seats { @apply bg-accent-primary/30 text-accent-primary border-accent-primary/50; }
   .show-badge-new { @apply bg-spotlight/20 text-spotlight border-spotlight/30; }
@@ -1028,226 +1518,101 @@
   .image-fallback-wrap { @apply inline-block bg-gray-100 text-center align-middle; }
   .image-fallback-center { @apply flex items-center justify-center w-full h-full; }
 
-  .ui-tooltip-content { @apply bg-primary text-primary-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-md px-3 py-1.5 text-xs text-balance; }
-  .ui-tooltip-arrow { @apply bg-primary fill-primary z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px]; }
-  .ui-table-container { @apply relative w-full overflow-x-auto; }
-  .ui-table { @apply w-full caption-bottom text-sm; }
-  .ui-progress-root { @apply bg-primary/20 relative h-2 w-full overflow-hidden rounded-full; }
-  .ui-progress-indicator { @apply bg-primary h-full w-full flex-1 transition-all; }
-  .ui-slider-root { @apply relative flex w-full touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col; }
-  .ui-slider-track { @apply bg-muted relative grow overflow-hidden rounded-full data-[orientation=horizontal]:h-4 data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5; }
-  .ui-slider-range { @apply bg-primary absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full; }
-  .ui-slider-thumb { @apply border-primary bg-background ring-ring/50 block size-4 shrink-0 rounded-full border shadow-sm transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50; }
-  .ui-scroll-area-root { @apply relative; }
-  .ui-scroll-area-viewport { @apply focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1; }
-  .ui-scrollbar { @apply flex touch-none p-px transition-colors select-none; }
-  .ui-scrollbar-vertical { @apply h-full w-2.5 border-l border-l-transparent; }
-  .ui-scrollbar-horizontal { @apply h-2.5 flex-col border-t border-t-transparent; }
-  .ui-scrollbar-thumb { @apply bg-border relative flex-1 rounded-full; }
-  .ui-drawer-overlay { @apply data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50; }
-  .ui-drawer-content { @apply bg-background fixed z-50 flex h-auto flex-col data-[vaul-drawer-direction=top]:inset-x-0 data-[vaul-drawer-direction=top]:top-0 data-[vaul-drawer-direction=top]:mb-24 data-[vaul-drawer-direction=top]:max-h-[80vh] data-[vaul-drawer-direction=top]:rounded-b-lg data-[vaul-drawer-direction=top]:border-b data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:mt-24 data-[vaul-drawer-direction=bottom]:max-h-[80vh] data-[vaul-drawer-direction=bottom]:rounded-t-lg data-[vaul-drawer-direction=bottom]:border-t data-[vaul-drawer-direction=right]:inset-y-0 data-[vaul-drawer-direction=right]:right-0 data-[vaul-drawer-direction=right]:w-3/4 data-[vaul-drawer-direction=right]:border-l data-[vaul-drawer-direction=right]:sm:max-w-sm data-[vaul-drawer-direction=left]:inset-y-0 data-[vaul-drawer-direction=left]:left-0 data-[vaul-drawer-direction=left]:w-3/4 data-[vaul-drawer-direction=left]:border-r data-[vaul-drawer-direction=left]:sm:max-w-sm; }
-  .ui-drawer-handle { @apply bg-muted mx-auto mt-4 hidden h-2 w-[100px] shrink-0 rounded-full group-data-[vaul-drawer-direction=bottom]/drawer-content:block; }
-  .ui-checkbox { @apply border bg-input-background dark:bg-input/30 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50; }
-  .ui-checkbox-indicator { @apply flex items-center justify-center text-current transition-none; }
-  .ui-radio-group { @apply grid gap-3; }
-  .ui-radio-item { @apply border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50; }
-  .ui-radio-indicator { @apply relative flex items-center justify-center; }
-  .ui-radio-indicator-icon { @apply fill-primary absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2; }
-  .ui-resizable-group { @apply flex h-full w-full data-[panel-group-direction=vertical]:flex-col; }
-  .ui-resizable-handle { @apply bg-border focus-visible:ring-ring relative flex w-px items-center justify-center after:absolute after:inset-y-0 after:left-1/2 after:w-1 after:-translate-x-1/2 focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:outline-hidden data-[panel-group-direction=vertical]:h-px data-[panel-group-direction=vertical]:w-full data-[panel-group-direction=vertical]:after:left-0 data-[panel-group-direction=vertical]:after:h-1 data-[panel-group-direction=vertical]:after:w-full data-[panel-group-direction=vertical]:after:-translate-y-1/2 data-[panel-group-direction=vertical]:after:translate-x-0 [&[data-panel-group-direction=vertical]>div]:rotate-90; }
-  .ui-resizable-handle-grip { @apply bg-border z-10 flex h-4 w-3 items-center justify-center rounded-xs border; }
-  .ui-resizable-handle-icon { @apply size-2.5; }
-  .ui-toaster {}
-  .ui-select-trigger { @apply border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex w-full items-center justify-between gap-2 rounded-md border bg-input-background px-3 py-2 text-sm whitespace-nowrap transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4; }
-  .ui-select-icon { @apply size-4 opacity-50; }
-  .ui-select-content { @apply bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border shadow-md; }
-  .ui-select-content-popper { @apply data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1; }
-  .ui-select-viewport { @apply p-1; }
-  .ui-select-viewport-popper { @apply h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)] scroll-my-1; }
-  .ui-select-label { @apply text-muted-foreground px-2 py-1.5 text-xs; }
-  .ui-select-item { @apply focus:bg-accent focus:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2; }
-  .ui-select-item-indicator-wrap { @apply absolute right-2 flex size-3.5 items-center justify-center; }
-  .ui-select-separator { @apply bg-border pointer-events-none -mx-1 my-1 h-px; }
-  .ui-select-scroll-btn { @apply flex cursor-default items-center justify-center py-1; }
-  .ui-select-check { @apply size-4; }
-
-  .ui-dialog-overlay { @apply data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50; }
-  .ui-dialog-content { @apply bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg; }
-  .ui-dialog-close { @apply ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4; }
-  .ui-dialog-header { @apply flex flex-col gap-2 text-center sm:text-left; }
-  .ui-dialog-footer { @apply flex flex-col-reverse gap-2 sm:flex-row sm:justify-end; }
-  .ui-dialog-title { @apply text-lg leading-none font-semibold; }
-  .ui-dialog-description { @apply text-muted-foreground text-sm; }
-
-  .ui-dropdown-content { @apply bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md; }
-  .ui-dropdown-item { @apply focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4; }
-  .ui-dropdown-check-item { @apply focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4; }
-  .ui-dropdown-radio-item { @apply focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4; }
-  .ui-dropdown-indicator-wrap { @apply pointer-events-none absolute left-2 flex size-3.5 items-center justify-center; }
-  .ui-dropdown-label { @apply px-2 py-1.5 text-sm font-medium data-[inset]:pl-8; }
-  .ui-dropdown-separator { @apply bg-border -mx-1 my-1 h-px; }
-  .ui-dropdown-shortcut { @apply text-muted-foreground ml-auto text-xs tracking-widest; }
-  .ui-dropdown-sub-trigger { @apply focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[inset]:pl-8; }
-  .ui-dropdown-sub-content { @apply bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-md border p-1 shadow-lg; }
-
-  .ui-menubar { @apply bg-background flex h-9 items-center gap-1 rounded-md border p-1 shadow-xs; }
-  .ui-menubar-trigger { @apply focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground flex items-center rounded-sm px-2 py-1 text-sm font-medium outline-hidden select-none; }
-  .ui-menubar-content { @apply bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[12rem] origin-(--radix-menubar-content-transform-origin) overflow-hidden rounded-md border p-1 shadow-md; }
-  .ui-menubar-item { @apply focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4; }
-  .ui-menubar-check-item { @apply focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-xs py-1.5 pr-2 pl-8 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4; }
-  .ui-menubar-radio-item { @apply focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-xs py-1.5 pr-2 pl-8 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4; }
-  .ui-menubar-indicator-wrap { @apply pointer-events-none absolute left-2 flex size-3.5 items-center justify-center; }
-  .ui-menubar-label { @apply px-2 py-1.5 text-sm font-medium data-[inset]:pl-8; }
-  .ui-menubar-separator { @apply bg-border -mx-1 my-1 h-px; }
-  .ui-menubar-shortcut { @apply text-muted-foreground ml-auto text-xs tracking-widest; }
-  .ui-menubar-sub-trigger { @apply focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-none select-none data-[inset]:pl-8; }
-  .ui-menubar-sub-content { @apply bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] origin-(--radix-menubar-content-transform-origin) overflow-hidden rounded-md border p-1 shadow-lg; }
-
-  .ui-context-sub-trigger { @apply focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4; }
-  .ui-context-sub-content { @apply bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] origin-(--radix-context-menu-content-transform-origin) overflow-hidden rounded-md border p-1 shadow-lg; }
-  .ui-context-content { @apply bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--radix-context-menu-content-available-height) min-w-[8rem] origin-(--radix-context-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md; }
-  .ui-context-item { @apply focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4; }
-  .ui-context-check-item { @apply focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4; }
-  .ui-context-radio-item { @apply focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4; }
-  .ui-context-indicator-wrap { @apply pointer-events-none absolute left-2 flex size-3.5 items-center justify-center; }
-  .ui-context-label { @apply text-foreground px-2 py-1.5 text-sm font-medium data-[inset]:pl-8; }
-  .ui-context-separator { @apply bg-border -mx-1 my-1 h-px; }
-  .ui-context-shortcut { @apply text-muted-foreground ml-auto text-xs tracking-widest; }
-
-  .ui-chart-container { @apply [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border flex aspect-video justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden; }
-  .ui-chart-tooltip-label { @apply font-medium; }
-  .ui-chart-tooltip-content { @apply border-border/50 bg-background grid min-w-[8rem] items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl; }
-  .ui-chart-tooltip-list { @apply grid gap-1.5; }
-  .ui-chart-tooltip-item { @apply [&>svg]:text-muted-foreground flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5; }
-  .ui-chart-tooltip-item-dot { @apply items-center; }
-  .ui-chart-indicator { @apply shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg); }
-  .ui-chart-value-wrap { @apply flex flex-1 justify-between leading-none; }
-  .ui-chart-value-wrap-nested { @apply items-end; }
-  .ui-chart-value-wrap-regular { @apply items-center; }
-  .ui-chart-meta { @apply grid gap-1.5; }
-  .ui-chart-meta-text { @apply text-muted-foreground; }
-  .ui-chart-number { @apply text-foreground font-mono font-medium tabular-nums; }
-  .ui-chart-legend { @apply flex items-center justify-center gap-4; }
-  .ui-chart-legend-top { @apply pb-3; }
-  .ui-chart-legend-bottom { @apply pt-3; }
-  .ui-chart-legend-item { @apply [&>svg]:text-muted-foreground flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3; }
-  .ui-chart-legend-swatch { @apply h-2 w-2 shrink-0 rounded-[2px]; }
-  .ui-carousel-root { @apply relative; }
-  .ui-carousel-content-viewport { @apply overflow-hidden; }
-  .ui-carousel-content-track { @apply flex; }
-  .ui-carousel-item { @apply min-w-0 shrink-0 grow-0 basis-full; }
-  .ui-carousel-nav-btn { @apply absolute size-8 rounded-full; }
-  .ui-carousel-nav-prev-horizontal { @apply top-1/2 -left-12 -translate-y-1/2; }
-  .ui-carousel-nav-prev-vertical { @apply -top-12 left-1/2 -translate-x-1/2 rotate-90; }
-  .ui-carousel-nav-next-horizontal { @apply top-1/2 -right-12 -translate-y-1/2; }
-  .ui-carousel-nav-next-vertical { @apply -bottom-12 left-1/2 -translate-x-1/2 rotate-90; }
-
-  .ui-sheet-overlay { @apply data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50; }
-  .ui-sheet-content { @apply bg-background data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500; }
-  .ui-sheet-content-right { @apply data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm; }
-  .ui-sheet-content-left { @apply data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm; }
-  .ui-sheet-content-top { @apply data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b; }
-  .ui-sheet-content-bottom { @apply data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t; }
-  .ui-sheet-close { @apply ring-offset-background focus:ring-ring data-[state=open]:bg-secondary absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none; }
-  .ui-sheet-close-icon { @apply size-4; }
-  .ui-sheet-header { @apply flex flex-col gap-1.5 p-4; }
-  .ui-sheet-footer { @apply mt-auto flex flex-col gap-2 p-4; }
-  .ui-sheet-title { @apply text-foreground font-semibold; }
-  .ui-sheet-description { @apply text-muted-foreground text-sm; }
-
-  .ui-breadcrumb-list { @apply text-muted-foreground flex flex-wrap items-center gap-1.5 text-sm break-words sm:gap-2.5; }
-  .ui-breadcrumb-item { @apply inline-flex items-center gap-1.5; }
-  .ui-breadcrumb-link { @apply hover:text-foreground transition-colors; }
-  .ui-breadcrumb-page { @apply text-foreground font-normal; }
-  .ui-breadcrumb-separator { @apply [&>svg]:size-3.5; }
-  .ui-breadcrumb-ellipsis { @apply flex size-9 items-center justify-center; }
-  .ui-breadcrumb-ellipsis-icon { @apply size-4; }
-
-  .ui-nav-menu-root { @apply relative flex max-w-max flex-1 items-center justify-center; }
-  .ui-nav-menu-list { @apply flex flex-1 list-none items-center justify-center gap-1; }
-  .ui-nav-menu-item { @apply relative; }
-  .ui-nav-menu-trigger-icon { @apply relative top-[1px] ml-1 size-3 transition duration-300 group-data-[state=open]:rotate-180; }
-  .ui-nav-menu-content { @apply data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out data-[motion=from-end]:slide-in-from-right-52 data-[motion=from-start]:slide-in-from-left-52 data-[motion=to-end]:slide-out-to-right-52 data-[motion=to-start]:slide-out-to-left-52 top-0 left-0 w-full p-2 pr-2.5 md:absolute md:w-auto; }
-  .ui-nav-menu-content-no-viewport { @apply group-data-[viewport=false]/navigation-menu:bg-popover group-data-[viewport=false]/navigation-menu:text-popover-foreground group-data-[viewport=false]/navigation-menu:data-[state=open]:animate-in group-data-[viewport=false]/navigation-menu:data-[state=closed]:animate-out group-data-[viewport=false]/navigation-menu:data-[state=closed]:zoom-out-95 group-data-[viewport=false]/navigation-menu:data-[state=open]:zoom-in-95 group-data-[viewport=false]/navigation-menu:data-[state=open]:fade-in-0 group-data-[viewport=false]/navigation-menu:data-[state=closed]:fade-out-0 group-data-[viewport=false]/navigation-menu:top-full group-data-[viewport=false]/navigation-menu:mt-1.5 group-data-[viewport=false]/navigation-menu:overflow-hidden group-data-[viewport=false]/navigation-menu:rounded-md group-data-[viewport=false]/navigation-menu:border group-data-[viewport=false]/navigation-menu:shadow group-data-[viewport=false]/navigation-menu:duration-200 **:data-[slot=navigation-menu-link]:focus:ring-0 **:data-[slot=navigation-menu-link]:focus:outline-none; }
-  .ui-nav-menu-viewport-wrap { @apply absolute top-full left-0 isolate z-50 flex justify-center; }
-  .ui-nav-menu-viewport { @apply origin-top bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border shadow md:w-[var(--radix-navigation-menu-viewport-width)]; }
-  .ui-nav-menu-link { @apply data-[active=true]:focus:bg-accent data-[active=true]:hover:bg-accent data-[active=true]:bg-accent/50 data-[active=true]:text-accent-foreground hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:ring-ring/50 [&_svg:not([class*='text-'])]:text-muted-foreground flex flex-col gap-1 rounded-sm p-2 text-sm transition-all outline-none focus-visible:ring-[3px] focus-visible:outline-1 [&_svg:not([class*='size-'])]:size-4; }
-  .ui-nav-menu-indicator { @apply data-[state=visible]:animate-in data-[state=hidden]:animate-out data-[state=hidden]:fade-out data-[state=visible]:fade-in top-full z-[1] flex h-1.5 items-end justify-center overflow-hidden; }
-  .ui-nav-menu-indicator-tip { @apply bg-border relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm shadow-md; }
-
-  .ui-accordion-item { @apply border-b last:border-b-0; }
-  .ui-accordion-header { @apply flex; }
-  .ui-accordion-trigger { @apply focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-all outline-none hover:underline focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180; }
-  .ui-accordion-icon { @apply text-muted-foreground pointer-events-none size-4 shrink-0 translate-y-0.5 transition-transform duration-200; }
-  .ui-accordion-content { @apply data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden text-sm; }
-  .ui-accordion-content-inner { @apply pt-0 pb-4; }
-
-  .ui-input-otp-container { @apply flex items-center gap-2 has-disabled:opacity-50; }
-  .ui-input-otp-input { @apply disabled:cursor-not-allowed; }
-  .ui-input-otp-group { @apply flex items-center gap-1; }
-  .ui-input-otp-slot { @apply data-[active=true]:border-ring data-[active=true]:ring-ring/50 data-[active=true]:aria-invalid:ring-destructive/20 dark:data-[active=true]:aria-invalid:ring-destructive/40 aria-invalid:border-destructive data-[active=true]:aria-invalid:border-destructive dark:bg-input/30 border-input relative flex h-9 w-9 items-center justify-center border-y border-r text-sm bg-input-background transition-all outline-none first:rounded-l-md first:border-l last:rounded-r-md data-[active=true]:z-10 data-[active=true]:ring-[3px]; }
-  .ui-input-otp-caret-wrap { @apply pointer-events-none absolute inset-0 flex items-center justify-center; }
-  .ui-input-otp-caret { @apply animate-caret-blink bg-foreground h-4 w-px duration-1000; }
-
-  .ui-command { @apply bg-popover text-popover-foreground flex h-full w-full flex-col overflow-hidden rounded-md; }
-  .ui-command-input-wrap { @apply flex h-9 items-center gap-2 border-b px-3; }
-  .ui-command-search-icon { @apply size-4 shrink-0 opacity-50; }
-  .ui-command-input { @apply placeholder:text-muted-foreground flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50; }
-  .ui-command-list { @apply max-h-[300px] scroll-py-1 overflow-x-hidden overflow-y-auto; }
-  .ui-command-empty { @apply py-6 text-center text-sm; }
-  .ui-command-group { @apply text-foreground [&_[cmdk-group-heading]]:text-muted-foreground overflow-hidden p-1 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium; }
-  .ui-command-separator { @apply bg-border -mx-1 h-px; }
-  .ui-command-item { @apply data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4; }
-  .ui-command-shortcut { @apply text-muted-foreground ml-auto text-xs tracking-widest; }
-  .ui-command-dialog-title-only { @apply sr-only; }
-  .ui-command-dialog-content { @apply overflow-hidden p-0; }
-  .ui-command-dialog-inner { @apply [&_[cmdk-group-heading]]:text-muted-foreground **:data-[slot=command-input-wrapper]:h-12 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5; }
-
-  .ui-pagination { @apply mx-auto flex w-full justify-center; }
-  .ui-pagination-content { @apply flex flex-row items-center gap-1; }
-  .ui-pagination-prev-next { @apply gap-1 px-2.5; }
-  .ui-pagination-prev { @apply sm:pl-2.5; }
-  .ui-pagination-next { @apply sm:pr-2.5; }
-  .ui-pagination-text { @apply hidden sm:block; }
-  .ui-pagination-ellipsis { @apply flex size-9 items-center justify-center; }
-  .ui-pagination-ellipsis-icon { @apply size-4; }
-  .ui-sidebar-wrapper { @apply has-data-[variant=inset]:bg-sidebar flex min-h-svh w-full; }
-  .ui-sidebar-fixed { @apply bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col; }
-  .ui-sidebar-mobile-content { @apply bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden; }
-  .ui-sidebar-mobile-inner { @apply flex h-full w-full flex-col; }
-  .ui-sidebar-desktop-root { @apply text-sidebar-foreground hidden md:block; }
-  .ui-sidebar-gap { @apply relative w-(--sidebar-width) bg-transparent transition-[width] duration-200 ease-linear; }
-  .ui-sidebar-container { @apply fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex; }
-  .ui-sidebar-inner { @apply bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm; }
-  .ui-sidebar-trigger-btn { @apply size-7; }
-  .ui-sidebar-rail { @apply hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] sm:flex; }
-  .ui-sidebar-inset { @apply bg-background relative flex w-full flex-1 flex-col; }
-  .ui-sidebar-input { @apply bg-background h-8 w-full shadow-none; }
-  .ui-sidebar-header { @apply flex flex-col gap-2 p-2; }
-  .ui-sidebar-footer { @apply flex flex-col gap-2 p-2; }
-  .ui-sidebar-separator { @apply bg-sidebar-border mx-2 w-auto; }
-  .ui-sidebar-content { @apply flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden; }
-  .ui-sidebar-group { @apply relative flex w-full min-w-0 flex-col p-2; }
-  .ui-sidebar-group-label { @apply text-sidebar-foreground/70 ring-sidebar-ring flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0; }
-  .ui-sidebar-group-label-collapsed { @apply group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0; }
-  .ui-sidebar-group-action { @apply text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground absolute top-3.5 right-3 flex aspect-square w-5 items-center justify-center rounded-md p-0 outline-hidden transition-transform focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0; }
-  .ui-sidebar-group-action-hitbox { @apply after:absolute after:-inset-2 md:after:hidden; }
-  .ui-sidebar-group-action-collapsed { @apply group-data-[collapsible=icon]:hidden; }
-  .ui-sidebar-group-content { @apply w-full text-sm; }
-  .ui-sidebar-menu { @apply flex w-full min-w-0 flex-col gap-1; }
-  .ui-sidebar-menu-item { @apply relative; }
-  .ui-sidebar-menu-action { @apply text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground absolute top-1.5 right-1 flex aspect-square w-5 items-center justify-center rounded-md p-0 outline-hidden transition-transform focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0; }
-  .ui-sidebar-menu-badge { @apply text-sidebar-foreground pointer-events-none absolute right-1 flex h-5 min-w-5 items-center justify-center rounded-md px-1 text-xs font-medium tabular-nums select-none; }
-  .ui-sidebar-menu-skeleton { @apply flex h-8 items-center gap-2 rounded-md px-2; }
-  .ui-sidebar-menu-skeleton-icon { @apply size-4 rounded-md; }
-  .ui-sidebar-menu-skeleton-text { @apply h-4 max-w-(--skeleton-width) flex-1; }
-  .ui-sidebar-menu-sub { @apply border-sidebar-border mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l px-2.5 py-0.5; }
-  .ui-sidebar-menu-sub-hidden { @apply group-data-[collapsible=icon]:hidden; }
-  .ui-sidebar-menu-sub-item { @apply relative; }
-
   .script-actions { @apply flex flex-wrap gap-3; }
-  .script-open-btn { @apply inline-flex items-center gap-2 px-6 py-3 bg-accent-primary hover:bg-accent-primary/80 text-white rounded-lg transition-colors text-base font-medium; }
+  .script-open-btn {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg transition-colors text-base font-semibold;
+    background: color-mix(in oklab, var(--foreground) 82%, var(--card) 18%);
+    color: color-mix(in oklab, var(--card) 96%, black 4%);
+    border: 1px solid color-mix(in oklab, var(--foreground) 28%, transparent);
+  }
+  .script-open-btn:hover {
+    background: color-mix(in oklab, var(--foreground) 88%, var(--card) 12%);
+  }
   .script-download-btn { @apply inline-flex items-center gap-2 px-4 py-2 border border-border rounded-lg hover:bg-secondary transition-colors text-sm; }
+  .script-tech-section { scroll-margin-top: 6rem; }
+  .script-tech-header { @apply space-y-2; }
+  .script-tech-grid { @apply grid gap-4 lg:grid-cols-2; }
+  .script-tech-section-google .script-tech-grid { @apply grid-cols-1; }
+  #education-cloud-design-doc .script-tech-card {
+    display: flex;
+    flex-direction: column;
+  }
+  #education-cloud-design-doc .script-tech-link {
+    margin-top: auto;
+  }
+  #education-cloud-design-doc .script-tech-diagram-wrap {
+    margin-top: 1rem;
+  }
+  .script-tech-card {
+    @apply rounded-xl border p-8 space-y-6;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    background: color-mix(in oklab, var(--card) 92%, var(--background) 8%);
+    border-color: color-mix(in oklab, var(--border) 84%, transparent);
+  }
+  .script-tech-card-code {
+    display: flex;
+    flex-direction: column;
+  }
+  .script-tech-card-code .script-tech-code-row {
+    margin-top: auto;
+  }
+  .script-tech-card-code .script-tech-code {
+    margin-top: 0.75rem;
+  }
+  .script-tech-copy { @apply text-sm text-muted-foreground; }
+  .script-tech-code-row { @apply flex justify-end; }
+  .script-tech-copy-btn {
+    @apply inline-flex items-center justify-center rounded-md p-2;
+    color: var(--seating-control-fg, var(--foreground));
+    background: transparent;
+    border: 1px solid color-mix(in oklab, var(--foreground) 34%, transparent);
+  }
+  .script-tech-copy-icon { @apply w-4 h-4; }
+  .script-tech-copy-btn:hover {
+    background: color-mix(in oklab, var(--foreground) 10%, transparent);
+    color: var(--seating-control-hover-fg, var(--foreground));
+  }
+  .script-tech-link {
+    @apply inline-flex text-sm font-medium underline-offset-4 hover:underline;
+    color: var(--primary);
+  }
+  .script-tech-diagram-wrap {
+    @apply block rounded-lg border overflow-hidden;
+    aspect-ratio: 16 / 9;
+    background: color-mix(in oklab, var(--background) 92%, var(--card) 8%);
+    border-color: color-mix(in oklab, var(--border) 78%, transparent);
+  }
+  .script-tech-diagram {
+    @apply w-full h-full;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+  }
+  .script-tech-diagram-wrap-full {
+    aspect-ratio: auto;
+    width: 100%;
+    min-height: 0;
+    display: block;
+    padding: 0.5rem;
+  }
+  .script-tech-diagram-full {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .script-tech-code {
+    @apply rounded-lg border p-3 text-xs overflow-auto;
+    width: 100%;
+    max-width: 100%;
+    height: min(52vh, 30em);
+    background: color-mix(in oklab, var(--background) 86%, var(--card) 14%);
+    border-color: color-mix(in oklab, var(--border) 76%, transparent);
+    color: var(--foreground);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    line-height: 1.45;
+  }
   .script-modal-wrap { @apply fixed inset-0 z-50 flex items-start justify-center pt-[8vh] px-4; }
   .script-modal-backdrop { @apply absolute inset-0 bg-stage-base/90 backdrop-blur-sm; }
   .script-modal-panel { @apply relative w-full max-w-5xl bg-stage-depth rounded-xl shadow-2xl overflow-hidden border border-spotlight/20; }
@@ -1317,6 +1682,59 @@
   .script-modal-content { @apply h-[70vh] bg-card; }
   .script-resume-frame { @apply w-full h-full; }
   .script-modal-footer { @apply flex justify-end border-t border-spotlight/20 p-4 bg-stage-depth; }
+  .script-copy-toast {
+    @apply fixed right-4 bottom-4 z-50 rounded-md px-3 py-2 text-xs font-medium;
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--card) 88%, var(--background) 12%);
+    border: 1px solid color-mix(in oklab, var(--foreground) 34%, transparent);
+    box-shadow: 0 8px 24px color-mix(in oklab, black 28%, transparent);
+  }
+
+  @media (max-width: 768px) {
+    .script-tech-grid {
+      gap: 0.875rem;
+    }
+    .script-tech-section {
+      overflow-x: hidden;
+    }
+    .script-tech-card {
+      padding: 1rem;
+      gap: 0.875rem;
+    }
+    .script-tech-copy {
+      font-size: 0.875rem;
+      line-height: 1.45;
+    }
+    .script-tech-link {
+      font-size: 0.875rem;
+    }
+    .script-tech-code {
+      height: auto;
+      max-height: 18em;
+      font-size: 0.7rem;
+      line-height: 1.35;
+    }
+    .script-tech-diagram-wrap {
+      width: 100%;
+      max-width: 100%;
+    }
+    .script-tech-diagram-wrap-full {
+      height: auto;
+      padding: 0.375rem;
+    }
+    .script-actions {
+      width: 100%;
+    }
+    .script-actions .script-open-btn,
+    .script-actions .script-download-btn {
+      width: 100%;
+      justify-content: center;
+    }
+    .script-copy-toast {
+      right: 0.75rem;
+      bottom: 0.75rem;
+    }
+  }
 
   /* Accessibility baseline across all themes/modes */
   .hero-subtitle,
@@ -1361,7 +1779,75 @@
   .theater-mobile-search-btn,
   .theater-mobile-menu-btn,
   .style-picker-trigger {
+    width: 44px;
+    height: 44px;
     min-width: 44px;
     min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
   }
+
+  #stage,
+  #now-playing,
+  #booking-flow,
+  #calendar,
+  #seating,
+  #seating-chart {
+    scroll-margin-top: 5.25rem;
+  }
+
+  @media (max-width: 1280px) {
+    .theater-icon-btn:focus-visible,
+    .theater-mobile-search-btn:focus-visible,
+    .theater-mobile-menu-btn:focus-visible,
+    .style-picker-trigger:focus-visible,
+    .segment-btn:focus-visible,
+    .btn-prev:focus-visible,
+    .btn-next:focus-visible,
+    .show-card-btn:focus-visible,
+    .script-open-btn:focus-visible,
+    .script-download-btn:focus-visible,
+    .footer-link:focus-visible,
+    .link-button:focus-visible,
+    .theater-nav-link:focus-visible,
+    .theater-nav-mobile-link:focus-visible,
+    .calendar-root .calendar-day-btn:focus-visible,
+    .calendar-root .calendar-nav-btn:focus-visible,
+    .calendar-root .calendar-time-btn:focus-visible,
+    .seating-seat-btn:focus-visible,
+    .seating-tools-close:focus-visible,
+    .seating-reset-btn:focus-visible,
+    .seating-suggest-btn:focus-visible,
+    .seating-assign-btn:focus-visible {
+      outline-width: 3px;
+      outline-offset: 3px;
+    }
+  }
+
+  /* Final Stage lock: prevent runtime token shifts/cascade order from changing key typography and CTA color. */
+  html.theme-stage .show-card .show-card-btn,
+  html.theme-stage .show-card .show-card-btn:hover,
+  html.theme-stage .show-card .show-card-btn:focus-visible {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "URW Palladio L", P052, Georgia, serif !important;
+    background-image: none !important;
+    background-color: #c41e3a !important;
+    color: #ffffff !important;
+    border-color: #8f1228 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.035em;
+  }
+
+  html.theme-stage .show-card .show-card-btn:hover {
+    background-color: #a31730 !important;
+    border-color: #7a0f22 !important;
+  }
+
+  html.theme-stage .theater-live-pill {
+    background: #c41e3a !important;
+    color: #ffffff !important;
+    border: 1px solid #8f1228 !important;
+  }
+
 }

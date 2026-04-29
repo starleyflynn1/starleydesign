@@ -1,8 +1,8 @@
 export const THEMES = {
-  archive: 'archive',
   stage: 'stage',
-  blueprint: 'blueprint',
+  archive: 'archive',
   coastal: 'coastal',
+  blueprint: 'blueprint',
   neon: 'neon',
   terminal: 'terminal',
 } as const;
@@ -96,8 +96,8 @@ export const themeConfigs: Record<ThemeName, ThemeConfig> = {
   terminal: {
     name: 'terminal',
     displayName: 'Terminal',
-    description: 'Matrix-green/Mono - Developer console',
-    defaultMode: 'light',
+    description: 'Phosphor-green/Cyan/Amber - Retro console with status accents',
+    defaultMode: 'dark',
     radius: {
       button: 'rounded-md',
       card: 'rounded-lg',
