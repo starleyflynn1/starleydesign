@@ -120,12 +120,12 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
             <h3 className="section-title">The Designed Stage</h3>
             <p className="hero-description">
               Visual blueprints mapping the sophisticated interaction systems that bring The Designed Stage to life,
-              bridging technical complexity with intuitive user experience.
+              bridging technical complexity with intuitive <code>UX</code>.
               {' '}
               <a href="/backstage" className="link-button">
                 Step Backstage
               </a>
-              {' '}to explore the underlying schemas, environmental persistence, and accessibility guardrails of the
+              {' '}to explore the underlying <code>schemas</code>, environmental <code>persistence</code>, and accessibility guardrails of the
               production.
             </p>
           </div>
@@ -135,39 +135,39 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
               <h4 className="spotlight-text">Planned System Architecture</h4>
               <p className="script-tech-copy">
                 By moving away from "improvising" components and toward a Stage Manager&apos;s Script, we ensure the
-                entire application reads from a single source of truth. This centralized orchestration model protects
+                entire application reads from a <code>single source of truth</code>. This centralized orchestration model protects
                 the patron&apos;s journey through four key technical acts:
               </p>
               <p className="script-tech-copy">
                 <b>The Orchestration Layer</b>
                 <br />
                 This is the master script that handles three critical cues: <br />
-                State Consistency: No seat is spotlighted as "Selected" until the backend provides the cue. <br />
-                Side Effect Management: Coordinating the complex "backstage" handshakes between hold requests and
-                payment gateways. <br />
-                Conflict Resolution: Acting as the arbiter if two patrons attempt to claim the same seat simultaneously.
+                <code>State Consistency</code>: No seat is spotlighted as "Selected" until the <code>backend</code> provides the cue. <br />
+                <code>Side Effect Management</code>: Coordinating the complex "backstage" handshakes between <code>hold requests</code> and
+                <code>payment gateways</code>. <br />
+                <code>Conflict Resolution</code>: Acting as the arbiter if two patrons attempt to claim the same seat simultaneously.
               </p>
               <p className="script-tech-copy">
                 <b> The Box Office Lease (Temporary Holds) </b>
                 <br />
-                Inventory is protected by treating seat selection as a Lease Pattern. <br />
-                Optimistic UI: To keep the performance fluid, the store updates the seat to "Pending" the moment a
+                Inventory is protected by treating seat selection as a <code>Lease Pattern</code>. <br />
+                <code>Optimistic UI</code>: To keep the performance fluid, the store updates the seat to "Pending" the moment a
                 patron clicks. <br />
-                Countdown to Curtains: The store manages a high-integrity TTL (Time-to-Live) Buffer. It syncs a
+                <code>Countdown to Curtains</code>: The store manages a high-integrity <code>TTL</code> (<code>Time-to-Live</code>) buffer. It syncs a
                 10-minute timer with the server, broadcasts a "Warning" state as the hold nears expiration, and
                 gracefully releases the inventory if the patron misses their cue.
               </p>
               <p className="script-tech-copy">
                 <b> Ensemble Synchronization (Real-Time) </b>
                 <br />
-                A live performance requires everyone to see the same house. Utilizing WebSockets or SSE, the store
+                A live performance requires everyone to see the same house. Utilizing <code>WebSockets</code> or <code>SSE</code>, the store
                 ensures inventory is a live reflection of reality. When a seat is claimed, every active session
-                receives an "Inventory Update" to recalibrate. This prevents the "broken fourth wall" of a patron reaching checkout only to find their seat was taken
+                receives an "Inventory Update" to recalibrate. This prevents the "broken fourth wall" of a patron reaching <code>checkout</code> only to find their seat was taken
                 minutes ago.
               </p>
               <p className="script-tech-copy">
                 <b>  The Scripted Journey (State Machine) </b>
-                The booking flow is a narrative in five acts. By implementing a Finite State Machine (FSM), we ensure
+                The booking flow is a narrative in five acts. By implementing a <code>Finite State Machine</code> (<code>FSM</code>), we ensure
                 the patron cannot skip their marks-preventing "illegal transitions" like moving to Payment (Act 4)
                 without a validated Lease (Act 2). This rigid logic ensures every journey ends in a successful
                 "Pass to the Show."
@@ -188,8 +188,9 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
               <article className="script-tech-card script-tech-card-code">
   <h4 className="spotlight-text">The Director’s Logic: Intent-Based Seating</h4>
   <p className="script-tech-copy">
-    To keep the "Paradox of Choice" at bay for an audience member, this runtime algorithm acts as the front of house manager—evaluating 
-    contiguous seat groups row-by-row to surface a single, high-fidelity recommendation that honors the 
+    To keep the "Paradox of Choice" at bay for an audience member, this runtime algorithm acts as 
+    the digital usher that guides the patron to their best possible viewing experience.  The evaluation 
+    prioritizes <code>contiguous seat groups</code> row-by-row to surface a single, high-fidelity recommendation that honors the 
     patron's intent.
   </p>
   <p className="script-tech-copy">
@@ -197,18 +198,18 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
     <br />
     Each candidate group is scored against the "Sweet Spot" of the house—the intersection of the horizontal 
     centerline and an optimal row depth (roughly 35% from the stage). The closer the ensemble matches this 
-    coordinate, the higher the "Sightline Score."
+    coordinate, the higher the <code>Sightline Score</code>.
   </p>
   <p className="script-tech-copy">
     <b> Ensemble Blocking & Aisle Cues </b>
     <br />
-    Only fully contiguous windows are cast. Groups that cross a configured aisle break receive a heavy "blocking 
+    Only fully contiguous windows are cast. Groups that cross a configured <code>aisle break</code> receive a heavy "blocking 
     penalty," as the algorithm prioritizes keeping the party together in a single, uninterrupted row.
   </p>
   <p className="script-tech-copy">
     <b> Managing the House Balance </b>
     <br />
-    The algorithm applies "Dead-Seat Prevention" to ensure the inventory remains marketable. Any selection 
+    The algorithm applies <code>Dead-Seat Prevention</code> to ensure the inventory remains marketable. Any selection 
     that would strand an isolated single seat—the theatrical equivalent of a missed cue—is de-prioritized to 
     preserve long-term sell-through health.
   </p>
@@ -236,9 +237,9 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
             <article className="script-tech-card script-tech-card-code">
               <h4 className="spotlight-text">State Management and Optimistic Holds</h4>
               <p className="script-tech-copy">
-                To ensure a zero-latency feel, seat interactions utilize optimistic UI updates for instant feedback,
+                To ensure a zero-latency feel, seat interactions utilize <code>optimistic UI</code> updates for instant feedback,
                 seamlessly reconciling with the server in the background to prevent inventory conflicts and maintain a
-                single source of truth.
+                <code>single source of truth</code>.
               </p>
               <div className="script-tech-code-row">
                 <button
@@ -257,8 +258,8 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
             <article className="script-tech-card script-tech-card-code">
               <h4 className="spotlight-text">Interactive Debug Snapshot</h4>
               <p className="script-tech-copy">
-                Built-in developer diagnostics provide real-time visibility into seat logic and ticket constraints.
-                This transparency bridges the gap between design and engineering, facilitating seamless QA, clear demo
+                Built-in developer diagnostics provide real-time visibility into <code>seat logic</code> and <code>ticket constraints</code>.
+                This transparency bridges the gap between design and engineering, facilitating seamless <code>QA</code>, clear demo
                 narration, and deep-dive architecture walkthroughs.
               </p>
               <div className="script-tech-code-row">
@@ -438,16 +439,16 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
             <article className="script-tech-card">
               <h4 className="spotlight-text">Requirement Discovery and Product Alignment</h4>
               <p className="script-tech-copy">
-                Work starts with a clearly defined problem statement and shared success metrics. I partner with PMs,
-                UX, and domain stakeholders to align on user outcomes, edge cases, and non-functional constraints so
-                implementation scope and Definition of Done remain explicit from day one.
+                Work starts with a clearly defined problem statement and shared success metrics. I partner with <code>PMs</code>,
+                <code>UX</code>, and domain stakeholders to align on user outcomes, edge cases, and <code>non-functional constraints</code> so
+                implementation scope and <code>Definition of Done</code> remain explicit from day one.
               </p>
             </article>
 
             <article className="script-tech-card">
               <h4 className="spotlight-text">Design Phase and Technical Review</h4>
               <p className="script-tech-copy">
-                Before production code, I draft a technical design that maps service boundaries, data contracts, and
+                Before production code, I draft a technical design that maps <code>service boundaries</code>, <code>data contracts</code>, and
                 risk trade-offs such as latency, consistency, and operational complexity. The design is reviewed with
                 engineering peers to validate reuse opportunities and reduce architectural drift.
               </p>
@@ -456,7 +457,7 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
             <article className="script-tech-card">
               <h4 className="spotlight-text">Iterative Implementation</h4>
               <p className="script-tech-copy">
-                Execution is milestone-driven with small, atomic PRs that keep review quality high and blast radius
+                Execution is milestone-driven with small, atomic <code>PRs</code> that keep review quality high and blast radius
                 low. This workflow improves collaboration across engineers and speeds decisions around code quality,
                 security posture, and long-term maintainability.
               </p>
@@ -465,9 +466,9 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
             <article className="script-tech-card">
               <h4 className="spotlight-text">Layered Test Cycle</h4>
               <p className="script-tech-copy">
-                Validation follows a layered strategy: unit tests for core logic, integration tests for service
-                boundaries, and end-to-end checks for real user journeys. Pre-release confidence is reinforced in
-                staging and canary environments using production-like configuration patterns.
+                Validation follows a layered strategy: <code>unit tests</code> for core logic, <code>integration tests</code> for service
+                boundaries, and <code>end-to-end</code> checks for real user journeys. Pre-release confidence is reinforced in
+                <code>staging</code> and <code>canary</code> environments using production-like configuration patterns.
               </p>
             </article>
 
@@ -475,7 +476,7 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
               <h4 className="spotlight-text">Deployment and Controlled Rollout</h4>
               <p className="script-tech-copy">
                 Launches are progressive, not binary. Feature flags and phased rollout gates enable real-time
-                monitoring at low exposure levels first, with fast disable paths when telemetry signals regressions in
+                monitoring at low exposure levels first, with fast disable paths when <code>telemetry</code> signals regressions in
                 latency, reliability, or error rates.
               </p>
             </article>
@@ -483,8 +484,8 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
             <article className="script-tech-card">
               <h4 className="spotlight-text">Observability and Post-Launch Learning</h4>
               <p className="script-tech-copy">
-                After release, ownership shifts to operational visibility and continuous improvement. Dashboards,
-                alerting, and incident review loops feed directly into backlog refinement so each cycle improves system
+                After release, ownership shifts to operational visibility and continuous improvement. <code>Dashboards</code>,
+                <code>alerting</code>, and <code>incident review loops</code> feed directly into backlog refinement so each cycle improves system
                 resilience, developer velocity, and user trust.
               </p>
             </article>

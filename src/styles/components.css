@@ -99,11 +99,11 @@
     border-color: color-mix(in oklab, var(--foreground) 30%, transparent);
   }
   .segment-btn.segment-btn-active {
-    background-color: var(--segment-active-bg, var(--selection-accent, var(--velvet))) !important;
-    color: var(--segment-active-fg, var(--marquee-surface)) !important;
-    border-color: var(--segment-active-bg, var(--selection-accent, var(--velvet))) !important;
-    border-width: 2px !important;
-    border-style: solid !important;
+    background-color: var(--segment-active-bg, var(--selection-accent, var(--velvet)));
+    color: var(--segment-active-fg, var(--marquee-surface));
+    border-color: var(--segment-active-bg, var(--selection-accent, var(--velvet)));
+    border-width: 2px;
+    border-style: solid;
     font-weight: 700;
     box-shadow: 0 0 0 1px color-mix(in oklab, var(--selection-accent, var(--velvet)) 45%, transparent);
   }
@@ -140,10 +140,10 @@
     padding-top: 0.5rem;
   }
   .booking-step-calendar .calendar-root { @apply mt-2; }
-  .booking-step-calendar .calendar-time-btn {
+  .booking-step-calendar .calendar-root .calendar-time-btn {
     min-height: 84px;
-    padding-top: 1.05rem !important;
-    padding-bottom: 1.05rem !important;
+    padding-top: 1.05rem;
+    padding-bottom: 1.05rem;
   }
   .booking-step-calendar { min-height: 0; }
   .booking-step-heading { @apply text-lg font-semibold; }
@@ -423,23 +423,16 @@
     background: color-mix(in oklab, var(--selection-accent, var(--velvet)) 82%, black 18%);
   }
   .btn-next[aria-disabled='true'],
-  .btn-next.btn-next-disabled {
-    cursor: not-allowed;
-    opacity: 1 !important;
-    background: var(--btn-disabled-bg) !important;
-    border-color: var(--btn-disabled-border) !important;
-    color: var(--btn-disabled-fg) !important;
-    box-shadow: none !important;
-    transform: none !important;
-  }
+  .btn-next.btn-next-disabled,
   .btn-prev:disabled,
   .btn-next:disabled {
-    opacity: 1 !important;
-    background: var(--btn-disabled-bg) !important;
-    border-color: var(--btn-disabled-border) !important;
-    color: var(--btn-disabled-fg) !important;
-    box-shadow: none !important;
-    transform: none !important;
+    cursor: not-allowed;
+    opacity: 1;
+    background: var(--btn-disabled-bg);
+    border-color: var(--btn-disabled-border);
+    color: var(--btn-disabled-fg);
+    box-shadow: none;
+    transform: none;
   }
   .feature-banner { @apply bg-gradient-to-r from-velvet/10 via-transparent to-spotlight/10 rounded-2xl p-8 border border-spotlight/20; }
   .feature-banner-inner { @apply max-w-3xl mx-auto text-center space-y-4; }
@@ -448,6 +441,22 @@
   .director-feature-grid { @apply grid-cols-1; }
   .feature-item { @apply space-y-2; }
   .feature-copy { @apply text-sm text-muted-foreground; }
+  /* Subtle inline code treatment for narrative technical copy. */
+  .backstage-page .hero-description code,
+  .backstage-page .feature-copy code,
+  .backstage-page .script-tech-copy code {
+    display: inline;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.92em;
+    line-height: inherit;
+    padding: 0.08em 0.34em;
+    border-radius: 0.32rem;
+    background: color-mix(in oklab, var(--spotlight) 18%, transparent);
+    border: 1px solid color-mix(in oklab, var(--spotlight) 34%, transparent);
+    color: var(--foreground);
+    white-space: normal;
+    word-break: keep-all;
+  }
   .app-footer { @apply border-t border-border bg-card/50 mt-16; }
   .app-footer-inner { @apply container mx-auto px-4 py-8; }
   .app-footer-row { @apply flex flex-col items-center justify-between gap-4 md:flex-row; }
@@ -663,17 +672,12 @@
   .style-picker-menu .style-picker-item[data-highlighted] .style-picker-check,
   .style-picker-menu .style-picker-item:hover .style-picker-check,
   .style-picker-menu .style-picker-item:focus-visible .style-picker-check {
-    color: var(--picker-hover-fg, var(--foreground)) !important;
-  }
-  .style-picker-menu .style-picker-item[data-highlighted] .style-picker-description,
-  .style-picker-menu .style-picker-item:hover .style-picker-description,
-  .style-picker-menu .style-picker-item:focus-visible .style-picker-description {
-    color: var(--picker-hover-fg, var(--foreground)) !important;
+    color: var(--picker-hover-fg, var(--foreground));
   }
   .style-picker-menu .style-picker-item[data-highlighted] .style-picker-swatch,
   .style-picker-menu .style-picker-item:hover .style-picker-swatch,
   .style-picker-menu .style-picker-item:focus-visible .style-picker-swatch {
-    border-color: color-mix(in oklab, var(--picker-hover-fg, var(--foreground)) 40%, transparent) !important;
+    border-color: color-mix(in oklab, var(--picker-hover-fg, var(--foreground)) 40%, transparent);
   }
 
   .usher-overlay-wrap { @apply fixed inset-0 z-50 flex items-start justify-center pt-[8vh] pb-4; }
@@ -706,17 +710,17 @@
     filter: none;
   }
   .usher-panel .usher-action-btn {
-    border-radius: 0.625rem !important;
-    padding: 0.75rem 1rem !important;
-    border: 0 !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
+    border-radius: 0.625rem;
+    padding: 0.75rem 1rem;
+    border: 0;
+    box-shadow: none;
+    backdrop-filter: none;
   }
   .usher-panel .usher-close-btn {
-    border-radius: 0.5rem !important;
-    padding: 0.25rem !important;
-    border: 0 !important;
-    box-shadow: none !important;
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+    border: 0;
+    box-shadow: none;
     min-width: 2rem;
     min-height: 2rem;
   }
@@ -755,8 +759,8 @@
     @apply w-full flex items-center gap-3 px-4 py-3 transition-all;
     background: transparent;
     border: 0;
-    border-radius: 0.625rem !important;
-    color: var(--foreground) !important;
+    border-radius: 0.625rem;
+    color: var(--foreground);
   }
   .usher-action-selected { @apply bg-gradient-to-r from-spotlight/20 to-transparent border-l-2 border-spotlight shadow-lg; }
   .usher-action-hover { @apply hover:bg-spotlight/5; }
@@ -810,7 +814,7 @@
   }
   .calendar-dot { @apply absolute bottom-1 left-1 w-3 h-3 rounded-full bg-accent-primary; }
   .calendar-day-selected .calendar-day-number {
-    color: var(--foreground) !important;
+    color: var(--foreground);
     font-weight: 600;
   }
   .calendar-perf-panel { @apply p-6 bg-card rounded-lg border border-spotlight/30; }
@@ -836,41 +840,41 @@
   .calendar-root .calendar-time-btn:hover,
   .calendar-root .calendar-time-btn:focus-visible,
   .calendar-root .calendar-time-btn:active {
-    text-transform: none !important;
-    letter-spacing: normal !important;
-    font-family: inherit !important;
-    padding: 1rem !important;
-    backdrop-filter: none !important;
-    transform: none !important;
-    filter: none !important;
-    overflow: visible !important;
+    text-transform: none;
+    letter-spacing: normal;
+    font-family: inherit;
+    padding: 1rem;
+    backdrop-filter: none;
+    transform: none;
+    filter: none;
+    overflow: visible;
   }
   .calendar-root .calendar-day-btn,
   .calendar-root .calendar-nav-btn {
-    text-transform: none !important;
-    letter-spacing: normal !important;
-    font-family: inherit !important;
-    box-shadow: none !important;
-    transform: none !important;
-    filter: none !important;
-    overflow: visible !important;
-    min-width: 2.75rem !important;
-    min-height: 2.75rem !important;
+    text-transform: none;
+    letter-spacing: normal;
+    font-family: inherit;
+    box-shadow: none;
+    transform: none;
+    filter: none;
+    overflow: visible;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
   }
   .calendar-root .calendar-day-btn,
   .calendar-root .calendar-nav-btn,
   .calendar-root .calendar-time-btn {
-    border-style: solid !important;
-    border-width: 1px !important;
-    border-radius: 0.5rem !important;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 0.5rem;
   }
   .calendar-root .calendar-day-btn {
-    padding: 0 !important;
+    padding: 0;
     width: 100%;
     height: 2.75rem;
   }
   .calendar-root .calendar-nav-btn {
-    padding: 0 !important;
+    padding: 0;
     width: 2.75rem;
     height: 2.75rem;
     display: inline-flex;
@@ -886,9 +890,9 @@
     color: var(--calendar-time-disabled-fg, color-mix(in oklab, var(--foreground) 78%, transparent));
   }
   .calendar-time-btn.calendar-time-disabled:hover {
-    background: var(--calendar-time-disabled-hover-bg, var(--calendar-time-disabled-bg, color-mix(in oklab, var(--card) 88%, var(--background) 12%))) !important;
-    border-color: var(--calendar-time-disabled-hover-border, var(--calendar-time-disabled-border, color-mix(in oklab, var(--foreground) 24%, transparent))) !important;
-    color: var(--calendar-time-disabled-hover-fg, color-mix(in oklab, var(--foreground) 82%, transparent)) !important;
+    background: var(--calendar-time-disabled-hover-bg, var(--calendar-time-disabled-bg, color-mix(in oklab, var(--card) 88%, var(--background) 12%)));
+    border-color: var(--calendar-time-disabled-hover-border, var(--calendar-time-disabled-border, color-mix(in oklab, var(--foreground) 24%, transparent)));
+    color: var(--calendar-time-disabled-hover-fg, color-mix(in oklab, var(--foreground) 82%, transparent));
   }
   .calendar-time-enabled {
     @apply border-spotlight/30;
@@ -901,11 +905,11 @@
     color: var(--foreground);
   }
   .calendar-time-btn.calendar-time-selected {
-    background: color-mix(in oklab, var(--spotlight) 36%, var(--card) 64%) !important;
-    border-color: color-mix(in oklab, var(--spotlight) 92%, transparent) !important;
+    background: color-mix(in oklab, var(--spotlight) 36%, var(--card) 64%);
+    border-color: color-mix(in oklab, var(--spotlight) 92%, transparent);
     box-shadow:
       inset 0 0 0 1px color-mix(in oklab, var(--spotlight) 36%, transparent),
-      0 0 0 2px color-mix(in oklab, var(--spotlight) 44%, transparent) !important;
+      0 0 0 2px color-mix(in oklab, var(--spotlight) 44%, transparent);
   }
   .calendar-time-selected-badge {
     @apply inline-flex items-center rounded-full px-2 py-0.5 mb-1 text-[10px] font-semibold uppercase tracking-wide;
@@ -918,7 +922,7 @@
   .calendar-time-btn.calendar-time-selected .calendar-seats,
   .calendar-time-btn.calendar-time-selected .calendar-time-availability,
   .calendar-time-btn.calendar-time-selected .calendar-available {
-    color: var(--foreground) !important;
+    color: var(--foreground);
   }
   .calendar-time-row { @apply flex items-center justify-between; }
   .calendar-time-meta { @apply flex items-center gap-3; }
@@ -935,18 +939,18 @@
   .calendar-time-disabled .calendar-time-type,
   .calendar-time-disabled .calendar-time-value,
   .calendar-time-disabled .calendar-time-availability {
-    color: var(--calendar-time-disabled-meta-fg, color-mix(in oklab, var(--foreground) 84%, transparent)) !important;
+    color: var(--calendar-time-disabled-meta-fg, color-mix(in oklab, var(--foreground) 84%, transparent));
   }
   .calendar-time-disabled .icon-md-spotlight,
   .calendar-time-disabled .calendar-seats {
-    color: var(--calendar-time-disabled-meta-fg, color-mix(in oklab, var(--foreground) 84%, transparent)) !important;
+    color: var(--calendar-time-disabled-meta-fg, color-mix(in oklab, var(--foreground) 84%, transparent));
   }
   .calendar-time-disabled .calendar-soldout {
-    color: var(--calendar-soldout-color, color-mix(in oklab, var(--foreground) 84%, transparent)) !important;
+    color: var(--calendar-soldout-color, color-mix(in oklab, var(--foreground) 84%, transparent));
     font-weight: var(--calendar-soldout-weight, 700);
   }
   .dark .calendar-time-disabled .calendar-soldout {
-    color: var(--calendar-soldout-color-dark, var(--calendar-soldout-color, color-mix(in oklab, var(--foreground) 84%, transparent))) !important;
+    color: var(--calendar-soldout-color-dark, var(--calendar-soldout-color, color-mix(in oklab, var(--foreground) 84%, transparent)));
   }
   .calendar-time-btn.calendar-time-enabled:hover .calendar-time-type,
   .calendar-time-btn.calendar-time-enabled:hover .calendar-time-value,
@@ -1041,23 +1045,23 @@
   }
   .seating-aisle-gap-left,
   .seating-aisle-gap-right { @apply transition-transform duration-300; }
-  .seating-seat-btn {
+  .seating-root .seating-seat-btn {
     @apply relative w-8 h-8 rounded-md transition-all outline-none;
-    border: 0 !important;
-    padding: 0 !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-    text-transform: none !important;
-    letter-spacing: normal !important;
-    line-height: 1 !important;
-    font-family: inherit !important;
-    box-shadow: none !important;
-    transform: none !important;
-    filter: none !important;
+    border: 0;
+    padding: 0;
+    min-width: 0;
+    min-height: 0;
+    text-transform: none;
+    letter-spacing: normal;
+    line-height: 1;
+    font-family: inherit;
+    box-shadow: none;
+    transform: none;
+    filter: none;
   }
-  .seating-seat-btn:hover {
-    transform: none !important;
-    box-shadow: none !important;
+  .seating-root .seating-seat-btn:hover {
+    transform: none;
+    box-shadow: none;
   }
   .seating-seat-available { @apply bg-seat-available hover:bg-seat-available/85 cursor-pointer; filter: saturate(0.92); }
   .seating-seat-taken { @apply bg-slate-500 cursor-not-allowed opacity-90 grayscale; }
@@ -1070,7 +1074,7 @@
       0 0 0 2px var(--seating-selected-ring, color-mix(in oklab, var(--selection-accent, var(--velvet)) 55%, transparent)),
       0 0 12px var(--seating-selected-glow, color-mix(in oklab, var(--selection-accent, var(--velvet)) 70%, transparent)),
       inset 0 0 0 1px var(--seating-selected-inset, color-mix(in oklab, white 35%, transparent));
-    transform: scale(var(--seating-selected-scale, 1.03)) !important;
+    transform: scale(var(--seating-selected-scale, 1.03));
     filter: var(--seating-selected-filter, saturate(1.08));
   }
   .seating-seat-suggested { @apply ring-2 ring-emerald-400/90 ring-offset-1 ring-offset-background; }
@@ -1088,20 +1092,20 @@
   .seating-accessible-icon { @apply w-4 h-4 absolute inset-0 m-auto text-white; }
   .seating-seat-symbol { @apply absolute inset-0 grid place-items-center text-[10px] font-bold text-white; }
   .seating-seat-vip .seating-seat-symbol {
-    color: var(--seat-vip-symbol-color, #111827) !important;
+    color: var(--seat-vip-symbol-color, #111827);
   }
   .seating-seat-taken .seating-seat-symbol { @apply line-through; }
   /* Ensure global theme button rules never flatten seat states. */
-  .seating-seat-btn.seating-seat-available { background-color: var(--seat-available) !important; border-color: transparent !important; }
-  .seating-seat-btn.seating-seat-taken { background-color: #64748b !important; border-color: transparent !important; }
+  .seating-seat-btn.seating-seat-available { background-color: var(--seat-available); border-color: transparent; }
+  .seating-seat-btn.seating-seat-taken { background-color: #64748b; border-color: transparent; }
   .seating-seat-btn.seating-seat-vip {
-    background-color: var(--seat-vip) !important;
-    border: 0 !important;
+    background-color: var(--seat-vip);
+    border: 0;
   }
-  .seating-seat-btn.seating-seat-accessible { background-color: var(--seat-accessible) !important; border-color: transparent !important; }
+  .seating-seat-btn.seating-seat-accessible { background-color: var(--seat-accessible); border-color: transparent; }
   .seating-seat-btn.seating-seat-selected {
-    background-color: var(--selection-accent, var(--velvet)) !important;
-    border-color: color-mix(in oklab, var(--selection-accent, var(--velvet)) 70%, transparent) !important;
+    background-color: var(--selection-accent, var(--velvet));
+    border-color: color-mix(in oklab, var(--selection-accent, var(--velvet)) 70%, transparent);
   }
   .seating-legend { @apply flex items-center justify-center gap-6 pt-4 border-t border-spotlight/20; }
   .seating-legend-item { @apply flex items-center gap-2; }
@@ -1111,7 +1115,7 @@
     @apply text-[10px] leading-none font-bold text-white;
   }
   .seating-legend-dot-symbol-vip {
-    color: var(--seat-vip-symbol-color, #111827) !important;
+    color: var(--seat-vip-symbol-color, #111827);
   }
   .seating-legend-dot-accessible { @apply relative grid place-items-center; }
   .seating-legend-accessible-icon { @apply w-3 h-3 text-white; }
@@ -1179,12 +1183,12 @@
   /* Shared hardening: prevent theme-wide button styles from breaking tools a11y states. */
   .seating-tools-sidebar button,
   .seating-architecture-modal-card button {
-    text-transform: none !important;
-    letter-spacing: normal !important;
-    transform: none !important;
-    filter: none !important;
-    box-shadow: none !important;
-    font-family: inherit !important;
+    text-transform: none;
+    letter-spacing: normal;
+    transform: none;
+    filter: none;
+    box-shadow: none;
+    font-family: inherit;
   }
   .seating-tools-sidebar-open {
     @apply opacity-100 translate-x-0 pointer-events-auto;
@@ -1563,7 +1567,7 @@
     letter-spacing: 0.035em;
   }
   html.theme-stage .show-card .show-card-btn {
-    font-family: var(--font-display) !important;
+    font-family: var(--font-display);
   }
   .show-badge-selling-fast { @apply bg-accent-primary/20 text-accent-primary border-accent-primary/30; }
   .show-badge-last-seats { @apply bg-accent-primary/30 text-accent-primary border-accent-primary/50; }
@@ -1677,13 +1681,13 @@
     color: var(--script-modal-header-fg);
   }
   .script-modal-panel .script-modal-title {
-    color: var(--script-modal-header-fg) !important;
-    background: none !important;
-    -webkit-background-clip: initial !important;
-    background-clip: initial !important;
-    -webkit-text-fill-color: currentColor !important;
-    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.18) !important;
-    opacity: 1 !important;
+    color: var(--script-modal-header-fg);
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    -webkit-text-fill-color: currentColor;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
+    opacity: 1;
   }
   .script-modal-panel .script-modal-close-btn {
     @apply inline-flex items-center justify-center rounded-lg;
@@ -1693,31 +1697,31 @@
     min-height: 44px;
     padding: 0;
     border-radius: var(--radius);
-    background: var(--script-modal-close-bg, color-mix(in oklab, var(--script-modal-header-bg) 72%, var(--script-modal-header-fg) 28%)) !important;
-    color: var(--script-modal-close-fg, var(--script-modal-header-fg)) !important;
-    border: 1px solid var(--script-modal-close-border, color-mix(in oklab, var(--script-modal-header-fg) 42%, transparent)) !important;
+    background: var(--script-modal-close-bg, color-mix(in oklab, var(--script-modal-header-bg) 72%, var(--script-modal-header-fg) 28%));
+    color: var(--script-modal-close-fg, var(--script-modal-header-fg));
+    border: 1px solid var(--script-modal-close-border, color-mix(in oklab, var(--script-modal-header-fg) 42%, transparent));
     box-shadow: 0 0 0 1px color-mix(in oklab, var(--script-modal-header-fg) 18%, transparent);
     transform: none;
     filter: none;
     overflow: visible;
   }
   .script-modal-panel .script-modal-close-btn:hover {
-    background: var(--script-modal-close-hover-bg, color-mix(in oklab, var(--script-modal-header-fg) 22%, var(--script-modal-header-bg) 78%)) !important;
-    color: var(--script-modal-close-hover-fg, var(--script-modal-close-fg, var(--script-modal-header-fg))) !important;
-    border-color: var(--script-modal-close-hover-border, color-mix(in oklab, var(--script-modal-header-fg) 56%, transparent)) !important;
+    background: var(--script-modal-close-hover-bg, color-mix(in oklab, var(--script-modal-header-fg) 22%, var(--script-modal-header-bg) 78%));
+    color: var(--script-modal-close-hover-fg, var(--script-modal-close-fg, var(--script-modal-header-fg)));
+    border-color: var(--script-modal-close-hover-border, color-mix(in oklab, var(--script-modal-header-fg) 56%, transparent));
   }
   .script-modal-panel .script-modal-close-btn:hover .script-modal-close-glyph {
-    color: var(--script-modal-close-hover-fg, var(--script-modal-close-fg, var(--script-modal-header-fg))) !important;
+    color: var(--script-modal-close-hover-fg, var(--script-modal-close-fg, var(--script-modal-header-fg)));
   }
   .script-modal-panel .script-modal-close-btn:focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
   }
   .script-modal-panel .script-modal-close-icon {
-    color: currentColor !important;
-    stroke: currentColor !important;
-    stroke-width: 2.75 !important;
-    opacity: 1 !important;
+    color: currentColor;
+    stroke: currentColor;
+    stroke-width: 2.75;
+    opacity: 1;
     position: absolute;
     width: 20px;
     height: 20px;
@@ -1727,10 +1731,10 @@
     font-size: 1.55rem;
     line-height: 1;
     font-weight: 700;
-    color: var(--script-modal-close-fg, var(--script-modal-header-fg)) !important;
-    text-transform: none !important;
-    letter-spacing: 0 !important;
-    opacity: 1 !important;
+    color: var(--script-modal-close-fg, var(--script-modal-header-fg));
+    text-transform: none;
+    letter-spacing: 0;
+    opacity: 1;
     pointer-events: none;
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
