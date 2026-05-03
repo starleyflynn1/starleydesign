@@ -539,11 +539,11 @@
 
 /* Keep Usher navigation instructions readable in Archive light mode. */
 .theme-archive .usher-footer {
-  color: color-mix(in oklab, var(--foreground) 82%, transparent);
+  color: var(--foreground);
 }
 
-.theme-archive .usher-footer-keygroup span {
-  color: color-mix(in oklab, var(--foreground) 88%, transparent);
+.theme-archive .usher-footer-hint {
+  color: var(--text-subtle-aa);
   font-weight: 600;
 }
 
@@ -581,10 +581,10 @@
 
 /* And in dark mode, bump contrast/weight for instruction labels too. */
 .dark.theme-archive .usher-footer {
-  color: color-mix(in oklab, var(--foreground) 88%, transparent);
+  color: color-mix(in oklab, var(--foreground) 94%, white 6%);
 }
 
-.dark.theme-archive .usher-footer-keygroup span {
-  color: color-mix(in oklab, var(--foreground) 92%, white 8%);
+.dark.theme-archive .usher-footer-hint {
+  color: color-mix(in oklab, var(--foreground) 96%, white 4%);
   font-weight: 600;
 }

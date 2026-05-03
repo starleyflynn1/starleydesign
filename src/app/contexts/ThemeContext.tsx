@@ -94,7 +94,8 @@ const rgbToCss = ([r, g, b]: [number, number, number]) => `rgb(${r} ${g} ${b})`;
 
 const themeStyleLoaders: Record<ThemeName, () => Promise<unknown>> = {
   archive: () => import('../../styles/themes/archive.css'),
-  stage: () => import('../../styles/themes/stage.css'),
+  /* Stage is imported in index.css; avoid a second network round-trip for the default theme. */
+  stage: () => Promise.resolve(),
   blueprint: () => import('../../styles/themes/blueprint.css'),
   coastal: () => import('../../styles/themes/coastal.css'),
   neon: () => import('../../styles/themes/neon.css'),
@@ -131,8 +132,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   });
 
   const lastPointerRef = useRef<{ x: number; y: number } | null>(null);
-  // Start empty: all theme styles (including Stage) are loaded via dynamic imports.
-  // Marking Stage as preloaded prevents its CSS chunk from ever being requested.
+  // Stage theme CSS is bundled in index.css; other themes load on demand.
   const loadedThemeStylesRef = useRef<Set<ThemeName>>(new Set());
   const hasRunInitialGuardrailsRef = useRef(false);
 
@@ -182,39 +182,42 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     root.style.removeProperty('--primary');
     root.style.removeProperty('--accent');
 
-    const backgroundRgb = resolveVariableRgb('--background');
-    const primaryRgb = resolveVariableRgb('--primary');
-    const accentRgb = resolveVariableRgb('--accent');
-    if (!backgroundRgb || !primaryRgb || !accentRgb) return;
+    // Read computed tokens after the next frame so style invalidation + layout aren't forced synchronously.
+    requestAnimationFrame(() => {
+      const backgroundRgb = resolveVariableRgb('--background');
+      const primaryRgb = resolveVariableRgb('--primary');
+      const accentRgb = resolveVariableRgb('--accent');
+      if (!backgroundRgb || !primaryRgb || !accentRgb) return;
 
-    const adjustTokenForContrast = (tokenRgb: [number, number, number]) => {
-      const minTextContrast = 4.5;
-      const initialContrast = contrastRatio(tokenRgb, backgroundRgb);
-      if (initialContrast >= minTextContrast) return tokenRgb;
+      const adjustTokenForContrast = (tokenRgb: [number, number, number]) => {
+        const minTextContrast = 4.5;
+        const initialContrast = contrastRatio(tokenRgb, backgroundRgb);
+        if (initialContrast >= minTextContrast) return tokenRgb;
 
-      const backgroundLuminance = calculateRelativeLuminance(backgroundRgb);
-      const target = backgroundLuminance > 0.45 ? ([0, 0, 0] as [number, number, number]) : ([255, 255, 255] as [number, number, number]);
+        const backgroundLuminance = calculateRelativeLuminance(backgroundRgb);
+        const target = backgroundLuminance > 0.45 ? ([0, 0, 0] as [number, number, number]) : ([255, 255, 255] as [number, number, number]);
 
-      let best = tokenRgb;
-      let bestContrast = initialContrast;
-      for (let i = 1; i <= 18; i += 1) {
-        const factor = i * 0.055;
-        const candidate = mixRgb(tokenRgb, target, factor);
-        const candidateContrast = contrastRatio(candidate, backgroundRgb);
-        if (candidateContrast > bestContrast) {
-          best = candidate;
-          bestContrast = candidateContrast;
+        let best = tokenRgb;
+        let bestContrast = initialContrast;
+        for (let i = 1; i <= 18; i += 1) {
+          const factor = i * 0.055;
+          const candidate = mixRgb(tokenRgb, target, factor);
+          const candidateContrast = contrastRatio(candidate, backgroundRgb);
+          if (candidateContrast > bestContrast) {
+            best = candidate;
+            bestContrast = candidateContrast;
+          }
+          if (candidateContrast >= minTextContrast) break;
         }
-        if (candidateContrast >= minTextContrast) break;
-      }
-      return best;
-    };
+        return best;
+      };
 
-    const adjustedPrimary = adjustTokenForContrast(primaryRgb);
-    const adjustedAccent = adjustTokenForContrast(accentRgb);
+      const adjustedPrimary = adjustTokenForContrast(primaryRgb);
+      const adjustedAccent = adjustTokenForContrast(accentRgb);
 
-    root.style.setProperty('--primary', rgbToCss(adjustedPrimary));
-    root.style.setProperty('--accent', rgbToCss(adjustedAccent));
+      root.style.setProperty('--primary', rgbToCss(adjustedPrimary));
+      root.style.setProperty('--accent', rgbToCss(adjustedAccent));
+    });
   }, [currentTheme, resolveVariableRgb]);
 
   const runThemeTransition = useCallback(

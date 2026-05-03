@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { CloseIcon, MenuIcon, MoonIcon, PauseIcon, PlayIcon, SearchIcon, SunIcon, TheaterIcon } from './AppIcons';
 import { useTheme } from '../contexts/ThemeContext';
 import { StylePicker } from './StylePicker';
@@ -30,7 +30,7 @@ export function TheaterHeader({ onSearchClick, onNavigate }: TheaterHeaderProps)
       && (current.hash || '') === (target.hash || '')
     );
   }, []);
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (typeof window === 'undefined') return;
     const mq = window.matchMedia(DESKTOP_NAV_MEDIA);
     const syncViewport = () => setIsDesktopViewport(mq.matches);

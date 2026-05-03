@@ -156,17 +156,7 @@
   background: color-mix(in oklab, var(--velvet) 80%, black 20%);
 }
 
-/* Ensure hero badge and marquee text pass contrast in Stage light mode. */
-.theme-stage .hero-badge {
-  background: color-mix(in oklab, var(--velvet) 18%, var(--card) 82%);
-  border-color: color-mix(in oklab, var(--velvet) 52%, transparent);
-  color: color-mix(in oklab, var(--velvet) 86%, #2b0911 14%);
-}
-
-.theme-stage .hero-badge .icon-sm {
-  color: inherit;
-}
-
+/* Ensure marquee text passes contrast in Stage light mode. */
 .theme-stage .theater-marquee-inner {
   color: var(--stage-base);
 }
@@ -383,21 +373,6 @@
 .dark .theme-stage .btn-prev:hover {
   background: color-mix(in oklab, var(--spotlight) 22%, var(--card) 78%) !important;
   color: var(--marquee-surface) !important;
-}
-
-/* Ensure badge and marquee copy remain legible in Stage dark mode. */
-.dark.theme-stage .hero-badge,
-.theme-stage.dark .hero-badge,
-.dark .theme-stage .hero-badge {
-  background: color-mix(in oklab, var(--spotlight) 34%, var(--card) 66%);
-  border-color: color-mix(in oklab, var(--spotlight) 64%, transparent);
-  color: #fff4cf;
-}
-
-.dark.theme-stage .hero-badge .icon-sm,
-.theme-stage.dark .hero-badge .icon-sm,
-.dark .theme-stage .hero-badge .icon-sm {
-  color: inherit;
 }
 
 .dark.theme-stage .theater-marquee-inner,

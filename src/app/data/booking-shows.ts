@@ -6,7 +6,7 @@ export const BOOKING_SHOWS: Show[] = [
   {
     title: 'Hamilton',
     image: '/images/shows/hamilton-320.jpg',
-    imageSrcSet: '/images/shows/hamilton-320.jpg 320w, /images/shows/hamilton-480.jpg 480w, /images/shows/hamilton-768.jpg 768w, /images/shows/hamilton-1200.jpg 1200w',
+    imageSrcSet: '/images/shows/hamilton-320.jpg 320w, /images/shows/hamilton-480.jpg 480w, /images/shows/hamilton-680.jpg 680w, /images/shows/hamilton-768.jpg 768w, /images/shows/hamilton-1200.jpg 1200w',
     imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
     date: 'Current Run',
     scope: 'Outdoor Amphitheater',
@@ -17,7 +17,7 @@ export const BOOKING_SHOWS: Show[] = [
   {
     title: 'The Phantom of the Opera',
     image: '/images/shows/phantom-320.jpg',
-    imageSrcSet: '/images/shows/phantom-320.jpg 320w, /images/shows/phantom-480.jpg 480w, /images/shows/phantom-768.jpg 768w, /images/shows/phantom-1200.jpg 1200w',
+    imageSrcSet: '/images/shows/phantom-320.jpg 320w, /images/shows/phantom-480.jpg 480w, /images/shows/phantom-680.jpg 680w, /images/shows/phantom-768.jpg 768w, /images/shows/phantom-1200.jpg 1200w',
     imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
     date: 'Current Run',
     scope: 'Main Stage',
@@ -28,7 +28,7 @@ export const BOOKING_SHOWS: Show[] = [
   {
     title: 'Wicked',
     image: '/images/shows/wicked-320.jpg',
-    imageSrcSet: '/images/shows/wicked-320.jpg 320w, /images/shows/wicked-480.jpg 480w, /images/shows/wicked-768.jpg 768w, /images/shows/wicked-1200.jpg 1200w',
+    imageSrcSet: '/images/shows/wicked-320.jpg 320w, /images/shows/wicked-480.jpg 480w, /images/shows/wicked-680.jpg 680w, /images/shows/wicked-768.jpg 768w, /images/shows/wicked-1200.jpg 1200w',
     imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
     date: 'Current Run',
     scope: 'Family Night Series',
@@ -39,7 +39,7 @@ export const BOOKING_SHOWS: Show[] = [
   {
     title: 'Les Misérables',
     image: '/images/shows/les-miserables-320.jpg',
-    imageSrcSet: '/images/shows/les-miserables-320.jpg 320w, /images/shows/les-miserables-480.jpg 480w, /images/shows/les-miserables-768.jpg 768w, /images/shows/les-miserables-1200.jpg 1200w',
+    imageSrcSet: '/images/shows/les-miserables-320.jpg 320w, /images/shows/les-miserables-480.jpg 480w, /images/shows/les-miserables-680.jpg 680w, /images/shows/les-miserables-768.jpg 768w, /images/shows/les-miserables-1200.jpg 1200w',
     imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
     date: 'Coming Soon',
     scope: 'Limited Engagement',
@@ -50,7 +50,7 @@ export const BOOKING_SHOWS: Show[] = [
   {
     title: 'The Lion King',
     image: '/images/shows/lion-king-320.jpg',
-    imageSrcSet: '/images/shows/lion-king-320.jpg 320w, /images/shows/lion-king-480.jpg 480w, /images/shows/lion-king-768.jpg 768w, /images/shows/lion-king-1200.jpg 1200w',
+    imageSrcSet: '/images/shows/lion-king-320.jpg 320w, /images/shows/lion-king-480.jpg 480w, /images/shows/lion-king-680.jpg 680w, /images/shows/lion-king-768.jpg 768w, /images/shows/lion-king-1200.jpg 1200w',
     imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
     date: 'Coming Soon',
     scope: 'Main Stage',

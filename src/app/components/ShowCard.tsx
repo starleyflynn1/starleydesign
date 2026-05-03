@@ -16,6 +16,8 @@ interface ShowCardProps {
   rating?: number;
   onClick?: () => void;
   scriptHref?: string;
+  /** When true, poster loads eagerly with high fetch priority (above-the-fold / LCP candidates). */
+  priority?: boolean;
 }
 
 const badgeStyles = {
@@ -44,6 +46,7 @@ export function ShowCard({
   rating,
   onClick,
   scriptHref,
+  priority = false,
 }: ShowCardProps) {
   const webpSrcSet = toWebpSrcSet(imageSrcSet);
 
@@ -61,9 +64,9 @@ export function ShowCard({
             sizes={imageSizes}
             alt={title}
             className="show-card-image"
-            loading="lazy"
+            loading={priority ? 'eager' : 'lazy'}
             decoding="async"
-            fetchPriority="low"
+            fetchPriority={priority ? 'high' : undefined}
           />
         </picture>
 

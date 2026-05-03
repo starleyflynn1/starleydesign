@@ -4,7 +4,7 @@ import { CheckIcon } from './AppIcons';
 import { useTheme } from '../contexts/ThemeContext';
 import { themeConfigs, THEMES } from '../contexts/theme-config';
 
-interface StylePickerProps {
+export interface StylePickerProps {
   onThemeSelected?: () => void;
   onOpenChange?: (open: boolean) => void;
   onEscape?: () => void;

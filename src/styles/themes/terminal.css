@@ -142,11 +142,10 @@
   --script-modal-close-hover-fg: #ffffff;
   --script-modal-close-hover-border: color-mix(in oklab, #00ff41 60%, transparent);
 
-  /* Seating inventory — matrix green + void; VIP = amber (complements green/cyan, not steel accessible) */
-  --seat-available: color-mix(in oklab, var(--matrix-green) 42%, var(--terminal-bg) 58%);
+  --seat-available: #36ba01;
   --seat-selected: #9e003e;
   --seat-taken: #475569;
-  --seat-vip: color-mix(in oklab, #d4af37 34%, var(--terminal-bg) 66%);
+  --seat-vip: #e09f1f;
   --seat-accessible: #0369a1;
   --seat-vip-symbol-color: #0f172a;
 }
@@ -358,9 +357,13 @@
   border: 1px solid color-mix(in oklab, var(--foreground) 45%, transparent);
 }
 
-.theme-terminal .usher-footer,
-.theme-terminal .usher-footer-keygroup span {
-  color: color-mix(in oklab, var(--foreground) 86%, transparent);
+.theme-terminal .usher-footer {
+  color: var(--foreground);
+}
+
+.theme-terminal .usher-footer-hint {
+  color: var(--text-muted-aa);
+  font-weight: 600;
 }
 
 /* Light-mode hover consistency baseline (shared ratios across themes). */

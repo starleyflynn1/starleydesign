@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useState, useRef, useId } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Search, Theater, MapPin, Grid3X3, Calendar, User, CreditCard, Settings, X } from 'lucide-react';
 
@@ -34,6 +34,8 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
   const [selectedActionId, setSelectedActionId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const baseId = useId();
+  const listboxId = `${baseId}-listbox`;
 
   const filteredActions = useMemo(
     () => (query
@@ -78,8 +80,13 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
     const panel = panelRef.current;
     if (!panel) return;
     if (!selectedActionId) return;
-    const activeAction = panel.querySelector<HTMLElement>(`[data-usher-id="${selectedActionId}"]`);
-    activeAction?.scrollIntoView({ block: 'nearest' });
+    const id = selectedActionId;
+    // Defer scroll measurement until after layout so we don't force sync layout mid-render.
+    const raf = requestAnimationFrame(() => {
+      const activeAction = panel.querySelector<HTMLElement>(`[data-usher-id="${id}"]`);
+      activeAction?.scrollIntoView({ block: 'nearest' });
+    });
+    return () => cancelAnimationFrame(raf);
   }, [isOpen, selectedActionId]);
 
   const moveSelection = (delta: number) => {
@@ -201,7 +208,7 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
           >
             <div className="usher-search-wrap">
               <div className="usher-search-row">
-                <Search className="icon-md-spotlight" />
+                <Search className="icon-md-spotlight" aria-hidden />
                 <input
                   ref={inputRef}
                   type="text"
@@ -209,72 +216,100 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   className="usher-input"
+                  role="combobox"
+                  aria-autocomplete="list"
+                  aria-controls={listboxId}
+                  aria-expanded={filteredActions.length > 0}
+                  aria-activedescendant={
+                    selectedActionId && filteredActions.some((a) => a.id === selectedActionId)
+                      ? `${baseId}-option-${selectedActionId}`
+                      : undefined
+                  }
+                  aria-haspopup="listbox"
                 />
                 <button
                   onClick={onClose}
                   className="usher-close-btn"
                   aria-label="Close"
                 >
-                  <X className="icon-md-muted" />
+                  <X className="icon-md-muted" aria-hidden />
                 </button>
               </div>
             </div>
 
             <div className="usher-results">
               {filteredActions.length === 0 ? (
-                <div className="usher-no-results">
-                  No results found for "{query}"
+                <div className="usher-no-results" role="status" aria-live="polite">
+                  No results found for &quot;{query}&quot;
                 </div>
               ) : (
-                <div className="usher-group-list">
-                  {groupedFilteredActions.map(([category, actions]) => (
-                    <div key={category}>
-                      <div className="usher-group-label">
-                        {category}
-                      </div>
-                      {actions.map((action) => {
-                        const isSelected = action.id === selectedActionId;
-                        const Icon = action.icon;
+                <div
+                  className="usher-group-list"
+                  id={listboxId}
+                  role="listbox"
+                  aria-label="Suggestions"
+                >
+                  {groupedFilteredActions.map(([category, actions], groupIndex) => {
+                    const categoryHeadingId = `${baseId}-cat-${groupIndex}`;
+                    return (
+                      <div key={category} role="group" aria-labelledby={categoryHeadingId}>
+                        <div id={categoryHeadingId} className="usher-group-label">
+                          {category}
+                        </div>
+                        {actions.map((action) => {
+                          const isSelected = action.id === selectedActionId;
+                          const Icon = action.icon;
+                          const optionLabel = action.badge
+                            ? `${action.category}, ${action.title}, ${action.badge}`
+                            : `${action.category}, ${action.title}`;
 
-                        return (
-                          <button
-                            key={action.id}
-                            type="button"
-                            onClick={() => {
-                              onSelect(action);
-                              onClose();
-                            }}
-                            onFocus={() => setSelectedActionId(action.id)}
-                            className={`usher-action-btn ${
-                              isSelected
-                                ? 'usher-action-selected'
-                                : 'usher-action-hover'
-                            }`}
-                            data-usher-id={action.id}
-                            style={
-                              isSelected
-                                ? {
-                                    boxShadow: 'inset 0 0 20px rgba(212, 175, 55, 0.1)',
-                                  }
-                                : {}
-                            }
-                          >
-                            <Icon
-                              className={`w-5 h-5 ${
-                                isSelected ? 'icon-md-spotlight' : 'icon-md-muted'
+                          return (
+                            <div
+                              key={action.id}
+                              role="option"
+                              id={`${baseId}-option-${action.id}`}
+                              aria-selected={isSelected}
+                              aria-label={optionLabel}
+                              tabIndex={-1}
+                              onClick={() => {
+                                onSelect(action);
+                                onClose();
+                              }}
+                              onMouseEnter={() => setSelectedActionId(action.id)}
+                              className={`usher-action-btn ${
+                                isSelected
+                                  ? 'usher-action-selected'
+                                  : 'usher-action-hover'
                               }`}
-                            />
-                            <span className="usher-action-title">{action.title}</span>
-                            {action.badge && (
-                              <span className="usher-badge">
-                                {action.badge}
+                              data-usher-id={action.id}
+                              style={
+                                isSelected
+                                  ? {
+                                      boxShadow: 'inset 0 0 20px rgba(212, 175, 55, 0.1)',
+                                    }
+                                  : {}
+                              }
+                            >
+                              <Icon
+                                className={`w-5 h-5 ${
+                                  isSelected ? 'icon-md-spotlight' : 'icon-md-muted'
+                                }`}
+                                aria-hidden
+                              />
+                              <span className="usher-action-title" aria-hidden="true">
+                                {action.title}
                               </span>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ))}
+                              {action.badge && (
+                                <span className="usher-badge" aria-hidden="true">
+                                  {action.badge}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -282,18 +317,26 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
             <div className="usher-footer">
               <div className="usher-footer-keys">
                 <div className="usher-footer-keygroup">
-                  <kbd className="usher-kbd">↑</kbd>
-                  <kbd className="usher-kbd">↓</kbd>
-                  <span>Navigate</span>
+                  <kbd className="usher-kbd" aria-label="Up arrow">
+                    <span aria-hidden>↑</span>
+                  </kbd>
+                  <kbd className="usher-kbd" aria-label="Down arrow">
+                    <span aria-hidden>↓</span>
+                  </kbd>
+                  <span className="usher-footer-hint">Navigate</span>
                 </div>
                 <div className="usher-footer-keygroup">
-                  <kbd className="usher-kbd">↵</kbd>
-                  <span>Select</span>
+                  <kbd className="usher-kbd" aria-label="Enter">
+                    <span aria-hidden>↵</span>
+                  </kbd>
+                  <span className="usher-footer-hint">Select</span>
                 </div>
               </div>
               <div className="usher-footer-keygroup">
-                <kbd className="usher-kbd">ESC</kbd>
-                <span>Close</span>
+                <kbd className="usher-kbd" aria-label="Escape">
+                  <span aria-hidden>ESC</span>
+                </kbd>
+                <span className="usher-footer-hint">Close</span>
               </div>
             </div>
           </motion.div>

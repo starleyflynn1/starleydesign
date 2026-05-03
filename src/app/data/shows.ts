@@ -4,7 +4,7 @@ export const SHOWS: Show[] = [
   {
     title: 'The Design System',
     image: '/images/shows/design-system-320.jpg',
-    imageSrcSet: '/images/shows/design-system-320.jpg 320w, /images/shows/design-system-480.jpg 480w, /images/shows/design-system-768.jpg 768w, /images/shows/design-system-1200.jpg 1200w',
+    imageSrcSet: '/images/shows/design-system-320.jpg 320w, /images/shows/design-system-480.jpg 480w, /images/shows/design-system-680.jpg 680w, /images/shows/design-system-768.jpg 768w, /images/shows/design-system-1200.jpg 1200w',
     imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
     date: '2026',
     scope: 'User Experience Architecture',
@@ -15,7 +15,7 @@ export const SHOWS: Show[] = [
   {
     title: 'Salesforce',
     image: '/images/shows/salesforce-320.jpg',
-    imageSrcSet: '/images/shows/salesforce-320.jpg 320w, /images/shows/salesforce-480.jpg 480w, /images/shows/salesforce-768.jpg 768w, /images/shows/salesforce-1200.jpg 1200w',
+    imageSrcSet: '/images/shows/salesforce-320.jpg 320w, /images/shows/salesforce-480.jpg 480w, /images/shows/salesforce-680.jpg 680w, /images/shows/salesforce-768.jpg 768w, /images/shows/salesforce-1200.jpg 1200w',
     imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
     date: '2022 — 2026',
     scope: 'Digital Campus at Scale',
@@ -26,7 +26,7 @@ export const SHOWS: Show[] = [
   {
     title: 'Google',
     image: '/images/shows/google-320.jpg',
-    imageSrcSet: '/images/shows/google-320.jpg 320w, /images/shows/google-480.jpg 480w, /images/shows/google-768.jpg 768w, /images/shows/google-1200.jpg 1200w',
+    imageSrcSet: '/images/shows/google-320.jpg 320w, /images/shows/google-480.jpg 480w, /images/shows/google-680.jpg 680w, /images/shows/google-768.jpg 768w, /images/shows/google-1200.jpg 1200w',
     imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
     date: '2021 — 2022',
     scope: 'Lead Management Engine',
@@ -37,7 +37,7 @@ export const SHOWS: Show[] = [
   {
     title: 'BFA Theater',
     image: '/images/shows/bfa-theater-320.jpg',
-    imageSrcSet: '/images/shows/bfa-theater-320.jpg 320w, /images/shows/bfa-theater-480.jpg 480w, /images/shows/bfa-theater-768.jpg 768w, /images/shows/bfa-theater-1200.jpg 1200w',
+    imageSrcSet: '/images/shows/bfa-theater-320.jpg 320w, /images/shows/bfa-theater-480.jpg 480w, /images/shows/bfa-theater-680.jpg 680w, /images/shows/bfa-theater-768.jpg 768w, /images/shows/bfa-theater-1200.jpg 1200w',
     imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
     date: '2004 — 2026',
     scope: 'Collaborative Production',

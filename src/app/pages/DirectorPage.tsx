@@ -7,8 +7,7 @@ export function DirectorPage() {
         <h2 className="section-title">Engineering Experiences, Directing Outcomes</h2>
         <div className="feature-grid director-feature-grid">
           <article className="feature-item">
-            <h3 className="
-            ">The Vision</h3>
+            <h3 className="spotlight-text feature-card-title">The Vision</h3>
             <p className="feature-copy">
               For over a decade, I&apos;ve operated at the intersection of robust logic and
               human-centric design. As a Senior Engineer and Creative Technologist I build the magic
@@ -25,7 +24,7 @@ export function DirectorPage() {
             </p>
           </article>
           <article className="feature-item">
-            <h3 className="spotlight-text">The Craft</h3>
+            <h3 className="spotlight-text feature-card-title">The Craft</h3>
             <p className="feature-copy">
               My toolkit is a blend of high-level technical engineering and creative
               experimentation.
@@ -43,7 +42,7 @@ export function DirectorPage() {
             </p>
           </article>
           <article className="feature-item">
-            <h3 className="spotlight-text">The Performance</h3>
+            <h3 className="spotlight-text feature-card-title">The Performance</h3>
             <p className="feature-copy">
               I am currently seeking to lead the development of next-generation interfaces as a
               Creative Technologist or UX Engineer. I&apos;m ready to bring complex design visions
@@ -51,7 +50,7 @@ export function DirectorPage() {
             </p>
           </article>
           <article className="feature-item">
-            <h3 className="spotlight-text">Closing Note</h3>
+            <h3 className="spotlight-text feature-card-title">Closing Note</h3>
             <p className="feature-copy">
               When I&apos;m not behind a screen, you can usually find me on stage. My recent
               performance in{' '}

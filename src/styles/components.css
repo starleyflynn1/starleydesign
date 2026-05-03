@@ -45,7 +45,6 @@
     flex-direction: column;
   }
   .hero-section { @apply text-center py-12 space-y-4; }
-  .hero-badge { @apply inline-flex items-center gap-2 px-4 py-2 bg-velvet/10 border border-velvet/30 rounded-full text-sm text-velvet mb-4; }
   .icon-sm { @apply w-4 h-4; }
   .hero-title { font-family: var(--font-display); }
   .hero-subtitle {
@@ -81,6 +80,13 @@
     color: color-mix(in oklab, var(--spotlight) 74%, #f4d58a 26%);
     font-weight: 700;
   }
+  /* Card titles under a section-title (Backstage / Director): gold accent, sans — not display-serif like section-title. */
+  .feature-item .feature-card-title {
+    @apply text-base leading-snug font-bold;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    text-transform: none;
+    letter-spacing: normal;
+  }
   .section-stack { @apply space-y-6; }
   .section-header-row { @apply flex items-center justify-between; }
   .section-title { @apply text-2xl; font-family: var(--font-display); }
@@ -95,6 +101,8 @@
     background: color-mix(in oklab, var(--card) 90%, var(--background) 10%);
     border: 1px solid color-mix(in oklab, var(--foreground) 18%, transparent);
   }
+
+  /* Avoid content-visibility on main sections: intrinsic-size guesses caused CLS when layout finalized. */
   .component-panel-booking {
     @apply p-4 md:p-5;
     flex: 1 1 auto;
@@ -125,16 +133,6 @@
     border-style: solid;
     font-weight: 700;
     box-shadow: 0 0 0 1px color-mix(in oklab, var(--selection-accent, var(--velvet)) 45%, transparent);
-  }
-  .segment-btn.segment-btn-active::after {
-    content: "";
-    position: absolute;
-    left: 20%;
-    right: 20%;
-    bottom: -3px;
-    height: 2px;
-    border-radius: 9999px;
-    background: color-mix(in oklab, var(--marquee-surface) 85%, transparent);
   }
   .booking-view { @apply space-y-8; }
   .booking-view-no-scroll {
@@ -229,6 +227,24 @@
     max-height: min(52vh, 540px);
     overflow: auto;
     padding-right: 0.25rem;
+  }
+  @media (max-width: 1023px) {
+    .booking-seat-layout {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+    }
+    .booking-seat-sidebar {
+      order: -1;
+      width: 100%;
+    }
+    .booking-seat-main {
+      order: 0;
+      max-height: none;
+      overflow: visible;
+      padding-right: 0;
+    }
   }
   @media (min-width: 1024px) {
     .booking-seat-main .seating-root-compact { @apply space-y-4; }
@@ -460,30 +476,56 @@
   .director-feature-grid { @apply grid-cols-1; }
   .feature-item { @apply space-y-2; }
   .feature-copy { @apply text-sm text-muted-foreground; }
-  /* Subtle inline code treatment for narrative technical copy. */
-  .backstage-page .hero-description code,
-  .backstage-page .feature-copy code,
-  .backstage-page .script-tech-copy code {
-    display: inline;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    font-size: 0.92em;
+  /* Emphasis in Script/Backstage narrative: bold, not monospace chips. */
+  .backstage-page .feature-copy strong,
+  .backstage-page .hero-description strong,
+  .backstage-page .script-tech-copy strong {
+    font-weight: 700;
+    color: color-mix(in oklab, var(--foreground) 78%, var(--spotlight) 22%);
+  }
+  /* Snippet body: <code> inside <pre class="script-tech-code"> only (no inline chip styling). */
+  .backstage-page .script-tech-code code {
+    display: block;
+    font-family: inherit;
+    font-size: inherit;
     line-height: inherit;
-    padding: 0.08em 0.34em;
-    border-radius: 0.32rem;
-    background: color-mix(in oklab, var(--spotlight) 18%, transparent);
-    border: 1px solid color-mix(in oklab, var(--spotlight) 34%, transparent);
-    color: var(--foreground);
-    white-space: normal;
-    word-break: keep-all;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    white-space: pre;
+    word-break: normal;
   }
   .app-footer { @apply border-t border-border bg-card/50 mt-16; }
   .app-footer-inner { @apply container mx-auto px-4 py-8; }
   .app-footer-row { @apply flex flex-col items-center justify-between gap-4 md:flex-row; }
   .footer-brand { @apply flex items-center gap-3; }
   .icon-md-velvet { @apply w-6 h-6 text-velvet; }
-  .footer-copy { @apply text-sm text-muted-foreground; }
-  .footer-links { @apply flex gap-6 text-sm text-muted-foreground; }
-  .footer-link { @apply hover:text-spotlight transition-colors; }
+  .footer-copy {
+    @apply m-0 max-w-prose text-sm leading-snug;
+    color: var(--text-muted-aa, color-mix(in oklab, var(--foreground) 72%, transparent));
+  }
+  .footer-copy-lead {
+    @apply text-sm font-normal;
+    color: var(--text-muted-aa, color-mix(in oklab, var(--foreground) 72%, transparent));
+  }
+  .footer-brand-name {
+    font-family: var(--font-display, inherit);
+    @apply text-lg font-semibold tracking-tight text-foreground;
+    color: var(--foreground);
+  }
+  .footer-copy-rest {
+    @apply text-sm font-normal;
+    color: var(--text-muted-aa, color-mix(in oklab, var(--foreground) 72%, transparent));
+  }
+  .footer-links {
+    @apply flex flex-wrap items-center justify-center gap-x-4 gap-y-3 text-sm text-muted-foreground;
+  }
+  .footer-link {
+    @apply inline-flex items-center justify-center min-h-11 min-w-11 px-3 py-2 rounded-md hover:text-spotlight transition-colors;
+    box-sizing: border-box;
+  }
 
   .booking-progress-root { @apply w-full max-w-4xl mx-auto py-8; }
   .booking-progress-track-wrap { @apply relative; }
@@ -762,8 +804,11 @@
   }
   .usher-close-btn {
     @apply p-1 hover:bg-spotlight/10 rounded-md transition-colors;
-    color: color-mix(in oklab, var(--foreground) 72%, transparent);
+    color: var(--text-muted-aa);
     border: 0;
+  }
+  .usher-close-btn:hover {
+    color: var(--foreground);
   }
   .usher-results {
     @apply overflow-y-auto;
@@ -782,6 +827,7 @@
   }
   .usher-action-btn {
     @apply w-full flex items-center gap-3 px-4 py-3 transition-all;
+    cursor: pointer;
     background: transparent;
     border: 0;
     border-radius: 0.625rem;
@@ -793,6 +839,9 @@
     @apply w-5 h-5;
     color: color-mix(in oklab, var(--foreground) 72%, transparent);
   }
+  .usher-panel .usher-action-btn .icon-md-muted {
+    color: var(--text-muted-aa);
+  }
   .usher-action-title {
     @apply flex-1 text-left;
     color: var(--foreground);
@@ -800,16 +849,36 @@
   }
   .usher-badge { @apply px-2 py-1 text-xs bg-accent-primary/20 text-accent-primary rounded-md border border-accent-primary/30; }
   .usher-footer {
-    @apply border-t border-spotlight/20 px-4 py-3 flex items-center justify-between text-xs;
-    color: color-mix(in oklab, var(--foreground) 74%, transparent);
+    @apply border-t border-spotlight/20 px-4 py-3 flex items-center justify-between;
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    color: var(--foreground);
   }
   .usher-footer-keys { @apply flex items-center gap-4; }
-  .usher-footer-keygroup { @apply flex items-center gap-1; }
-  .usher-kbd {
-    @apply px-2.5 py-1.5 bg-intermission-gray rounded text-spotlight;
-    font-size: 0.875rem;
-    line-height: 1;
+  .usher-footer-keygroup {
+    @apply flex items-center gap-2 flex-wrap;
+  }
+  .usher-footer-hint {
+    color: var(--text-muted-aa);
     font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .usher-kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.85rem;
+    padding: 0.4rem 0.55rem;
+    border-radius: 0.375rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: 0.04em;
+    background: color-mix(in oklab, var(--foreground) 12%, var(--card) 88%);
+    color: var(--foreground);
+    border: 1px solid color-mix(in oklab, var(--foreground) 28%, transparent);
+    box-shadow: inset 0 1px 0 color-mix(in oklab, var(--foreground) 8%, transparent);
   }
 
   .calendar-root { @apply space-y-4; }
@@ -996,7 +1065,20 @@
 
   .seating-root { @apply relative; }
   .seating-main-column { @apply space-y-6; min-width: 0; }
-  .seating-fit-viewport { width: 100%; }
+  .seating-fit-viewport {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .seating-fit-viewport-inner {
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .seating-fit-scale-clip {
+    min-width: 0;
+    box-sizing: border-box;
+  }
   .seating-fit-viewport-scroll {
     overflow-x: auto;
     overflow-y: hidden;
@@ -1007,6 +1089,10 @@
     display: flex;
     justify-content: center;
     overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     border-radius: 0.75rem;
     border: 1px solid color-mix(in oklab, var(--foreground) 16%, transparent);
     background: color-mix(in oklab, var(--card) 92%, var(--background) 8%);
@@ -1177,7 +1263,7 @@
     color-scheme: dark;
   }
   .seating-suggest-btn {
-    @apply px-3 py-1.5 rounded-md text-sm min-h-[40px] inline-flex items-center justify-center;
+    @apply px-4 py-2.5 rounded-md text-sm min-h-[44px] min-w-[44px] inline-flex items-center justify-center;
     color: var(--seating-accent-fg, var(--foreground));
     background: var(--seating-accent-bg, color-mix(in oklab, var(--spotlight) 20%, var(--card) 80%));
     border: 1px solid var(--seating-accent-border, color-mix(in oklab, var(--spotlight) 50%, transparent));
@@ -1273,7 +1359,7 @@
     color: var(--seating-control-hover-fg, var(--seating-control-fg, var(--foreground)));
   }
   .seating-reset-btn {
-    @apply inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm min-h-[40px];
+    @apply inline-flex items-center justify-center rounded-md px-4 py-2.5 text-sm min-h-[44px] min-w-[44px];
     color: var(--seating-control-fg, var(--foreground));
     background: transparent;
     border: 2px solid color-mix(in oklab, var(--foreground) 44%, transparent);
@@ -1479,15 +1565,52 @@
     color: var(--seating-panel-subtitle-fg, color-mix(in oklab, var(--foreground) 80%, transparent));
   }
   @media (max-width: 768px) {
+    .seating-architecture-modal-wrap {
+      align-items: stretch;
+      padding: max(0.35rem, env(safe-area-inset-top)) max(0.35rem, env(safe-area-inset-right))
+        max(0.35rem, env(safe-area-inset-bottom)) max(0.35rem, env(safe-area-inset-left));
+    }
     .seating-architecture-modal-card {
-      width: 96%;
-      max-width: 96vw;
+      width: 100%;
+      max-width: 100%;
       min-height: 0;
-      padding: 0.9rem;
-      max-height: calc(100dvh - 0.75rem);
+      padding: 0.75rem 0.65rem;
+      margin-top: 0;
+      margin-bottom: 0;
+      max-height: min(100dvh, 100svh);
+      display: flex;
+      flex-direction: column;
+    }
+    .seating-architecture-diagram-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.65rem;
+      min-height: 0;
+      flex: 1 1 auto;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
+    }
+    /* Chips overlaid the diagram on desktop; on short viewports they collided with SVG nodes. */
+    .seating-architecture-legend-overlay {
+      position: static;
+      top: auto;
+      right: auto;
+      z-index: auto;
+      justify-content: center;
+      margin: 0;
     }
     .seating-architecture-image {
-      max-height: 56vh;
+      flex: 0 1 auto;
+      width: 100%;
+      max-width: none;
+      height: auto;
+      max-height: none;
+      object-fit: contain;
+    }
+    .seating-architecture-explainer {
+      flex: 0 0 auto;
     }
   }
   .seating-summary { @apply p-4 bg-card rounded-lg border border-border; }
@@ -1826,7 +1949,6 @@
   .hero-subtitle,
   .hero-description,
   .feature-copy,
-  .footer-copy,
   .footer-links,
   .calendar-perf-date,
   .calendar-seats,
@@ -1882,6 +2004,13 @@
   #seating,
   #seating-chart {
     scroll-margin-top: 5.25rem;
+  }
+
+  /* Idle-deferred SeatingChart (main tab): reserve height to limit layout shift before chunk loads */
+  .seating-chart-deferred-placeholder {
+    @apply w-full rounded-xl border border-border/60;
+    min-height: min(52vh, 32rem);
+    background: color-mix(in oklab, var(--muted) 38%, transparent);
   }
 
   @media (max-width: 1280px) {

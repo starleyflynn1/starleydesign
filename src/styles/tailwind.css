@@ -1,4 +1,4 @@
-@import 'tailwindcss' source(none);
+@import 'tailwindcss';
 @source '../main.tsx';
 @source '../app/App.tsx';
 @source '../app/pages/**/*.{js,ts,jsx,tsx}';

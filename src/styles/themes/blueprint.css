@@ -256,9 +256,9 @@
   border: 1px solid color-mix(in oklab, var(--blueprint-blue) 42%, transparent);
 }
 
-.dark.theme-blueprint .usher-footer-keygroup span,
+.dark.theme-blueprint .usher-footer-hint,
 .dark.theme-blueprint .usher-footer {
-  color: color-mix(in oklab, var(--foreground) 90%, #ffffff 10%);
+  color: color-mix(in oklab, var(--foreground) 94%, #ffffff 6%);
 }
 
 .dark.theme-blueprint .usher-close-btn:hover .icon-md-muted {

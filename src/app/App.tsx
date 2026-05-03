@@ -18,7 +18,6 @@ const BackstagePage = lazy(() => import('./pages/BackstagePage').then((module) =
 const GlobalUsher = lazy(() =>
   import('./components/GlobalUsher').then((module) => ({ default: module.GlobalUsher }))
 );
-
 export default function App() {
   const [isUsherOpen, setIsUsherOpen] = useState(false);
   const [currentView, setCurrentView] = useState<'home' | 'booking' | 'seating' | 'calendar'>('seating');
@@ -131,22 +130,6 @@ export default function App() {
     setBookingShowOverride(undefined);
 
     if (typeof window === 'undefined') return;
-    const scrollToBookingFlow = (panelSelector?: string) => {
-      requestAnimationFrame(() => {
-        document.getElementById('booking-flow')?.scrollIntoView({
-          behavior: 'auto',
-          block: 'start',
-        });
-
-        if (!panelSelector) return;
-        requestAnimationFrame(() => {
-          document.querySelector(panelSelector)?.scrollIntoView({
-            behavior: 'auto',
-            block: 'start',
-          });
-        });
-      });
-    };
     if (!href || href === '/#stage') {
       setCurrentView('home');
       window.history.replaceState(null, '', '/#stage');
@@ -163,13 +146,11 @@ export default function App() {
     if (href.includes('#seating')) {
       setCurrentView('seating');
       window.history.replaceState(null, '', '/#seating');
-      scrollToBookingFlow('#seating-chart');
       return;
     }
     if (href.includes('#calendar')) {
       setCurrentView('calendar');
       window.history.replaceState(null, '', '/#calendar');
-      scrollToBookingFlow();
       return;
     }
     setCurrentView('home');
@@ -247,32 +228,38 @@ export default function App() {
       return;
     }
 
+    let anchorRaf = 0;
     const updateExitDialogAnchor = () => {
-      const bookingFlow = document.getElementById('booking-flow');
-      const header = document.querySelector('.theater-header') as HTMLElement | null;
-      const headerBottom = header?.getBoundingClientRect().bottom ?? 0;
-      const bookingFlowRect = bookingFlow?.getBoundingClientRect();
-      const viewportPadding = 16;
-      const estimatedDialogHeight = 232;
-      const visibleFlowTop = bookingFlowRect
-        ? Math.max(bookingFlowRect.top, headerBottom + viewportPadding)
-        : headerBottom + viewportPadding;
-      const visibleFlowBottom = bookingFlowRect
-        ? Math.min(bookingFlowRect.bottom, window.innerHeight - viewportPadding)
-        : window.innerHeight - viewportPadding;
-      const visibleFlowHeight = Math.max(0, visibleFlowBottom - visibleFlowTop);
-      const centeredWithinFlow = visibleFlowTop + Math.max(0, (visibleFlowHeight - estimatedDialogHeight) / 2);
-      const fallbackTop = Math.max(headerBottom + 28, 112);
-      const maxTop = Math.max(viewportPadding, window.innerHeight - estimatedDialogHeight - viewportPadding);
-      const anchoredTop = visibleFlowHeight > 0 ? centeredWithinFlow : fallbackTop;
+      cancelAnimationFrame(anchorRaf);
+      anchorRaf = requestAnimationFrame(() => {
+        anchorRaf = 0;
+        const bookingFlow = document.getElementById('booking-flow');
+        const header = document.querySelector('.theater-header') as HTMLElement | null;
+        const headerBottom = header?.getBoundingClientRect().bottom ?? 0;
+        const bookingFlowRect = bookingFlow?.getBoundingClientRect();
+        const viewportPadding = 16;
+        const estimatedDialogHeight = 232;
+        const visibleFlowTop = bookingFlowRect
+          ? Math.max(bookingFlowRect.top, headerBottom + viewportPadding)
+          : headerBottom + viewportPadding;
+        const visibleFlowBottom = bookingFlowRect
+          ? Math.min(bookingFlowRect.bottom, window.innerHeight - viewportPadding)
+          : window.innerHeight - viewportPadding;
+        const visibleFlowHeight = Math.max(0, visibleFlowBottom - visibleFlowTop);
+        const centeredWithinFlow = visibleFlowTop + Math.max(0, (visibleFlowHeight - estimatedDialogHeight) / 2);
+        const fallbackTop = Math.max(headerBottom + 28, 112);
+        const maxTop = Math.max(viewportPadding, window.innerHeight - estimatedDialogHeight - viewportPadding);
+        const anchoredTop = visibleFlowHeight > 0 ? centeredWithinFlow : fallbackTop;
 
-      setExitDialogAnchorTop(Math.round(Math.max(fallbackTop, Math.min(anchoredTop, maxTop))));
+        setExitDialogAnchorTop(Math.round(Math.max(fallbackTop, Math.min(anchoredTop, maxTop))));
+      });
     };
 
     updateExitDialogAnchor();
     window.addEventListener('scroll', updateExitDialogAnchor, { passive: true });
     window.addEventListener('resize', updateExitDialogAnchor);
     return () => {
+      cancelAnimationFrame(anchorRaf);
       window.removeEventListener('scroll', updateExitDialogAnchor);
       window.removeEventListener('resize', updateExitDialogAnchor);
     };
@@ -638,9 +625,10 @@ export default function App() {
             <div className="app-footer-row">
               <div className="footer-brand">
                 <TheaterIcon className="icon-md-velvet" />
-                <span className="footer-copy">
-                  © 2026 The Designed Stage. Theater Design System by Starley Flynn.
-                </span>
+                <p className="footer-copy">
+                  <span className="footer-copy-lead">© 2026 </span>
+                  <strong className="footer-brand-name">Starley Flynn</strong>
+                </p>
               </div>
               <div className="footer-links">
                 <a href="/#stage" className="footer-link">
@@ -649,14 +637,8 @@ export default function App() {
                 <a href="/script" className="footer-link">
                   Script
                 </a>
-                <a href="/director" className="footer-link">
-                  Director
-                </a>
                 <a href="/backstage" className="footer-link">
                   Backstage
-                </a>
-                <a href="/backstage#accessibility-motion-control" className="footer-link">
-                  Accessibility
                 </a>
               </div>
             </div>

@@ -1,5 +1,4 @@
 import React, { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
-import { Sparkles } from 'lucide-react';
 import { InfoIcon, TheaterIcon } from '../components/AppIcons';
 import { ShowCard } from '../components/ShowCard';
 import { BookingStep, Performance, Show } from '../data/types';
@@ -83,6 +82,35 @@ export function StagePage({
   const [bookingTicketCount, setBookingTicketCount] = useState(2);
   const [suggestRequestKey, setSuggestRequestKey] = useState(0);
   const [resetRequestKey, setResetRequestKey] = useState(0);
+  /** Defer main-tab SeatingChart chunk until idle so it is not chained right after the entry script (Lighthouse critical path). */
+  const [deferredSeatingTabReady, setDeferredSeatingTabReady] = useState(false);
+
+  useEffect(() => {
+    if (currentView !== 'seating') {
+      setDeferredSeatingTabReady(false);
+      return;
+    }
+    let cancelled = false;
+    const markReady = () => {
+      if (!cancelled) setDeferredSeatingTabReady(true);
+    };
+    const w = window as Window & {
+      requestIdleCallback?: (cb: IdleRequestCallback, opts?: IdleRequestOptions) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    if (typeof w.requestIdleCallback === 'function') {
+      const id = w.requestIdleCallback(markReady, { timeout: 2000 });
+      return () => {
+        cancelled = true;
+        w.cancelIdleCallback?.(id);
+      };
+    }
+    const timeoutId = window.setTimeout(markReady, 1);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, [currentView]);
 
   useEffect(() => {
     if (initialBookingShow && showTitles.includes(initialBookingShow)) {
@@ -301,13 +329,6 @@ export function StagePage({
       if (!confirmExitNavigation(destination)) return;
     }
     setCurrentView(view);
-    if (typeof window === 'undefined') return;
-    requestAnimationFrame(() => {
-      document.getElementById('booking-flow')?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    });
   };
 
   return (
@@ -320,14 +341,9 @@ export function StagePage({
           transform: `scale(${stageScale})`,
           transformOrigin: 'top center',
           transition: stagePinchStartDistanceRef.current ? 'none' : 'transform 160ms ease-out',
-          touchAction: isMobileViewport ? 'none' : undefined,
+          touchAction: isMobileViewport ? 'pan-x pan-y' : undefined,
         }}
       >
-        <div className="hero-badge">
-          <Sparkles className="icon-sm" />
-          <span>Theater Design System</span>
-        </div>
-
         <div className="main-header-branding">
           <span className="presenter-credit">Starley Flynn presents</span>
           <h2 className="main-header-title hero-title">
@@ -335,13 +351,13 @@ export function StagePage({
           </h2>
         </div>
 
-        <p className="hero-subtitle">Where Performance Theater Meets the Technical Stack</p>
+        <p className="hero-subtitle">Where Performance Theater Meets Systems Architecture</p>
         <p className="hero-description">
           <span>
             <span>
-              A technical showcase of a Design System engineered for complex state management 
-              and high-fidelity interaction—featuring a command-driven &quot;Global Usher,&quot; 
-              accessible spatial mapping, and a seamless booking flow.
+              A design system for complex state-driven interactions. Powered by 
+              a command-driven &quot;Global Usher&quot; that bridges accessible 
+              spatial navigation with a seamless booking flow.
             </span>
           </span>
         </p>
@@ -367,6 +383,7 @@ export function StagePage({
             <ShowCard
               key={show.title}
               {...show}
+              priority
               scriptHref={
                 show.title === 'The Design System'
                   ? '/script#technical-documentation'
@@ -680,12 +697,17 @@ export function StagePage({
         {currentView === 'seating' && (
           <div id="seating">
             <div id="seating-chart">
-              <Suspense fallback={null}>
-                <SeatingChart
-                  section="Orchestra"
-                  onSeatSelect={() => {}}
+              {deferredSeatingTabReady ? (
+                <Suspense fallback={null}>
+                  <SeatingChart section="Orchestra" onSeatSelect={() => {}} />
+                </Suspense>
+              ) : (
+                <div
+                  className="seating-chart-deferred-placeholder"
+                  aria-busy="true"
+                  aria-label="Loading seating chart"
                 />
-              </Suspense>
+              )}
             </div>
           </div>
         )}
@@ -702,49 +724,56 @@ export function StagePage({
             <div className="feature-item">
               <h4 className="spotlight-text">Global Usher (⌘K)</h4>
               <p className="feature-copy">
-                An atmospheric, keyboard-first command palette that utilizes spotlight transitions and theater-themed state management to guide the audience through complex inventory.
+                An atmospheric, keyboard-first command palette that utilizes spotlight transitions and theater-themed state
+                management to navigate complex inventory.
               </p>
             </div>
             <div className="feature-item">
-              <h4 className="spotlight-text">Seating Chart</h4>
+              <h4 className="spotlight-text">The Interactive House</h4>
               <p className="feature-copy">
-              An interactive spatial engine featuring real-time state management for VIP, accessible, and standard inventory.
+                A spatial seating engine architected to support real-time state synchronization for VIP, accessible, and
+                standard inventory, engineered for high-integrity UX.
               </p>
             </div>
             <div className="feature-item">
-              <h4 className="spotlight-text">Booking Progress</h4>
+              <h4 className="spotlight-text">The 5-Act Checkout</h4>
               <p className="feature-copy">
-              A 5-act narrative journey utilizing visual progress indicators to transform a standard checkout into a guided performance.
+                A narrative booking journey that utilizes visual progress indicators to transform a standard transaction into
+                a guided performance.
               </p>
             </div>
             <div className="feature-item">
               <h4 className="spotlight-text">Performance Calendar</h4>
               <p className="feature-copy">
-              A custom temporal interface engineered for real-time synchronization between matinee and evening show availability.
+                A custom temporal interface engineered for precision concurrency management between matinee and evening show
+                availability.
               </p>
             </div>
             <div className="feature-item">
-              <h4 className="spotlight-text">Dark Mode Toggle</h4>
+              <h4 className="spotlight-text">Dark Mode: &quot;The Blackout&quot;</h4>
               <p className="feature-copy">
-              A low-glare optimization engine specifically calibrated for discreet device usage in light-sensitive theater environments.
+                A low-glare optimization engine calibrated for discreet device usage in light-sensitive environments,
+                reducing visual noise without sacrificing clarity.
               </p>
             </div>
             <div className="feature-item">
-              <h4 className="spotlight-text">Motion Pause</h4>
+              <h4 className="spotlight-text">Motion Pause: &quot;Static Stage&quot;</h4>
               <p className="feature-copy">
-              A global override that silences the "Stage," providing a static mode for sensitive viewers by halting all background transitions and ambient animations.
+                A global override that silences ambient animations and background transitions, providing a static environment
+                for viewers with motion sensitivity.
               </p>
             </div>
             <div className="feature-item">
-              <h4 className="spotlight-text">Theme Toggles</h4>
+              <h4 className="spotlight-text">Atmospheric Presets</h4>
               <p className="feature-copy">
-              Dynamic environmental presets that transition the UI between high-visibility utility and immersive, atmospheric "Misty" or "Midnight" states.
+                Dynamic environment toggles that transition the UI between high-visibility utility and immersive
+                &quot;Misty&quot; or &quot;Midnight&quot; states.
               </p>
             </div>
             <div className="feature-item">
-              <h4 className="spotlight-text">Show Cards</h4>
+              <h4 className="spotlight-text">Production Show Cards</h4>
               <p className="feature-copy">
-              Modular data primitives designed to harmonize high-density production metadata with a premium aesthetic finish.
+                Modular data primitives designed to harmonize high-density metadata with a premium aesthetic finish.
               </p>
             </div>
           </div>

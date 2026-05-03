@@ -5,6 +5,22 @@ type SeatStatus = 'available' | 'unavailable' | 'vip' | 'accessible' | 'selected
 type SectionType = 'standard' | 'vip' | 'accessible' | 'mixed';
 type AssignmentType = Exclude<SeatStatus, 'selected'>;
 
+function formatSeatStatusForAria(status: SeatStatus): string {
+  switch (status) {
+    case 'vip':
+      return 'VIP';
+    case 'accessible':
+      return 'Accessible';
+    case 'unavailable':
+      return 'Unavailable';
+    case 'selected':
+      return 'Selected';
+    case 'available':
+    default:
+      return 'Available';
+  }
+}
+
 interface Seat {
   id: string;
   row: string;
@@ -35,11 +51,199 @@ const seatColors = {
   selected: 'seating-seat-selected',
 };
 
+/** Defer geometry reads until after the next paint so they do not run in the same turn as layout-invalidating writes (forced reflow). */
+function runAfterNextPaint(run: () => void) {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(run);
+  });
+}
+
 const DEFAULT_SECTION_TYPES: { left: SectionType; center: SectionType; right: SectionType } = {
   left: 'mixed',
   center: 'vip',
   right: 'mixed',
 };
+
+/** Row labels A–Z, then AA, AB, … so large grids do not reuse single-letter codes past Z. */
+function rowLabelFromIndex(index: number): string {
+  let n = index;
+  let label = '';
+  while (n >= 0) {
+    label = String.fromCharCode(65 + (n % 26)) + label;
+    n = Math.floor(n / 26) - 1;
+  }
+  return label;
+}
+
+const SOLD_GROUP_SIZES = [2, 3, 4] as const;
+
+function isProtectedSeat(s: Seat): boolean {
+  return s.status === 'accessible' || s.status === 'vip';
+}
+
+/** VIP “sold” blocks: sizes 2–4 with gaps between clusters; trailing lone VIP usually merged into sold. */
+function applyGappedUnavailableOnVipSegment(segment: Seat[], seed: number): void {
+  if (segment.length < 2) return;
+  let idx = 0;
+  let localSeed = (seed ^ segment.length * 131) >>> 0;
+  while (idx + 2 <= segment.length) {
+    const groupSize = SOLD_GROUP_SIZES[localSeed % 3];
+    const remaining = segment.length - idx;
+    const runLen = Math.min(groupSize, remaining);
+    if (runLen < 2) {
+      idx += 1;
+      localSeed = (localSeed * 17 + 1) >>> 0;
+      continue;
+    }
+    for (let k = 0; k < runLen; k++) {
+      segment[idx + k].status = 'unavailable';
+    }
+    idx += runLen;
+    if (idx >= segment.length) break;
+    const gap = 2 + (localSeed % 4);
+    idx += gap;
+    localSeed = (localSeed * 1103515245 + 12345) >>> 0;
+  }
+
+  let tail = segment.length - 1;
+  while (tail >= 0 && segment[tail].status === 'vip') tail--;
+  const trailing = segment.length - 1 - tail;
+  if (trailing === 1) {
+    const leaveLoneAvailable = ((localSeed ^ segment.length ^ seed) % 7) === 0;
+    if (!leaveLoneAvailable) {
+      segment[segment.length - 1].status = 'unavailable';
+    }
+  }
+}
+
+/** Standard / mixed sold-hash targets: pack into runs of 2–4 with no gaps; trailing lone usually merged. */
+function applyPackedUnavailableOnSoldSegment(segment: Seat[], rowSeed: number): void {
+  if (segment.length < 2) return;
+  let idx = 0;
+  let localSeed = (rowSeed ^ segment.length * 131) >>> 0;
+  while (idx < segment.length) {
+    const remaining = segment.length - idx;
+    if (remaining === 1) break;
+    const pick = SOLD_GROUP_SIZES[localSeed % 3];
+    let runLen = Math.min(pick, remaining);
+    if (remaining - runLen === 1 && runLen >= 3) {
+      runLen -= 1;
+    }
+    if (runLen < 2) runLen = Math.min(2, remaining);
+    if (runLen > remaining) runLen = remaining;
+    for (let k = 0; k < runLen; k++) {
+      segment[idx + k].status = 'unavailable';
+    }
+    idx += runLen;
+    localSeed = (localSeed * 1103515245 + 12345) >>> 0;
+  }
+
+  let t = segment.length - 1;
+  while (t >= 0 && segment[t].status === 'available') t--;
+  const trailingAvailable = segment.length - 1 - t;
+  if (trailingAvailable === 1) {
+    const leaveLone = ((localSeed ^ segment.length ^ rowSeed) % 7) === 0;
+    if (!leaveLone) segment[segment.length - 1].status = 'unavailable';
+  }
+}
+
+function pairSoldSingletonWithNeighbor(seat: Seat, rowSeats: Seat[], seed: number): void {
+  const left = rowSeats.find((s) => s.number === seat.number - 1);
+  const right = rowSeats.find((s) => s.number === seat.number + 1);
+  const trySeat = (buddy: Seat | undefined): boolean => {
+    if (!buddy || buddy.status !== 'available' || isProtectedSeat(buddy)) return false;
+    seat.status = 'unavailable';
+    buddy.status = 'unavailable';
+    return true;
+  };
+  const order = seed % 2 === 0 ? [left, right] : [right, left];
+  for (const buddy of order) {
+    if (trySeat(buddy)) return;
+  }
+  if ((seed ^ seat.number) % 7 !== 0) seat.status = 'unavailable';
+}
+
+/** Turn part of each VIP run into unavailable seats in contiguous blocks (sizes 2–4), with gaps between blocks. */
+function applyClusteredVipUnavailable(seats: Seat[]): void {
+  const byRow = new Map<string, Seat[]>();
+  for (const seat of seats) {
+    const list = byRow.get(seat.row);
+    if (list) list.push(seat);
+    else byRow.set(seat.row, [seat]);
+  }
+
+  for (const rowSeats of byRow.values()) {
+    rowSeats.sort((a, b) => a.number - b.number);
+    const vipInOrder = rowSeats.filter((s) => s.status === 'vip');
+    if (vipInOrder.length < 2) continue;
+
+    const segments: Seat[][] = [];
+    let seg: Seat[] = [];
+    for (const s of vipInOrder) {
+      if (seg.length === 0 || s.number === seg[seg.length - 1].number + 1) {
+        seg.push(s);
+      } else {
+        segments.push(seg);
+        seg = [s];
+      }
+    }
+    if (seg.length) segments.push(seg);
+
+    const rowLabel = rowSeats[0].row;
+    let seed = rowLabel.split('').reduce((acc, ch) => acc * 31 + ch.charCodeAt(0), 0);
+
+    for (const segment of segments) {
+      applyGappedUnavailableOnVipSegment(segment, seed);
+      seed = (seed * 131 + segment.length) >>> 0;
+    }
+  }
+}
+
+/** Apply the same sold clustering rules to hash-selected standard/mixed seats (no scattered singles). */
+function applyClusteredGeneralSold(seats: Seat[], soldIds: Set<string>): void {
+  const byRow = new Map<string, Seat[]>();
+  for (const seat of seats) {
+    const list = byRow.get(seat.row);
+    if (list) list.push(seat);
+    else byRow.set(seat.row, [seat]);
+  }
+
+  for (const rowSeats of byRow.values()) {
+    rowSeats.sort((a, b) => a.number - b.number);
+    const pool = rowSeats.filter((s) => soldIds.has(s.id) && s.status === 'available');
+    if (pool.length === 0) continue;
+
+    const segments: Seat[][] = [];
+    let seg: Seat[] = [];
+    for (const s of pool) {
+      if (seg.length === 0 || s.number === seg[seg.length - 1].number + 1) {
+        seg.push(s);
+      } else {
+        segments.push(seg);
+        seg = [s];
+      }
+    }
+    if (seg.length) segments.push(seg);
+
+    const rowLabel = rowSeats[0].row;
+    let seed = rowLabel.split('').reduce((acc, ch) => acc * 31 + ch.charCodeAt(0), 0);
+
+    for (const segment of segments) {
+      if (segment.length === 1) {
+        pairSoldSingletonWithNeighbor(segment[0], rowSeats, seed);
+      } else {
+        applyPackedUnavailableOnSoldSegment(segment, seed);
+      }
+      seed = (seed * 131 + segment.length) >>> 0;
+    }
+  }
+}
+
+const ROW_COUNT_OPTIONS = Array.from({ length: 25 }, (_, i) => i + 6);
+/** Wide orchestra-style sections often run 40–60+ seats across; cap keeps selects usable. */
+const SEATS_PER_ROW_OPTIONS = [
+  8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 44, 48, 52, 56, 60,
+];
 
 export function SeatingChart({
   section,
@@ -71,8 +275,8 @@ export function SeatingChart({
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [suggestedSeatIds, setSuggestedSeatIds] = useState<string[]>([]);
   const [ticketCountState, setTicketCountState] = useState(2);
-  const [rowCount, setRowCount] = useState(10);
-  const [seatsPerRow, setSeatsPerRow] = useState(8);
+  const [rowCount, setRowCount] = useState(25);
+  const [seatsPerRow, setSeatsPerRow] = useState(30);
   const [assignmentType, setAssignmentType] = useState<AssignmentType>('available');
   const [seatOverrides, setSeatOverrides] = useState<Record<string, AssignmentType>>({});
   const [sectionTypes, setSectionTypes] = useState<{ left: SectionType; center: SectionType; right: SectionType }>(
@@ -85,6 +289,7 @@ export function SeatingChart({
     typeof window !== 'undefined' ? window.matchMedia('(max-width: 768px)').matches : false
   );
   const [fitScale, setFitScale] = useState(1);
+  const [fitScaledBox, setFitScaledBox] = useState<{ w: number; h: number } | null>(null);
   const recalcFitScaleRef = useRef<() => void>(() => {});
   const ticketCount = controlledTicketCount ?? ticketCountState;
   const updateTicketCount = (count: number) => {
@@ -100,7 +305,7 @@ export function SeatingChart({
     seatsPerRowValue: number,
     sectionTypesValue: { left: SectionType; center: SectionType; right: SectionType }
   ): Seat[] => {
-    const rows = Array.from({ length: rowCountValue }, (_, index) => String.fromCharCode(65 + index));
+    const rows = Array.from({ length: rowCountValue }, (_, index) => rowLabelFromIndex(index));
     const seats: Seat[] = [];
     const vipStart = Math.max(2, Math.floor(rowCountValue * 0.25));
     const vipEnd = Math.min(rowCountValue - 2, Math.floor(rowCountValue * 0.65));
@@ -108,6 +313,8 @@ export function SeatingChart({
     const vipSeatEnd = Math.min(seatsPerRowValue - 2, Math.ceil(seatsPerRowValue * 0.72));
     const firstAisle = Math.max(3, Math.floor(seatsPerRowValue / 3));
     const secondAisle = Math.min(seatsPerRowValue - 2, Math.floor((seatsPerRowValue * 2) / 3));
+
+    const soldHashTargets = new Set<string>();
 
     rows.forEach((row, rowIndex) => {
       for (let i = 1; i <= seatsPerRowValue; i++) {
@@ -127,9 +334,14 @@ export function SeatingChart({
         let status: SeatStatus = 'available';
         if (isAccessible || sectionType === 'accessible') status = 'accessible';
         else if (sectionType === 'vip') status = 'vip';
-        else if (sectionType === 'standard') status = isTaken ? 'unavailable' : 'available';
-        else if (isVIP) status = 'vip';
-        else if (isTaken) status = 'unavailable';
+        else if (sectionType === 'standard') {
+          if (isTaken) soldHashTargets.add(`${row}${i}`);
+          status = 'available';
+        } else if (isVIP) status = 'vip';
+        else if (isTaken) {
+          soldHashTargets.add(`${row}${i}`);
+          status = 'available';
+        }
 
         seats.push({
           id: `${row}${i}`,
@@ -141,6 +353,9 @@ export function SeatingChart({
         });
       }
     });
+
+    applyClusteredVipUnavailable(seats);
+    applyClusteredGeneralSold(seats, soldHashTargets);
 
     return seats;
   };
@@ -182,6 +397,7 @@ export function SeatingChart({
   useEffect(() => {
     if (!isMobileViewport || !isFitOverview) {
       setFitScale(1);
+      setFitScaledBox(null);
       return;
     }
 
@@ -189,7 +405,9 @@ export function SeatingChart({
       const viewport = fitViewportRef.current;
       const content = fitContentRef.current;
       if (!viewport || !content) return;
-      const availableWidth = Math.max(0, viewport.clientWidth - 8);
+      // Leave room for overview padding, borders, and parent card gutters on small screens.
+      const horizontalGutter = 20;
+      const availableWidth = Math.max(0, viewport.clientWidth - horizontalGutter);
       const stageTopbar = content.querySelector('.seating-stage-topbar') as HTMLElement | null;
       const grid = content.querySelector('.seating-grid') as HTMLElement | null;
       const legend = content.querySelector('.seating-legend') as HTMLElement | null;
@@ -199,50 +417,99 @@ export function SeatingChart({
         grid?.scrollWidth ?? 0,
         legend?.scrollWidth ?? 0
       );
+      const contentHeight = Math.max(
+        content.scrollHeight,
+        stageTopbar?.scrollHeight ?? 0,
+        grid?.scrollHeight ?? 0,
+        legend?.scrollHeight ?? 0
+      );
       if (!contentWidth || !availableWidth) {
         setFitScale(1);
+        setFitScaledBox(null);
         return;
       }
-      // Keep a little horizontal breathing room so content stays visually
-      // inside the card edge on narrow mobile viewports.
-      const fittedScale = (availableWidth / contentWidth) * 0.95;
-      setFitScale(Math.max(0.62, Math.min(0.95, fittedScale)));
+      // Fit full width of the house; allow small scales on wide grids (no floor at 0.62 — that forced clipping).
+      const fittedScale = (availableWidth / contentWidth) * 0.92;
+      const next = Math.min(1, Math.max(0.06, fittedScale));
+      if (!Number.isFinite(next)) {
+        setFitScale(1);
+        setFitScaledBox(null);
+        return;
+      }
+      setFitScale(next);
+      // transform: scale() does not shrink layout height — clip to the painted size so scroll parents don't show a tall empty tail.
+      setFitScaledBox({
+        w: Math.max(0, Math.round(contentWidth * next)),
+        h: Math.max(0, Math.round(contentHeight * next)),
+      });
     };
     recalcFitScaleRef.current = recalc;
 
-    recalc();
-    window.addEventListener('resize', recalc);
-    return () => window.removeEventListener('resize', recalc);
+    let rafOuter = 0;
+    let rafInner = 0;
+    const scheduleRecalc = () => {
+      cancelAnimationFrame(rafOuter);
+      cancelAnimationFrame(rafInner);
+      rafOuter = requestAnimationFrame(() => {
+        rafInner = requestAnimationFrame(() => {
+          rafOuter = 0;
+          rafInner = 0;
+          recalc();
+        });
+      });
+    };
+
+    scheduleRecalc();
+    window.addEventListener('resize', scheduleRecalc);
+    return () => {
+      cancelAnimationFrame(rafOuter);
+      cancelAnimationFrame(rafInner);
+      window.removeEventListener('resize', scheduleRecalc);
+    };
   }, [isMobileViewport, isFitOverview, rowCount, seatsPerRow, compactMode, sectionTypes]);
   useEffect(() => {
     if (!isMobileViewport || !isFitOverview) return;
     if (typeof ResizeObserver === 'undefined') return;
     const viewport = fitViewportRef.current;
-    const content = fitContentRef.current;
-    if (!viewport || !content) return;
+    if (!viewport) return;
+
+    let rafOuter = 0;
+    let rafInner = 0;
+    const scheduleRecalc = () => {
+      cancelAnimationFrame(rafOuter);
+      cancelAnimationFrame(rafInner);
+      rafOuter = requestAnimationFrame(() => {
+        rafInner = requestAnimationFrame(() => {
+          rafOuter = 0;
+          rafInner = 0;
+          recalcFitScaleRef.current();
+        });
+      });
+    };
 
     const observer = new ResizeObserver(() => {
-      recalcFitScaleRef.current();
+      scheduleRecalc();
     });
     observer.observe(viewport);
-    observer.observe(content);
-    return () => observer.disconnect();
+    return () => {
+      cancelAnimationFrame(rafOuter);
+      cancelAnimationFrame(rafInner);
+      observer.disconnect();
+    };
   }, [isMobileViewport, isFitOverview]);
   useEffect(() => {
     if (!isMobileViewport || !isFitOverview) return;
-    requestAnimationFrame(() => {
+    runAfterNextPaint(() => {
       recalcFitScaleRef.current();
-      requestAnimationFrame(() => {
-        recalcFitScaleRef.current();
-      });
     });
   }, [isMobileViewport, isFitOverview, rowCount, seatsPerRow, sectionTypes]);
   useEffect(() => {
     if (!isMobileViewport || !isFitOverview) return;
-    const viewport = fitViewportRef.current;
-    if (!viewport) return;
-    // Reset any prior horizontal scroll offset from interactive mode.
-    viewport.scrollLeft = 0;
+    const raf = requestAnimationFrame(() => {
+      const viewport = fitViewportRef.current;
+      if (viewport) viewport.scrollLeft = 0;
+    });
+    return () => cancelAnimationFrame(raf);
   }, [isMobileViewport, isFitOverview]);
 
   useEffect(() => {
@@ -260,9 +527,8 @@ export function SeatingChart({
       const nextEntries = Object.entries(prev).filter(([id]) => validIds.has(id));
       return nextEntries.length === Object.keys(prev).length ? prev : Object.fromEntries(nextEntries);
     });
-    if (focusedSeatId === null) {
-      const firstFocusable = seats.find((seat) => seat.status !== 'unavailable');
-      if (firstFocusable) setFocusedSeatId(firstFocusable.id);
+    if (focusedSeatId === null && seats.length > 0) {
+      setFocusedSeatId(seats[0].id);
     }
   }, [seats, focusedSeatId]);
 
@@ -332,19 +598,29 @@ export function SeatingChart({
 
   const getSeatLocationLabel = (seat: Seat) => `Row ${seat.row}, Seat ${seat.number}`;
 
+  const getSeatAriaLabel = (seat: Seat, displayStatus: SeatStatus) => {
+    const pricePart = typeof seat.price === 'number' ? `, $${seat.price}` : '';
+    const base = `${getSeatLocationLabel(seat)}, ${formatSeatStatusForAria(displayStatus)}${pricePart}`;
+    if (seat.status === 'unavailable' && !isToolsOpen) {
+      return `${base}, not available for purchase`;
+    }
+    return base;
+  };
+
   const findSuggestedSeatIds = (count: number): string[] => {
     if (count <= 0) return [];
-    const sortedRows = [...rows].sort();
+    // Preserve stage-to-balcony order (Set order from row-major seats), not lexicographic sort.
+    const orderedRows = [...rows];
     const centerSeat = (seatsPerRow + 1) / 2;
     // Slightly forward-center is typically the best compromise for theater viewing.
-    const targetRowIndex = Math.round((sortedRows.length - 1) * 0.35);
+    const targetRowIndex = Math.round((orderedRows.length - 1) * 0.35);
 
     type Candidate = { ids: string[]; score: number };
     let bestNonAisle: Candidate | null = null;
     let bestAny: Candidate | null = null;
 
-    for (let rowIndex = 0; rowIndex < sortedRows.length; rowIndex++) {
-      const row = sortedRows[rowIndex];
+    for (let rowIndex = 0; rowIndex < orderedRows.length; rowIndex++) {
+      const row = orderedRows[rowIndex];
       const rowSeats = seats
         .filter((seat) => seat.row === row)
         .sort((a, b) => a.number - b.number)
@@ -409,6 +685,19 @@ export function SeatingChart({
     return (bestNonAisle ?? bestAny)?.ids ?? [];
   };
 
+  const scrollSuggestedSeatsIntoView = (seatIds: string[]) => {
+    if (typeof document === 'undefined' || seatIds.length === 0) return;
+    const midId = seatIds[Math.floor(seatIds.length / 2)];
+    runAfterNextPaint(() => {
+      runAfterNextPaint(() => {
+        const escaped = typeof CSS !== 'undefined' && typeof CSS.escape === 'function' ? CSS.escape(midId) : midId;
+        document
+          .querySelector<HTMLElement>(`button[data-seat-id="${escaped}"]`)
+          ?.scrollIntoView({ block: 'center', inline: 'center', behavior: 'smooth' });
+      });
+    });
+  };
+
   const runSuggestBestNow = () => {
     const suggested = findSuggestedSeatIds(ticketCount);
     setSuggestedSeatIds(suggested);
@@ -417,6 +706,7 @@ export function SeatingChart({
     setSelectedSeats(nextSelection);
     setSeatLiveMessage(`Suggested ${nextSelection.length} seat${nextSelection.length === 1 ? '' : 's'} and selected them.`);
     onSeatSelect?.(nextSelection);
+    scrollSuggestedSeatsIntoView(suggested);
   };
   const handleSuggestBest = () => {
     if (isSuggesting) return;
@@ -425,6 +715,19 @@ export function SeatingChart({
       runSuggestBestNow();
       setIsSuggesting(false);
     }, 320);
+  };
+
+  const handleViewEntireTheater = () => {
+    setIsFitOverview(true);
+    runAfterNextPaint(() => {
+      runAfterNextPaint(() => {
+        recalcFitScaleRef.current();
+        runAfterNextPaint(() => {
+          const stage = fitContentRef.current?.querySelector<HTMLElement>('.seating-stage-topbar');
+          stage?.scrollIntoView({ block: 'center', inline: 'center', behavior: 'auto' });
+        });
+      });
+    });
   };
 
   const applyAssignmentType = () => {
@@ -552,23 +855,22 @@ try {
 
     event.preventDefault();
     const currentRowIdx = rows.indexOf(seat.row);
-    let nextRowIdx = currentRowIdx;
-    let nextCol = seat.colIndex;
+    let r = currentRowIdx;
+    let c = seat.colIndex;
 
-    if (key === 'ArrowRight') nextCol += 1;
-    if (key === 'ArrowLeft') nextCol -= 1;
-    if (key === 'ArrowDown') nextRowIdx += 1;
-    if (key === 'ArrowUp') nextRowIdx -= 1;
+    if (key === 'ArrowRight') c += 1;
+    else if (key === 'ArrowLeft') c -= 1;
+    else if (key === 'ArrowDown') r += 1;
+    else if (key === 'ArrowUp') r -= 1;
 
-    const nextRow = rows[nextRowIdx];
+    const nextRow = rows[r];
     if (!nextRow) return;
 
-    const nextSeat = seats.find((candidate) => candidate.row === nextRow && candidate.colIndex === nextCol);
+    const nextSeat = seats.find((s) => s.row === nextRow && s.colIndex === c);
     if (!nextSeat) return;
 
     setFocusedSeatId(nextSeat.id);
-    const nextSeatButton = document.querySelector<HTMLButtonElement>(`button[data-seat-id="${nextSeat.id}"]`);
-    nextSeatButton?.focus();
+    document.querySelector<HTMLButtonElement>(`button[data-seat-id="${nextSeat.id}"]`)?.focus();
   };
 
   return (
@@ -599,6 +901,27 @@ try {
             ? 'seating-fit-viewport-scroll'
             : ''
         }`}
+      >
+      <div
+        className={
+          isMobileViewport && isFitOverview
+            ? 'seating-fit-scale-clip'
+            : 'seating-fit-viewport-inner'
+        }
+        style={
+          isMobileViewport && isFitOverview && fitScaledBox
+            ? {
+                height: fitScaledBox.h,
+                width: '100%',
+                maxWidth: '100%',
+                overflow: 'hidden',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'flex-start',
+                boxSizing: 'border-box',
+              }
+            : undefined
+        }
       >
       <div
         ref={fitContentRef}
@@ -635,7 +958,9 @@ try {
       </div>
 
       <p id="seating-grid-help" className="sr-only">
-        Seating chart keyboard controls: use arrow keys to move between seats, and press Enter or Space to select a seat.
+        Seating chart keyboard controls: arrow keys move one seat at a time in all directions through the full house,
+        including sold or held seats, so you can build a mental map of the theater. Press Enter or Space to select an
+        available seat; sold or held seats cannot be purchased from this chart unless seating tools are open.
       </p>
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {seatLiveMessage}
@@ -663,16 +988,17 @@ try {
                   return (
                     <div key={seat.id} className="seating-seat-wrap">
                       <button
+                        type="button"
                         data-seat-id={seat.id}
                         onMouseDown={() => {
                           setIsDragSelecting(true);
                           handleSeatClick(seat, false);
                         }}
                         onMouseEnter={() => {
+                          setSeatHoverTooltip(seat);
                           if (isDragSelecting) handleSeatClick(seat, true);
                         }}
                         onMouseMove={(event) => {
-                          setSeatHoverTooltip(seat);
                           setTooltipPosition({ x: event.clientX, y: event.clientY });
                         }}
                         onMouseLeave={() => {
@@ -681,10 +1007,13 @@ try {
                         onFocus={(event) => {
                           setFocusedSeatId(seat.id);
                           setSeatHoverTooltip(seat);
-                          const rect = event.currentTarget.getBoundingClientRect();
-                          setTooltipPosition({
-                            x: rect.left + rect.width / 2,
-                            y: rect.bottom,
+                          const target = event.currentTarget;
+                          runAfterNextPaint(() => {
+                            const rect = target.getBoundingClientRect();
+                            setTooltipPosition({
+                              x: rect.left + rect.width / 2,
+                              y: rect.bottom,
+                            });
                           });
                         }}
                         onBlur={() => {
@@ -695,9 +1024,8 @@ try {
                           // Keyboard-triggered click (Enter/Space) has detail=0.
                           if (event.detail === 0) handleSeatClick(seat);
                         }}
-                        disabled={isUnavailable && !isToolsOpen}
                         className={`seating-seat-btn ${seatColors[displayStatus]} ${isSuggested ? 'seating-seat-suggested' : ''} ${focusedSeatId === seat.id ? 'seating-seat-focused' : ''}`}
-                        aria-label={`${getSeatLocationLabel(seat)}, ${displayStatus}, $${seat.price}`}
+                        aria-label={getSeatAriaLabel(seat, displayStatus)}
                         role="gridcell"
                         aria-selected={displayStatus === 'selected'}
                         aria-disabled={isUnavailable && !isToolsOpen}
@@ -768,19 +1096,20 @@ try {
           <span className="seating-legend-label">Selected</span>
         </div>
       </div>
-      </div>
-      </div>
+
       {isMobileViewport && !isFitOverview && (
         <div className="seating-fit-actions">
           <button
             type="button"
             className="seating-fit-secondary-btn"
-            onClick={() => setIsFitOverview(true)}
+            onClick={handleViewEntireTheater}
           >
             View Entire Theater
           </button>
         </div>
       )}
+      </div>
+      </div>
       </div>
 
       {!hideTools && (
@@ -809,7 +1138,7 @@ try {
                 onChange={(event) => setRowCount(Number(event.target.value))}
                 className="seating-ticket-count-select"
               >
-                {[6, 7, 8, 9, 10, 11, 12].map((count) => (
+                {ROW_COUNT_OPTIONS.map((count) => (
                   <option key={count} value={count}>
                     {count}
                   </option>
@@ -823,7 +1152,7 @@ try {
                 onChange={(event) => setSeatsPerRow(Number(event.target.value))}
                 className="seating-ticket-count-select"
               >
-                {[8, 10, 12, 14, 16, 18].map((count) => (
+                {SEATS_PER_ROW_OPTIONS.map((count) => (
                   <option key={count} value={count}>
                     {count}
                   </option>
@@ -1165,6 +1494,7 @@ try {
           </section>
         </div>
       )}
+      </div>
       {copyToastMessage && (
         <div className="seating-copy-toast" role="status" aria-live="polite">
           {copyToastMessage}
