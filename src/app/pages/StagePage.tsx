@@ -46,6 +46,21 @@ export function StagePage({
   const isStagePinchingRef = useRef(false);
   const gestureStartScaleRef = useRef(1);
   const [stageScale, setStageScale] = useState(1);
+  const stageScaleRef = useRef(stageScale);
+  useEffect(() => {
+    stageScaleRef.current = stageScale;
+  }, [stageScale]);
+  const [isMobileViewport, setIsMobileViewport] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 768px)').matches : false
+  );
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(max-width: 768px)');
+    const onChange = () => setIsMobileViewport(mq.matches);
+    mq.addEventListener('change', onChange);
+    setIsMobileViewport(mq.matches);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
   const isComponentFocusMode = currentView === 'booking';
   const isBookingNoScrollMode = currentView === 'booking';
   const showTitles = useMemo(() => bookingShows.map((show) => show.title), [bookingShows]);
@@ -208,7 +223,6 @@ export function StagePage({
     setBookingStep(Math.max(1, bookingStep - 1));
     repositionBookingStepViewport();
   };
-  const isMobileViewport = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
   const getTouchDistance = (touches: TouchList) => {
     if (touches.length < 2) return null;
     const first = touches[0];
@@ -230,7 +244,7 @@ export function StagePage({
       const distance = getTouchDistance(event.touches);
       if (!distance) return;
       stagePinchStartDistanceRef.current = distance;
-      stagePinchStartScaleRef.current = stageScale;
+      stagePinchStartScaleRef.current = stageScaleRef.current;
       isStagePinchingRef.current = true;
       event.preventDefault();
     };
@@ -254,7 +268,7 @@ export function StagePage({
     // iOS Safari exposes pinch zoom as GestureEvents.
     const handleGestureStart = (event: Event) => {
       const gesture = event as Event & { scale?: number; preventDefault: () => void };
-      gestureStartScaleRef.current = stageScale;
+      gestureStartScaleRef.current = stageScaleRef.current;
       gesture.preventDefault();
     };
 
@@ -280,7 +294,7 @@ export function StagePage({
       target.removeEventListener('gesturestart', handleGestureStart as EventListener);
       target.removeEventListener('gesturechange', handleGestureChange as EventListener);
     };
-  }, [isMobileViewport, stageScale]);
+  }, [isMobileViewport]);
   const handleComponentTabChange = (view: 'booking' | 'seating' | 'calendar') => {
     if (currentView === 'booking' && view !== 'booking' && confirmExitNavigation) {
       const destination = view === 'seating' ? '/#seating' : '/#calendar';
@@ -298,36 +312,48 @@ export function StagePage({
 
   return (
     <main className={`app-main ${isBookingNoScrollMode ? 'app-main-booking' : ''}`}>
-      {!isComponentFocusMode && (
-        <section id="stage" className="hero-section">
-          <div
-            ref={stagePinchTargetRef}
-            style={{
-              transform: `scale(${stageScale})`,
-              transformOrigin: 'top center',
-              transition: stagePinchStartDistanceRef.current ? 'none' : 'transform 160ms ease-out',
-              touchAction: isMobileViewport ? 'none' : undefined,
-            }}
-          >
-          <div className="hero-badge">
-            <Sparkles className="icon-sm" />
-            <span>Theater Design System</span>
-          </div>
+  {!isComponentFocusMode && (
+    <section id="stage" className="hero-section">
+      <div
+        ref={stagePinchTargetRef}
+        style={{
+          transform: `scale(${stageScale})`,
+          transformOrigin: 'top center',
+          transition: stagePinchStartDistanceRef.current ? 'none' : 'transform 160ms ease-out',
+          touchAction: isMobileViewport ? 'none' : undefined,
+        }}
+      >
+        <div className="hero-badge">
+          <Sparkles className="icon-sm" />
+          <span>Theater Design System</span>
+        </div>
+
+        <div className="main-header-branding">
+          <span className="presenter-credit">Starley Flynn presents</span>
           <h2 className="main-header-title hero-title">
             The Designed Stage
           </h2>
-          <p className="hero-subtitle">Where Performance Theater Meets the Technical Stack</p>
-          <p className="hero-description"><span><span>A technical showcase of a Design System engineered for complex state management and high-fidelity interaction—featuring a command-driven "Global Usher," accessible spacial mapping, and seamless booking flows.</span></span></p>
+        </div>
 
-          <div className="hero-shortcut-wrap">
-            <kbd className="hero-shortcut">
-              <span className="spotlight-text">⌘ K</span> to open Global Usher
-            </kbd>
-          </div>
-          </div>
-        </section>
-      )}
+        <p className="hero-subtitle">Where Performance Theater Meets the Technical Stack</p>
+        <p className="hero-description">
+          <span>
+            <span>
+              A technical showcase of a Design System engineered for complex state management 
+              and high-fidelity interaction—featuring a command-driven &quot;Global Usher,&quot; 
+              accessible spatial mapping, and a seamless booking flow.
+            </span>
+          </span>
+        </p>
 
+        <div className="hero-shortcut-wrap">
+          <kbd className="hero-shortcut">
+            <span className="spotlight-text">⌘ K</span> to open Global Usher
+          </kbd>
+        </div>
+      </div>
+    </section>
+  )}
       {!isComponentFocusMode && (
       <section id="now-playing" className="section-stack">
         <div className="section-header-row">
@@ -397,13 +423,10 @@ export function StagePage({
           <Suspense fallback={null}>
             <PerformanceCalendar
               performances={performances}
-              onSelectPerformance={(date, time, type) => {
-                console.log('Selected performance:', { date, time, type });
+              onSelectPerformance={() => {
                 if (typeof window !== 'undefined') {
                   window.location.assign('/backstage#recursive-component-logic');
-                  return;
                 }
-                setCurrentView('seating');
               }}
             />
           </Suspense>
@@ -463,6 +486,7 @@ export function StagePage({
                         const slot = dayPerformances?.times.find(
                           (performance) => performance.time === time && performance.type === type
                         );
+                        if (!slot) return;
                         setSelectedPerformance({
                           date,
                           time,
@@ -659,9 +683,7 @@ export function StagePage({
               <Suspense fallback={null}>
                 <SeatingChart
                   section="Orchestra"
-                  onSeatSelect={(seats) => {
-                    console.log('Selected seats:', seats);
-                  }}
+                  onSeatSelect={() => {}}
                 />
               </Suspense>
             </div>

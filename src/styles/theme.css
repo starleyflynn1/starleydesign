@@ -61,11 +61,14 @@
   --color-seat-taken: var(--seat-taken);
   --color-seat-vip: var(--seat-vip);
   --color-seat-accessible: var(--seat-accessible);
+  --color-seat-selected: var(--seat-selected);
 }
 
 /* Cross-theme accessibility tokens (AA-oriented defaults). */
 :root {
   --selection-accent: var(--velvet);
+  /* Selected seats on the chart; override per theme to diverge from --selection-accent */
+  --seat-selected: var(--selection-accent);
   --seat-vip-symbol-color: #111827;
   /* Fallback seating tokens so non-Stage themes always render seat states. */
   --seat-available: #5e8a4f;
@@ -96,11 +99,12 @@
 
 .dark {
   --selection-accent: var(--velvet);
+  --seat-selected: var(--selection-accent);
   --seat-vip-symbol-color: #0b1020;
   /* Dark fallback variants keep seat states readable on deep surfaces. */
   --seat-available: #7aa25f;
   --seat-taken: #7185a1;
-  --seat-vip: #e0c25a;
+  --seat-vip: #dfc256;
   --seat-accessible: #78aee8;
 }
 

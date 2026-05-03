@@ -3,3 +3,11 @@
 @import './theme.css';
 @import './components.css';
 @import './themes/archive.css';
+
+/* Unlayered: mobile theater controls must stay off at lg+ regardless of @layer / utility order. */
+@media (min-width: 1024px) {
+  .theater-header .theater-mobile-menu-btn,
+  .theater-header .theater-nav-mobile {
+    display: none !important;
+  }
+}

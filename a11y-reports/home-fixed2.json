@@ -28976,7 +28976,7 @@
             "all": [],
             "none": [],
             "impact": null,
-            "html": "<span>A technical showcase of a Design System engineered for complex state management and high-fidelity interaction—featuring a command-driven \"Global Usher,\" accessible spacial mapping, and seamless booking flows.</span>",
+            "html": "<span>A technical showcase of a Design System engineered for complex state management and high-fidelity interaction—featuring a command-driven \"Global Usher,\" accessible spacial mapping, and seamless booking flow.</span>",
             "target": [
               "span > span"
             ]
@@ -34812,7 +34812,7 @@
             "all": [],
             "none": [],
             "impact": null,
-            "html": "<p class=\"hero-description\"><span><span>A technical showcase of a Design System engineered for complex state management and high-fidelity interaction—featuring a command-driven \"Global Usher,\" accessible spacial mapping, and seamless booking flows.</span></span></p>",
+            "html": "<p class=\"hero-description\"><span><span>A technical showcase of a Design System engineered for complex state management and high-fidelity interaction—featuring a command-driven \"Global Usher,\" accessible spacial mapping, and seamless booking flow.</span></span></p>",
             "target": [
               ".hero-description"
             ]
@@ -34832,7 +34832,7 @@
             "all": [],
             "none": [],
             "impact": null,
-            "html": "<span><span>A technical showcase of a Design System engineered for complex state management and high-fidelity interaction—featuring a command-driven \"Global Usher,\" accessible spacial mapping, and seamless booking flows.</span></span>",
+            "html": "<span><span>A technical showcase of a Design System engineered for complex state management and high-fidelity interaction—featuring a command-driven \"Global Usher,\" accessible spacial mapping, and seamless booking flow.</span></span>",
             "target": [
               ".hero-description > span"
             ]
@@ -34852,7 +34852,7 @@
             "all": [],
             "none": [],
             "impact": null,
-            "html": "<span>A technical showcase of a Design System engineered for complex state management and high-fidelity interaction—featuring a command-driven \"Global Usher,\" accessible spacial mapping, and seamless booking flows.</span>",
+            "html": "<span>A technical showcase of a Design System engineered for complex state management and high-fidelity interaction—featuring a command-driven \"Global Usher,\" accessible spacial mapping, and seamless booking flow.</span>",
             "target": [
               "span > span"
             ]

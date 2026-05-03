@@ -185,41 +185,38 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
 
             <article className="script-tech-card script-tech-card-code">
               <h4 className="spotlight-text">Intent-Based Seating Algorithm</h4>
-              <article className="script-tech-card script-tech-card-code">
-  <h4 className="spotlight-text">The Director’s Logic: Intent-Based Seating</h4>
-  <p className="script-tech-copy">
-    To keep the "Paradox of Choice" at bay for an audience member, this runtime algorithm acts as 
-    the digital usher that guides the patron to their best possible viewing experience.  The evaluation 
-    prioritizes <code>contiguous seat groups</code> row-by-row to surface a single, high-fidelity recommendation that honors the 
-    patron's intent.
-  </p>
-  <p className="script-tech-copy">
-    <b> Finding the Golden Sightline </b>
-    <br />
-    Each candidate group is scored against the "Sweet Spot" of the house—the intersection of the horizontal 
-    centerline and an optimal row depth (roughly 35% from the stage). The closer the ensemble matches this 
-    coordinate, the higher the <code>Sightline Score</code>.
-  </p>
-  <p className="script-tech-copy">
-    <b> Ensemble Blocking & Aisle Cues </b>
-    <br />
-    Only fully contiguous windows are cast. Groups that cross a configured <code>aisle break</code> receive a heavy "blocking 
-    penalty," as the algorithm prioritizes keeping the party together in a single, uninterrupted row.
-  </p>
-  <p className="script-tech-copy">
-    <b> Managing the House Balance </b>
-    <br />
-    The algorithm applies <code>Dead-Seat Prevention</code> to ensure the inventory remains marketable. Any selection 
-    that would strand an isolated single seat—the theatrical equivalent of a missed cue—is de-prioritized to 
-    preserve long-term sell-through health.
-  </p>
-  <p className="script-tech-copy">
-    <b> Auto-Selection </b>
-    <br />
-    The highest-scoring group is spotlighted as the primary suggestion. This ensures a fast-paced "Opening Night" 
-    experience, balancing immersive sightline quality with the logistical needs of a live house.
-  </p>
-</article>
+              <p className="script-tech-copy">
+                To keep the &quot;Paradox of Choice&quot; at bay for an
+                audience member, this runtime algorithm acts as the digital usher that guides the patron to their best
+                possible viewing experience. The evaluation prioritizes <code>contiguous seat groups</code> row-by-row to surface a
+                single, high-fidelity recommendation that honors the patron&apos;s intent.
+              </p>
+              <p className="script-tech-copy">
+                <b>Finding the Golden Sightline</b>
+                <br />
+                Each candidate group is scored against the &quot;Sweet Spot&quot; of the house—the intersection of the horizontal
+                centerline and an optimal row depth (roughly 35% from the stage). The closer the ensemble matches this
+                coordinate, the higher the <code>Sightline Score</code>.
+              </p>
+              <p className="script-tech-copy">
+                <b>Ensemble Blocking &amp; Aisle Cues</b>
+                <br />
+                Only fully contiguous windows are cast. Groups that cross a configured <code>aisle break</code> receive a heavy
+                &quot;blocking penalty,&quot; as the algorithm prioritizes keeping the party together in a single, uninterrupted row.
+              </p>
+              <p className="script-tech-copy">
+                <b>Managing the House Balance</b>
+                <br />
+                The algorithm applies <code>Dead-Seat Prevention</code> to ensure the inventory remains marketable. Any selection
+                that would strand an isolated single seat—the theatrical equivalent of a missed cue—is de-prioritized to
+                preserve long-term sell-through health.
+              </p>
+              <p className="script-tech-copy">
+                <b>Auto-Selection</b>
+                <br />
+                The highest-scoring group is spotlighted as the primary suggestion. This ensures a fast-paced &quot;Opening Night&quot;
+                experience, balancing immersive sightline quality with the logistical needs of a live house.
+              </p>
               <div className="script-tech-code-row">
                 <button
                   type="button"

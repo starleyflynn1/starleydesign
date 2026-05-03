@@ -63,6 +63,15 @@
   --script-modal-close-hover-fg: #053f30;
   --script-modal-close-hover-border: color-mix(in oklab, #065f46 42%, #6b7280 58%);
 
+  /* Seating inventory — light CRT: deep green / amber / cyan */
+  --seat-available: #154406;
+  --seat-selected: #8e0000;
+  --seat-taken: #6b7280;
+  /* Deep amber: white “V” ≥4.5:1 (was #ff8f00 ~2.3:1) */
+  --seat-vip: #b8860b;
+  --seat-accessible: #0369a1;
+  --seat-vip-symbol-color: #0f172a;
+
   /* --- Global Theme Physics --- */
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   --radius: 2px;
@@ -117,8 +126,8 @@
   --segment-active-fg: var(--terminal-bg);
   --spotlight: var(--glitch-cyan);
   --border: #30363d;
-  --seating-selected-ring: color-mix(in oklab, var(--glitch-cyan) 74%, transparent);
-  --seating-selected-glow: color-mix(in oklab, var(--glitch-cyan) 66%, transparent);
+  --seating-selected-ring: color-mix(in oklab, var(--seat-selected) 74%, transparent);
+  --seating-selected-glow: color-mix(in oklab, var(--seat-selected) 66%, transparent);
   --seating-selected-inset: color-mix(in oklab, #ffffff 24%, transparent);
   --btn-disabled-bg: color-mix(in oklab, #15171c 74%, #00ff41 26%);
   --btn-disabled-border: color-mix(in oklab, #00ff41 30%, transparent);
@@ -132,6 +141,14 @@
   --script-modal-close-hover-bg: color-mix(in oklab, #00ff41 32%, #15171c 68%);
   --script-modal-close-hover-fg: #ffffff;
   --script-modal-close-hover-border: color-mix(in oklab, #00ff41 60%, transparent);
+
+  /* Seating inventory — matrix green + void; VIP = amber (complements green/cyan, not steel accessible) */
+  --seat-available: color-mix(in oklab, var(--matrix-green) 42%, var(--terminal-bg) 58%);
+  --seat-selected: #9e003e;
+  --seat-taken: #475569;
+  --seat-vip: color-mix(in oklab, #d4af37 34%, var(--terminal-bg) 66%);
+  --seat-accessible: #0369a1;
+  --seat-vip-symbol-color: #0f172a;
 }
 
 /* ============================================================
@@ -204,11 +221,6 @@
 .theme-terminal .show-card-btn:hover::after {
   content: " _";
   animation: terminal-cursor-blink 1s steps(2, start) infinite;
-}
-
-/* VIP marker must stay high-contrast on amber seats in Terminal themes. */
-.theme-terminal .seating-seat-vip .seating-seat-symbol {
-  color: #111827 !important;
 }
 
 /* Terminal calendar hover/readability isolation. */
@@ -284,7 +296,7 @@
 }
 
 /* --- Buttons --- */
-.theme-terminal :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.usher-action-btn):not(.usher-close-btn)) {
+.theme-terminal :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn)) {
   font-family: inherit;
   border: 1px solid var(--foreground);
   background: transparent;
@@ -295,7 +307,7 @@
   transition: all 0.1s steps(2);
 }
 
-.theme-terminal :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.usher-action-btn):not(.usher-close-btn):hover) {
+.theme-terminal :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn):hover) {
   background: var(--foreground);
   color: var(--background);
   box-shadow: 0 0 15px var(--foreground);

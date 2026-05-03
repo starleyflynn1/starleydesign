@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Sun, Moon } from 'lucide-react';
 
 interface Performance {
@@ -69,7 +69,7 @@ export function PerformanceCalendar({
     );
   };
 
-  const days = [];
+  const days: React.ReactNode[] = [];
   for (let i = 0; i < firstDayOfMonth; i++) {
     days.push(<div key={`empty-${i}`} className="calendar-empty-day"></div>);
   }
@@ -181,7 +181,7 @@ export function PerformanceCalendar({
                   const isTimeSelected = selectedTimeKey === timeKey;
                   return (
                   <button
-                    key={performance.time}
+                    key={timeKey}
                     onClick={() => {
                       setSelectedTimeKey(timeKey);
                       onSelectPerformance?.(selectedDate!, performance.time, performance.type);

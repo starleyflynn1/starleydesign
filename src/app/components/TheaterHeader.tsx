@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { CloseIcon, MenuIcon, MoonIcon, PauseIcon, PlayIcon, SearchIcon, SunIcon, TheaterIcon } from './AppIcons';
 import { useTheme } from '../contexts/ThemeContext';
 import { StylePicker } from './StylePicker';
@@ -8,10 +8,15 @@ interface TheaterHeaderProps {
   onNavigate?: (href: string) => boolean;
 }
 
+const DESKTOP_NAV_MEDIA = '(min-width: 1024px)';
+
 export function TheaterHeader({ onSearchClick, onNavigate }: TheaterHeaderProps) {
   const { mode, toggleMode, motionEnabled, toggleMotion } = useTheme();
+  const readDesktopViewport = () =>
+    typeof window !== 'undefined' && window.matchMedia(DESKTOP_NAV_MEDIA).matches;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileStylePickerOpen, setIsMobileStylePickerOpen] = useState(false);
+  const [isDesktopViewport, setIsDesktopViewport] = useState(readDesktopViewport);
   const mobileMenuRef = useRef<HTMLDivElement | null>(null);
   const mobileMenuButtonRef = useRef<HTMLButtonElement | null>(null);
   const closeMobileMenu = useCallback(() => setIsMobileMenuOpen(false), []);
@@ -25,6 +30,22 @@ export function TheaterHeader({ onSearchClick, onNavigate }: TheaterHeaderProps)
       && (current.hash || '') === (target.hash || '')
     );
   }, []);
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia(DESKTOP_NAV_MEDIA);
+    const syncViewport = () => setIsDesktopViewport(mq.matches);
+    syncViewport();
+    mq.addEventListener('change', syncViewport);
+    return () => mq.removeEventListener('change', syncViewport);
+  }, []);
+
+  useEffect(() => {
+    if (isDesktopViewport) {
+      setIsMobileMenuOpen(false);
+      setIsMobileStylePickerOpen(false);
+    }
+  }, [isDesktopViewport]);
+
   useEffect(() => {
     if (!isMobileMenuOpen) return;
 
@@ -108,7 +129,7 @@ export function TheaterHeader({ onSearchClick, onNavigate }: TheaterHeaderProps)
             <h1 className="theater-brand-title">The Designed Stage</h1>
           </div>
 
-          <nav className="theater-nav-desktop">
+          <nav className="theater-nav-desktop hidden lg:flex">
             {navItems.map((item) => (
               <a
                 key={item.label}
@@ -122,11 +143,12 @@ export function TheaterHeader({ onSearchClick, onNavigate }: TheaterHeaderProps)
           </nav>
 
           <div className="theater-actions">
-            <div className="theater-action-stack-desktop">
+            <div className="theater-action-stack-desktop hidden md:flex">
               <button
                 onClick={onSearchClick}
                 className="theater-icon-btn"
                 aria-label="Search"
+                title="Search"
                 type="button"
               >
                 <SearchIcon className="w-5 h-5" />
@@ -141,6 +163,7 @@ export function TheaterHeader({ onSearchClick, onNavigate }: TheaterHeaderProps)
                 }}
                 className="theater-icon-btn"
                 aria-label="Toggle dark mode"
+                title="Toggle dark mode"
                 type="button"
               >
                 {mode === 'dark' ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}
@@ -159,31 +182,41 @@ export function TheaterHeader({ onSearchClick, onNavigate }: TheaterHeaderProps)
                 {motionEnabled ? <PauseIcon className="w-5 h-5" /> : <PlayIcon className="w-5 h-5" />}
               </button>
             </div>
-            <button
-              onClick={onSearchClick}
-              className="theater-mobile-search-btn"
-              aria-label="Search"
-              type="button"
-            >
-              <SearchIcon className="w-5 h-5" />
-            </button>
+            {!isDesktopViewport && (
+              <>
+                <button
+                  onClick={onSearchClick}
+                  className="theater-mobile-search-btn inline-flex md:hidden"
+                  aria-label="Search"
+                  title="Search"
+                  type="button"
+                >
+                  <SearchIcon className="w-5 h-5" />
+                </button>
 
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="theater-mobile-menu-btn"
-              aria-label="Toggle menu"
-              aria-expanded={isMobileMenuOpen}
-              aria-controls="theater-mobile-menu"
-              type="button"
-              ref={mobileMenuButtonRef}
-            >
-              {isMobileMenuOpen ? <CloseIcon className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
-            </button>
+                <button
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  className="theater-mobile-menu-btn"
+                  aria-label="Toggle menu"
+                  title={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+                  aria-expanded={isMobileMenuOpen}
+                  aria-controls="theater-mobile-menu"
+                  type="button"
+                  ref={mobileMenuButtonRef}
+                >
+                  {isMobileMenuOpen ? <CloseIcon className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
+                </button>
+              </>
+            )}
           </div>
         </div>
 
-        {isMobileMenuOpen && (
-          <div id="theater-mobile-menu" className="theater-nav-mobile" ref={mobileMenuRef}>
+        {!isDesktopViewport && isMobileMenuOpen && (
+          <div
+            id="theater-mobile-menu"
+            className="theater-nav-mobile lg:hidden"
+            ref={mobileMenuRef}
+          >
             <div className="theater-nav-mobile-controls">
               <StylePicker
                 onOpenChange={setIsMobileStylePickerOpen}
@@ -200,6 +233,7 @@ export function TheaterHeader({ onSearchClick, onNavigate }: TheaterHeaderProps)
                 onClick={toggleMode}
                 className="theater-icon-btn"
                 aria-label="Toggle dark mode"
+                title="Toggle dark mode"
                 type="button"
               >
                 {mode === 'dark' ? <SunIcon className="w-5 h-5" /> : <MoonIcon className="w-5 h-5" />}

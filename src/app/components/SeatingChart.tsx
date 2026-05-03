@@ -64,7 +64,7 @@ export function SeatingChart({
   const [copyToastMessage, setCopyToastMessage] = useState<string | null>(null);
   const [applyHint, setApplyHint] = useState<string | null>(null);
   const applyHintTimeoutRef = useRef<number | null>(null);
-  const [motionTooltipSeat, setMotionTooltipSeat] = useState<Seat | null>(null);
+  const [seatHoverTooltip, setSeatHoverTooltip] = useState<Seat | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [focusedSeatId, setFocusedSeatId] = useState<string | null>(null);
   const [isDragSelecting, setIsDragSelecting] = useState(false);
@@ -512,7 +512,7 @@ try {
           rowCount,
           seatsPerRow,
           sectionTypes,
-          pointerTooltip: motionTooltipSeat ? motionTooltipSeat.id : null,
+          pointerTooltip: seatHoverTooltip ? seatHoverTooltip.id : null,
           assignmentType,
           seatOverrides,
           coordinates: seats.slice(0, 12).map((seat) => ({
@@ -524,7 +524,7 @@ try {
         null,
         2
       ),
-    [assignmentType, focusedSeatId, motionTooltipSeat, rowCount, seatOverrides, section, sectionTypes, seats, seatsPerRow, selectedSeats, suggestedSeatIds]
+    [assignmentType, focusedSeatId, seatHoverTooltip, rowCount, seatOverrides, section, sectionTypes, seats, seatsPerRow, selectedSeats, suggestedSeatIds]
   );
 
   const handleCopyPanel = async (content: string) => {
@@ -621,7 +621,6 @@ try {
               type="button"
               onClick={() => setIsToolsOpen(true)}
               aria-pressed={false}
-              title="Open seating tools"
             >
               <Settings2 className="w-4 h-4" />
               Tools
@@ -673,18 +672,23 @@ try {
                           if (isDragSelecting) handleSeatClick(seat, true);
                         }}
                         onMouseMove={(event) => {
-                          setMotionTooltipSeat(seat);
+                          setSeatHoverTooltip(seat);
                           setTooltipPosition({ x: event.clientX, y: event.clientY });
                         }}
                         onMouseLeave={() => {
-                          setMotionTooltipSeat(null);
+                          setSeatHoverTooltip(null);
                         }}
-                        onFocus={() => {
+                        onFocus={(event) => {
                           setFocusedSeatId(seat.id);
-                          setMotionTooltipSeat(seat);
+                          setSeatHoverTooltip(seat);
+                          const rect = event.currentTarget.getBoundingClientRect();
+                          setTooltipPosition({
+                            x: rect.left + rect.width / 2,
+                            y: rect.bottom,
+                          });
                         }}
                         onBlur={() => {
-                          setMotionTooltipSeat(null);
+                          setSeatHoverTooltip(null);
                         }}
                         onKeyDown={(event) => handleSeatKeyDown(event, seat)}
                         onClick={(event) => {
@@ -723,15 +727,14 @@ try {
         })}
       </div>
 
-      {motionTooltipSeat && (
+      {seatHoverTooltip && (
         <div
           className="seating-tooltip"
           style={{ left: `${tooltipPosition.x + 12}px`, top: `${tooltipPosition.y + 12}px` }}
-          role="status"
-          aria-live="polite"
+          aria-hidden="true"
         >
-          <div>{getSeatLocationLabel(motionTooltipSeat)}</div>
-          <div>${motionTooltipSeat.price}</div>
+          <div>{getSeatLocationLabel(seatHoverTooltip)}</div>
+          <div>${seatHoverTooltip.price}</div>
         </div>
       )}
 
@@ -877,7 +880,9 @@ try {
                 Seat Assignment ({selectedSeats.length} selected)
               </div>
               {selectedSeats.length === 0 && (
-                <div className="seating-tools-hint">Select seats on the chart to assign a type.</div>
+                <div id="seating-assign-hint" className="seating-tools-hint">
+                  Select seats on the chart to assign a type.
+                </div>
               )}
               <label className="seating-ticket-count-label">
                 Assignment Type
@@ -897,7 +902,7 @@ try {
                 className={`seating-assign-btn ${selectedSeats.length === 0 ? 'seating-assign-btn-disabled' : ''}`}
                 onClick={applyAssignmentType}
                 aria-disabled={selectedSeats.length === 0}
-                title={selectedSeats.length === 0 ? 'Select seat(s) to enable assignment' : `Apply to ${selectedSeats.length} selected seat(s)`}
+                aria-describedby={selectedSeats.length === 0 ? 'seating-assign-hint' : undefined}
               >
                 Apply
               </button>
@@ -925,7 +930,6 @@ try {
                 type="button"
                 onClick={() => setIsLogicOpen((prev) => !prev)}
                 aria-pressed={isLogicOpen}
-                title="Show seat grid logic snippet"
               >
                 <Code2 className="w-4 h-4" />
                 View Logic
@@ -935,7 +939,6 @@ try {
                 type="button"
                 onClick={() => setIsArchitectureOpen((prev) => !prev)}
                 aria-pressed={isArchitectureOpen}
-                title="Show planned centralized-store architecture"
               >
                 <Network className="w-4 h-4" />
                 Planned System Architecture
@@ -945,7 +948,6 @@ try {
                 type="button"
                 onClick={() => setIsDebugMode((prev) => !prev)}
                 aria-pressed={isDebugMode}
-                title="Toggle debug mode"
               >
                 <Bug className="w-4 h-4" />
                 Debug
@@ -964,7 +966,6 @@ try {
             type="button"
             onClick={() => setIsToolsOpen(true)}
             aria-pressed={false}
-            title="Open seating tools"
           >
             <Settings2 className="w-4 h-4" />
             Tools

@@ -11,7 +11,9 @@ export function DirectorPage() {
             ">The Vision</h3>
             <p className="feature-copy">
               For over a decade, I&apos;ve operated at the intersection of robust logic and
-              human-centric design. My approach to technology is much like a director&apos;s
+              human-centric design. As a Senior Engineer and Creative Technologist I build the magic
+              and the mechanics in equal measure. I specialize in turning complex technical constraints
+              into seamless user experiences. My approach to technology is much like a director&apos;s
               approach to a production: every component must have a purpose, every interaction must
               tell a story, and the final experience must be seamless for the audience.
             </p>

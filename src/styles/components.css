@@ -16,6 +16,25 @@
     color: var(--foreground);
     transition: all 0.4s ease;
   }
+  .presenter-credit {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    /* --spotlight alone fails contrast on some themes (e.g. coastal slate on mist). */
+    color: color-mix(in oklab, var(--text-subtle-aa) 72%, var(--spotlight) 28%);
+    margin-bottom: 0.35rem;
+    line-height: 1.25;
+  }
+
+  .main-header-branding {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.125rem;
+    max-width: 100%;
+  }
 
   .app-root { @apply min-h-screen bg-background; }
   .app-main { @apply container mx-auto px-4 py-8 space-y-12; }
@@ -536,7 +555,7 @@
     letter-spacing: 0.06em;
     font-weight: 700;
   }
-  .theater-nav-desktop { @apply hidden lg:flex items-center gap-6; }
+  .theater-nav-desktop { @apply items-center gap-6; }
   .theater-nav-link { @apply text-sm hover:text-spotlight transition-colors relative; }
   .theater-nav-link::after {
     content: "";
@@ -553,18 +572,24 @@
     width: 100%;
   }
   .theater-actions { @apply flex items-center gap-2; }
-  .theater-action-stack-desktop { @apply hidden md:flex md:items-center md:gap-2; }
+  .theater-action-stack-desktop { @apply md:items-center md:gap-2; }
   .theater-icon-btn {
     @apply inline-flex items-center justify-center p-2 hover:bg-spotlight/10 rounded-lg transition-colors;
     line-height: 1;
   }
   .theater-mobile-search-btn {
-    @apply md:hidden inline-flex items-center justify-center p-2 hover:bg-spotlight/10 rounded-lg transition-colors;
+    @apply items-center justify-center p-2 hover:bg-spotlight/10 rounded-lg transition-colors;
     line-height: 1;
   }
   .theater-mobile-menu-btn {
-    @apply lg:hidden inline-flex items-center justify-center p-2 hover:bg-spotlight/10 rounded-lg transition-colors;
+    @apply items-center justify-center p-2 hover:bg-spotlight/10 rounded-lg transition-colors;
     line-height: 1;
+  }
+  @media (min-width: 1024px) {
+    .theater-mobile-menu-btn,
+    .theater-nav-mobile {
+      display: none !important;
+    }
   }
   .theater-icon-btn svg,
   .theater-mobile-search-btn svg,
@@ -596,7 +621,7 @@
     background: color-mix(in oklab, var(--spotlight) 18%, transparent);
     border-color: color-mix(in oklab, var(--foreground) 28%, transparent);
   }
-  .theater-nav-mobile { @apply lg:hidden py-4 space-y-2 border-t border-border; }
+  .theater-nav-mobile { @apply py-4 space-y-2 border-t border-border; }
   .theater-nav-mobile-controls {
     @apply flex items-center justify-end gap-2 px-4 pb-2 mb-2 border-b border-border/70;
   }
@@ -881,6 +906,8 @@
     align-items: center;
     justify-content: center;
     flex: 0 0 auto;
+    color: var(--foreground);
+    overflow: visible;
   }
   .calendar-time-disabled {
     @apply cursor-not-allowed;
@@ -1064,15 +1091,15 @@
     box-shadow: none;
   }
   .seating-seat-available { @apply bg-seat-available hover:bg-seat-available/85 cursor-pointer; filter: saturate(0.92); }
-  .seating-seat-taken { @apply bg-slate-500 cursor-not-allowed opacity-90 grayscale; }
+  .seating-seat-taken { @apply bg-seat-taken cursor-not-allowed opacity-90 grayscale; }
   .seating-seat-vip { @apply bg-seat-vip hover:bg-seat-vip/85 cursor-pointer ring-2 ring-seat-vip/70; }
   .seating-seat-accessible { @apply bg-seat-accessible hover:bg-seat-accessible/85 cursor-pointer; }
   .seating-seat-selected {
     @apply text-white cursor-pointer scale-[1.03];
-    background: var(--selection-accent, var(--velvet));
+    background: var(--seat-selected, var(--selection-accent, var(--velvet)));
     box-shadow:
-      0 0 0 2px var(--seating-selected-ring, color-mix(in oklab, var(--selection-accent, var(--velvet)) 55%, transparent)),
-      0 0 12px var(--seating-selected-glow, color-mix(in oklab, var(--selection-accent, var(--velvet)) 70%, transparent)),
+      0 0 0 2px var(--seating-selected-ring, color-mix(in oklab, var(--seat-selected, var(--selection-accent, var(--velvet))) 55%, transparent)),
+      0 0 12px var(--seating-selected-glow, color-mix(in oklab, var(--seat-selected, var(--selection-accent, var(--velvet))) 70%, transparent)),
       inset 0 0 0 1px var(--seating-selected-inset, color-mix(in oklab, white 35%, transparent));
     transform: scale(var(--seating-selected-scale, 1.03));
     filter: var(--seating-selected-filter, saturate(1.08));
@@ -1097,15 +1124,15 @@
   .seating-seat-taken .seating-seat-symbol { @apply line-through; }
   /* Ensure global theme button rules never flatten seat states. */
   .seating-seat-btn.seating-seat-available { background-color: var(--seat-available); border-color: transparent; }
-  .seating-seat-btn.seating-seat-taken { background-color: #64748b; border-color: transparent; }
+  .seating-seat-btn.seating-seat-taken { background-color: var(--seat-taken); border-color: transparent; }
   .seating-seat-btn.seating-seat-vip {
     background-color: var(--seat-vip);
     border: 0;
   }
   .seating-seat-btn.seating-seat-accessible { background-color: var(--seat-accessible); border-color: transparent; }
   .seating-seat-btn.seating-seat-selected {
-    background-color: var(--selection-accent, var(--velvet));
-    border-color: color-mix(in oklab, var(--selection-accent, var(--velvet)) 70%, transparent);
+    background-color: var(--seat-selected, var(--selection-accent, var(--velvet)));
+    border-color: color-mix(in oklab, var(--seat-selected, var(--selection-accent, var(--velvet))) 70%, transparent);
   }
   .seating-legend { @apply flex items-center justify-center gap-6 pt-4 border-t border-spotlight/20; }
   .seating-legend-item { @apply flex items-center gap-2; }

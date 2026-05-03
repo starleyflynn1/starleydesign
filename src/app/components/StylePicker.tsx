@@ -76,6 +76,7 @@ export function StylePicker({ onThemeSelected, onOpenChange, onEscape }: StylePi
           type="button"
           className="style-picker-trigger"
           aria-label="Select theme"
+          title="Select theme"
           aria-haspopup="menu"
           aria-expanded={isOpen}
           aria-controls="style-picker-menu"

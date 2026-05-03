@@ -65,6 +65,14 @@
   background-image: 
     radial-gradient(var(--border) 1px, transparent 1px);
   background-size: 24px 24px;
+
+  /* Seating inventory — green / blue / amber VIP vs crimson selected (was VIP≈selected) */
+  --seat-available: #15803d;
+  --seat-taken: #64748b;
+  --seat-vip: #c9a227;
+  --seat-selected: #991b1b;
+  --seat-accessible: #0369a1;
+  --seat-vip-symbol-color: #0f172a;
 }
 
 /* ============================================================
@@ -113,7 +121,7 @@
 
 /* Keep VIP seat emphasis warm, not blueprint-blue */
 .theme-blueprint .seating-seat-vip {
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--safety-orange) 45%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--seat-vip) 50%, transparent);
 }
 
 
@@ -140,7 +148,7 @@
 }
 
 /* --- Buttons --- */
-.theme-blueprint :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.usher-action-btn):not(.usher-close-btn)) {
+.theme-blueprint :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn)) {
   background: transparent;
   color: var(--blueprint-blue);
   border: 2px solid var(--blueprint-blue);
@@ -151,7 +159,7 @@
   position: relative;
 }
 
-.theme-blueprint :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.usher-action-btn):not(.usher-close-btn):hover) {
+.theme-blueprint :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn):hover) {
   background: var(--blueprint-blue);
   color: #ffffff;
 }
@@ -199,6 +207,14 @@
   --script-modal-close-hover-bg: color-mix(in oklab, #38bdf8 24%, #0f172a 76%);
   --script-modal-close-hover-fg: #f8fafc;
   --script-modal-close-hover-border: color-mix(in oklab, #7dd3fc 56%, transparent);
+
+  /* Seating inventory — deeper fills so white glyphs ≥4.5:1; VIP ≠ sky accessible */
+  --seat-available: #15803d;
+  --seat-selected: #cd0b0b;
+  --seat-taken: #64748b;
+  --seat-vip: #d4af37;
+  --seat-accessible: #0369a1;
+  --seat-vip-symbol-color: #0f172a;
 }
 
 /* ============================================================

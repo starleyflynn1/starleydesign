@@ -127,7 +127,7 @@ export function BackstagePage() {
         </p>
         <div className="feature-grid">
           <article className="feature-item">
-            <h4 className="spotlight-text">Motion Pause (WCAG 2.1)</h4>
+            <h4 className="spotlight-text">Motion Pause (WCAG 2.2)</h4>
             <p className="feature-copy">
               A global override that respects the <code>prefers-reduced-motion</code> media query while
               providing a manual toggle. This stills the stage, stopping all ambient mist
@@ -155,8 +155,8 @@ export function BackstagePage() {
           <article className="feature-item">
             <h4 className="spotlight-text">Fluid Reflow & Touch Targets</h4>
             <p className="feature-copy">
-            The system is engineered for <code>400% zoom</code> compatibility, ensuring the layout 
-            reflows without loss of functionality. Interactive elements like the calendar and 
+            The system is engineered for <code>400% zoom</code> compatibility, orchestrating a layout 
+            that reflows gracefully without loss of functionality. Interactive elements like the calendar and 
             seating chart maintain a minimum <code>44px</code> tap target, supporting users with limited fine 
             motor control across all device scales.
             </p>

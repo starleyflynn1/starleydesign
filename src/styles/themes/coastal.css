@@ -20,7 +20,13 @@
   --primary-foreground: #ffffff;
   --velvet: var(--sea-glass);
   --selection-accent: var(--velvet);
-  --seat-available: #5e8a4f;
+  --seat-available: #2d7a72;
+  /* Coral-burgundy: teal complement (red-orange family), not purple */
+  --seat-selected: #9b2d42;
+  --seat-taken: #64748b;
+  --seat-vip: #c9a227;
+  --seat-accessible: #1d6fa8;
+  --seat-vip-symbol-color: #0f172a;
   --spotlight: #94a3b8;
   --card: rgba(255, 255, 255, 0.7);
   --border: rgba(71, 85, 105, 0.1);
@@ -106,7 +112,13 @@
   --calendar-time-disabled-hover-bg: var(--calendar-time-disabled-bg);
   --calendar-time-disabled-hover-border: var(--calendar-time-disabled-border);
   --calendar-time-disabled-hover-fg: #effbff;
-  --seat-available: #7aa25f;
+  /* Dark house: deeper mint / amber / blue so white seat marks stay legible */
+  --seat-available: #0f766e;
+  --seat-selected: #c24141;
+  --seat-taken: #64748b;
+  --seat-vip: #b8860b;
+  --seat-accessible: #0369a1;
+  --seat-vip-symbol-color: #0f172a;
   --border: rgba(255, 255, 255, 0.08);
   --text-muted-aa: #d7e4f2;
   --text-subtle-aa: #bfd4e8;
@@ -230,7 +242,7 @@
 }
 
 /* --- Buttons --- */
-.theme-coastal :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.usher-action-btn):not(.usher-close-btn)) {
+.theme-coastal :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn)) {
   font-family: 'Outfit', sans-serif;
   font-weight: 500;
   border-radius: var(--radius);
@@ -243,7 +255,7 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.theme-coastal :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.usher-action-btn):not(.usher-close-btn):hover) {
+.theme-coastal :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn):hover) {
   transform: translateY(-3px);
   filter: brightness(1.05);
   box-shadow: 0 12px 25px -5px rgba(13, 148, 136, 0.4);

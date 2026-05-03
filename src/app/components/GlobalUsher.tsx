@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Search, Theater, MapPin, Grid3X3, Calendar, User, CreditCard, Settings, X } from 'lucide-react';
 
@@ -31,18 +31,38 @@ const mockActions: Action[] = [
 
 export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
   const [query, setQuery] = useState('');
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedActionId, setSelectedActionId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  const filteredActions = query
-    ? mockActions.filter(
-        (action) =>
-          action.title.toLowerCase().includes(query.toLowerCase()) ||
-          action.category.toLowerCase().includes(query.toLowerCase())
-      )
-    : mockActions;
+  const filteredActions = useMemo(
+    () => (query
+      ? mockActions.filter(
+          (action) =>
+            action.title.toLowerCase().includes(query.toLowerCase()) ||
+            action.category.toLowerCase().includes(query.toLowerCase())
+        )
+      : mockActions),
+    [query]
+  );
 
+  /** Preserve filter order while grouping for display (Object.entries order ≠ flat list order). */
+  const groupedFilteredActions = useMemo(() => {
+    const order: string[] = [];
+    const map = new Map<string, Action[]>();
+    for (const action of filteredActions) {
+      if (!map.has(action.category)) {
+        map.set(action.category, []);
+        order.push(action.category);
+      }
+      map.get(action.category)!.push(action);
+    }
+    return order.map((category) => [category, map.get(category)!] as const);
+  }, [filteredActions]);
+  const orderedActions = useMemo(
+    () => groupedFilteredActions.flatMap(([, actions]) => actions),
+    [groupedFilteredActions]
+  );
   useEffect(() => {
     if (isOpen && inputRef.current) {
       inputRef.current.focus();
@@ -50,22 +70,53 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
   }, [isOpen]);
 
   useEffect(() => {
-    setSelectedIndex(0);
-  }, [query]);
+    setSelectedActionId(orderedActions[0]?.id ?? null);
+  }, [query, orderedActions]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  useEffect(() => {
+    if (!isOpen) return;
+    const panel = panelRef.current;
+    if (!panel) return;
+    if (!selectedActionId) return;
+    const activeAction = panel.querySelector<HTMLElement>(`[data-usher-id="${selectedActionId}"]`);
+    activeAction?.scrollIntoView({ block: 'nearest' });
+  }, [isOpen, selectedActionId]);
+
+  const moveSelection = (delta: number) => {
+    const len = orderedActions.length;
+    if (len === 0) return;
+    const currentIndex = selectedActionId
+      ? orderedActions.findIndex((action) => action.id === selectedActionId)
+      : -1;
+    const baseIndex = currentIndex >= 0 ? currentIndex : 0;
+    const nextIndex = (baseIndex + delta + len) % len;
+    setSelectedActionId(orderedActions[nextIndex].id);
+  };
+
+  const confirmSelection = () => {
+    const action = orderedActions.find((candidate) => candidate.id === selectedActionId)
+      ?? orderedActions[0];
+    if (!action) return;
+    onSelect(action);
+    onClose();
+  };
+
+  const handleListKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedIndex((i) => (i + 1) % filteredActions.length);
+      moveSelection(1);
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setSelectedIndex((i) => (i - 1 + filteredActions.length) % filteredActions.length);
+      moveSelection(-1);
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      setSelectedActionId(orderedActions[0]?.id ?? null);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      setSelectedActionId(orderedActions[orderedActions.length - 1]?.id ?? null);
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      if (filteredActions[selectedIndex]) {
-        onSelect(filteredActions[selectedIndex]);
-        onClose();
-      }
+      confirmSelection();
     } else if (e.key === 'Escape') {
       e.preventDefault();
       onClose();
@@ -131,6 +182,18 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
               boxShadow: '0 0 40px rgba(212, 175, 55, 0.3), 0 20px 50px rgba(0, 0, 0, 0.5)',
             }}
             onClick={(e) => e.stopPropagation()}
+            onKeyDownCapture={(e) => {
+              if (
+                e.key === 'ArrowDown' ||
+                e.key === 'ArrowUp' ||
+                e.key === 'Enter' ||
+                e.key === 'Escape' ||
+                e.key === 'Home' ||
+                e.key === 'End'
+              ) {
+                handleListKeyDown(e);
+              }
+            }}
             onKeyDown={trapFocus}
             role="dialog"
             aria-modal="true"
@@ -145,7 +208,6 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
                   placeholder="Search shows, venues, or your account..."
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  onKeyDown={handleKeyDown}
                   className="usher-input"
                 />
                 <button
@@ -165,35 +227,30 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
                 </div>
               ) : (
                 <div className="usher-group-list">
-                  {Object.entries(
-                    filteredActions.reduce((acc, action) => {
-                      if (!acc[action.category]) acc[action.category] = [];
-                      acc[action.category].push(action);
-                      return acc;
-                    }, {} as Record<string, Action[]>)
-                  ).map(([category, actions]) => (
+                  {groupedFilteredActions.map(([category, actions]) => (
                     <div key={category}>
                       <div className="usher-group-label">
                         {category}
                       </div>
                       {actions.map((action) => {
-                        const globalIndex = filteredActions.indexOf(action);
-                        const isSelected = globalIndex === selectedIndex;
+                        const isSelected = action.id === selectedActionId;
                         const Icon = action.icon;
 
                         return (
                           <button
                             key={action.id}
+                            type="button"
                             onClick={() => {
                               onSelect(action);
                               onClose();
                             }}
-                            onMouseEnter={() => setSelectedIndex(globalIndex)}
+                            onFocus={() => setSelectedActionId(action.id)}
                             className={`usher-action-btn ${
                               isSelected
                                 ? 'usher-action-selected'
                                 : 'usher-action-hover'
                             }`}
+                            data-usher-id={action.id}
                             style={
                               isSelected
                                 ? {

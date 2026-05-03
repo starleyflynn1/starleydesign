@@ -15,10 +15,12 @@
   --intermission-gray: #2d2d3a;
 
   /* Semantic Theater Colors */
-  --seat-available: #3a8f5f;
+  --seat-available: #2f6b48;
   --seat-taken: #6b6b7b;
+  /* Classic metallic gold; VIP “V” uses dark ink (not white on gold) */
   --seat-vip: #d4af37;
-  --seat-accessible: #4a90e2;
+  --seat-vip-symbol-color: #111827;
+  --seat-accessible: #1d4ed8;
   --stage-hero-gold: color-mix(in oklab, var(--spotlight) 74%, #f4d58a 26%);
 
   /* Base Tokens */

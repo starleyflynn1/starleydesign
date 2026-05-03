@@ -1,4 +1,5 @@
 import React from 'react';
+import { flushSync } from 'react-dom';
 import { Suspense, lazy, useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { TheaterHeader } from './components/TheaterHeader';
@@ -485,13 +486,15 @@ export default function App() {
             onSelect={(action) => {
               if (bookingShowTitles.has(action.title)) {
                 runUsherSpotlightTransition(() => {
-                  setBookingShowOverride(action.title);
-                  setBookingStep(1);
-                  setCurrentView('booking');
                   if (typeof window !== 'undefined') {
                     const bookingUrl = `/?bookingCategory=${encodeURIComponent(
                       BOOKING_SHOWS_CATEGORY
                     )}&bookingShow=${encodeURIComponent(action.title)}#booking-flow`;
+                    flushSync(() => {
+                      setBookingShowOverride(action.title);
+                      setBookingStep(1);
+                      setCurrentView('booking');
+                    });
                     window.history.replaceState(null, '', bookingUrl);
                     requestAnimationFrame(() => {
                       document.getElementById('booking-flow')?.scrollIntoView({
@@ -499,6 +502,10 @@ export default function App() {
                         block: 'start',
                       });
                     });
+                  } else {
+                    setBookingShowOverride(action.title);
+                    setBookingStep(1);
+                    setCurrentView('booking');
                   }
                 });
                 return;
@@ -508,17 +515,18 @@ export default function App() {
               if (destination && destination.startsWith('/#')) {
                 runUsherSpotlightTransition(() => {
                   const hash = destination.slice(1);
-                  if (hash === '#seating-chart' || hash === '#seating') {
-                    setCurrentView('seating');
-                  } else if (hash === '#booking-flow' || hash === '#booking') {
-                    setCurrentView('booking');
-                  } else if (hash === '#calendar') {
-                    setCurrentView('calendar');
-                  } else {
-                    setCurrentView('home');
-                  }
-
                   if (typeof window !== 'undefined') {
+                    flushSync(() => {
+                      if (hash === '#seating-chart' || hash === '#seating') {
+                        setCurrentView('seating');
+                      } else if (hash === '#booking-flow' || hash === '#booking') {
+                        setCurrentView('booking');
+                      } else if (hash === '#calendar') {
+                        setCurrentView('calendar');
+                      } else {
+                        setCurrentView('home');
+                      }
+                    });
                     window.history.replaceState(null, '', destination);
                     requestAnimationFrame(() => {
                       const target =
@@ -531,6 +539,16 @@ export default function App() {
                         block: 'start',
                       });
                     });
+                  } else {
+                    if (hash === '#seating-chart' || hash === '#seating') {
+                      setCurrentView('seating');
+                    } else if (hash === '#booking-flow' || hash === '#booking') {
+                      setCurrentView('booking');
+                    } else if (hash === '#calendar') {
+                      setCurrentView('calendar');
+                    } else {
+                      setCurrentView('home');
+                    }
                   }
                 });
               } else if (destination) {

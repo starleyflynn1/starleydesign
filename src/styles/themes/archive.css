@@ -52,8 +52,8 @@
   --seating-accent-fg: var(--seating-control-fg);
   --seating-accent-hover-bg: var(--seating-control-hover-bg);
   --seating-accent-hover-fg: var(--seating-control-hover-fg);
-  --seating-selected-ring: color-mix(in oklab, var(--velvet) 60%, transparent);
-  --seating-selected-glow: color-mix(in oklab, var(--velvet) 48%, transparent);
+  --seating-selected-ring: color-mix(in oklab, var(--seat-selected) 60%, transparent);
+  --seating-selected-glow: color-mix(in oklab, var(--seat-selected) 48%, transparent);
   --seating-selected-inset: color-mix(in oklab, #fff8e8 38%, transparent);
   --seating-focused-ring: color-mix(in oklab, var(--stage-base) 84%, white 16%);
   --seating-focused-offset: color-mix(in oklab, var(--spotlight) 48%, transparent);
@@ -73,6 +73,15 @@
   --script-modal-close-hover-fg: #1a1410;
   --script-modal-close-hover-border: #7c2d12;
 
+  /* Seating inventory — archive paper / ink palette, WCAG-friendly fills */
+  --seat-available: #2f6b48;
+  --seat-taken: #78716c;
+  --seat-vip: #b8860b;
+  --seat-accessible: #1d4ed8;
+  --seat-vip-symbol-color: #0f172a;
+  /* Chart selection: chromatic rust, higher chroma than --velvet; ≥7:1 vs white, vs paper */
+  --seat-selected: #a8160c;
+
   /* --- Global Theme Physics --- */
   font-family: "Playfair Display", serif;
   --radius: 0px; 
@@ -89,7 +98,7 @@
 }
 
 /* --- The Archive Button --- */
-.theme-archive :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.usher-action-btn):not(.usher-close-btn)) {
+.theme-archive :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn)) {
   font-family: 'Playfair Display', serif;
   text-transform: uppercase;
   border: 4px double var(--stage-base);
@@ -99,7 +108,7 @@
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.theme-archive :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.usher-action-btn):not(.usher-close-btn):hover) {
+.theme-archive :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn):hover) {
   background: var(--stage-base);
   color: var(--marquee-surface);
   transform: translateY(-2px);
@@ -200,8 +209,8 @@
   --seating-accent-fg: var(--seating-control-fg);
   --seating-accent-hover-bg: var(--seating-control-hover-bg);
   --seating-accent-hover-fg: var(--seating-control-hover-fg);
-  --seating-selected-ring: color-mix(in oklab, var(--velvet) 62%, transparent);
-  --seating-selected-glow: color-mix(in oklab, var(--velvet) 72%, transparent);
+  --seating-selected-ring: color-mix(in oklab, var(--seat-selected) 62%, transparent);
+  --seating-selected-glow: color-mix(in oklab, var(--seat-selected) 72%, transparent);
   --seating-selected-inset: color-mix(in oklab, #ffffff 24%, transparent);
   --seating-focused-ring: color-mix(in oklab, var(--foreground) 86%, white 14%);
   --seating-focused-offset: color-mix(in oklab, var(--spotlight) 42%, transparent);
@@ -359,6 +368,15 @@
   --script-modal-close-hover-bg: #6a3c33;
   --script-modal-close-hover-fg: #ffffff;
   --script-modal-close-hover-border: #fca5a5;
+
+  /* Seating inventory — darker fills for white symbols; accessible blue not pastel sky */
+  --seat-available: #2f6b48;
+  --seat-taken: #78716c;
+  --seat-vip: #c9a227;
+  --seat-accessible: #0369a1;
+  --seat-vip-symbol-color: #0f172a;
+  /* Chart selection: saturated warm red (seats only); --velvet stays light for broader UI */
+  --seat-selected: #cc2d2d;
 }
 
 /* ============================================================

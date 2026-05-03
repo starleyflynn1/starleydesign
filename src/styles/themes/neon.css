@@ -18,6 +18,7 @@
   --accent: var(--neon-magenta);
   --velvet: var(--neon-magenta);
   --selection-accent: var(--velvet);
+  --seat-selected: #be185d;
   --segment-active-bg: var(--neon-magenta);
   --segment-active-fg: #ffffff;
   --border: rgba(219, 39, 119, 0.2);
@@ -43,8 +44,8 @@
   --seating-accent-fg: var(--foreground);
   --seating-accent-hover-bg: color-mix(in oklab, var(--primary) 32%, var(--background) 68%);
   --seating-accent-hover-fg: #ffffff;
-  --seating-selected-ring: color-mix(in oklab, var(--primary) 72%, transparent);
-  --seating-selected-glow: color-mix(in oklab, var(--primary) 62%, transparent);
+  --seating-selected-ring: color-mix(in oklab, var(--seat-selected) 72%, transparent);
+  --seating-selected-glow: color-mix(in oklab, var(--seat-selected) 62%, transparent);
   --seating-selected-inset: color-mix(in oklab, #ffffff 36%, transparent);
   --btn-disabled-bg: color-mix(in oklab, var(--background) 86%, #4b5563 14%);
   --btn-disabled-border: color-mix(in oklab, var(--primary) 22%, #6b7280 78%);
@@ -58,6 +59,14 @@
   --script-modal-close-hover-bg: color-mix(in oklab, #db2777 18%, #ffffff 82%);
   --script-modal-close-hover-fg: #1b1025;
   --script-modal-close-hover-border: color-mix(in oklab, #db2777 48%, #6b7280 52%);
+
+  /* Seating inventory — vaporwave: green / cyan / indigo vs magenta selection */
+  --seat-available: #0f766e;
+  --seat-taken: #71717a;
+  /* Amber VIP: distinct from teal available (was cyan #0891b2 ≈ same hue family) */
+  --seat-vip: #c9a227;
+  --seat-accessible: #4338ca;
+  --seat-vip-symbol-color: #0f172a;
 
   /* --- Global Physics --- */
   font-family: 'Space Grotesk', sans-serif;
@@ -104,8 +113,8 @@
   --seating-accent-fg: var(--foreground);
   --seating-accent-hover-bg: color-mix(in oklab, var(--primary) 32%, var(--background) 68%);
   --seating-accent-hover-fg: #ffffff;
-  --seating-selected-ring: color-mix(in oklab, #ff4fb1 78%, transparent);
-  --seating-selected-glow: color-mix(in oklab, #ff2f9b 72%, transparent);
+  --seating-selected-ring: color-mix(in oklab, var(--seat-selected) 78%, transparent);
+  --seating-selected-glow: color-mix(in oklab, var(--seat-selected) 72%, transparent);
   --seating-selected-inset: color-mix(in oklab, #ffffff 28%, transparent);
   --btn-disabled-bg: color-mix(in oklab, #12131c 80%, #d9e0ea 20%);
   --btn-disabled-border: color-mix(in oklab, #d9e0ea 30%, transparent);
@@ -119,6 +128,14 @@
   --script-modal-close-hover-bg: color-mix(in oklab, #ff007f 28%, #1c1125 72%);
   --script-modal-close-hover-fg: #ffffff;
   --script-modal-close-hover-border: color-mix(in oklab, #ff7ac2 58%, transparent);
+
+  /* OLED: darker fills for white dots; VIP warm vs cyan access; selected deep magenta */
+  --seat-available: #047857;
+  --seat-taken: #64748b;
+  --seat-vip: #ca8a04;
+  --seat-accessible: #4f46e5;
+  --seat-vip-symbol-color: #0f172a;
+  --seat-selected: #be185d;
   
   --card: rgba(20, 20, 28, 0.9);
   --border: rgba(255, 0, 127, 0.3);
@@ -215,7 +232,7 @@
 }
 
 /* --- Buttons --- */
-.theme-neon :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.usher-action-btn):not(.usher-close-btn)) {
+.theme-neon :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn)) {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 500;
   text-transform: uppercase;
@@ -230,7 +247,7 @@
   overflow: hidden;
 }
 
-.theme-neon :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.usher-action-btn):not(.usher-close-btn):hover) {
+.theme-neon :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn):hover) {
   border-color: var(--primary);
   box-shadow: 0 0 20px rgba(255, 0, 127, 0.3);
   transform: translateY(-2px);
