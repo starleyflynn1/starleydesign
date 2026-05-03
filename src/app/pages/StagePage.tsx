@@ -323,7 +323,12 @@ export function StagePage({
       target.removeEventListener('gesturechange', handleGestureChange as EventListener);
     };
   }, [isMobileViewport]);
-  const handleComponentTabChange = (view: 'booking' | 'seating' | 'calendar') => {
+  const handleComponentTabChange = (
+    view: 'booking' | 'seating' | 'calendar', 
+    e?: React.MouseEvent // Add the event parameter
+  ) => {
+    if (e) e.preventDefault(); // Stop the scroll-to-top behavior
+  
     if (currentView === 'booking' && view !== 'booking' && confirmExitNavigation) {
       const destination = view === 'seating' ? '/#seating' : '/#calendar';
       if (!confirmExitNavigation(destination)) return;

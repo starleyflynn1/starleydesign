@@ -248,7 +248,7 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
               <p className="script-tech-copy">
                 By using a <strong>Sparse Override Map</strong> for status changes and a <strong>Roving Tabindex</strong> for accessibility, the
                 system maintains constant-time lookup for user interactions. This &quot;Backstage&quot; logic ensures that even as the
-                house grows to thousands of seats, the UI remains fluid, achieving a <strong>100/100 Lighthouse performance score</strong>{' '}
+                house grows to thousands of seats, the UI remains fluid, achieving a <strong>95+ Lighthouse performance score</strong>{' '}
                 by minimizing React re-renders and DOM thrashing.
               </p>
               <div className="script-tech-code-row">

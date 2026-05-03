@@ -626,8 +626,7 @@ export default function App() {
               <div className="footer-brand">
                 <TheaterIcon className="icon-md-velvet" />
                 <p className="footer-copy">
-                  <span className="footer-copy-lead">© 2026 </span>
-                  <strong className="footer-brand-name">Starley Flynn</strong>
+                  <span className="footer-copy-lead">© 2026 Starley Flynn</span>
                 </p>
               </div>
               <div className="footer-links">

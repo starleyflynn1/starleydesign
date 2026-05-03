@@ -15,6 +15,7 @@
     -webkit-text-fill-color: transparent;
     color: var(--foreground);
     transition: all 0.4s ease;
+    pointer-events: none;
   }
   .presenter-credit {
     display: block;

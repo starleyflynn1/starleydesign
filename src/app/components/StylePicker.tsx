@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React,{ useEffect, useRef, useState } from 'react';
 import { Palette } from 'lucide-react';
 import { CheckIcon } from './AppIcons';
 import { useTheme } from '../contexts/ThemeContext';
@@ -34,7 +34,7 @@ export function StylePicker({ onThemeSelected, onOpenChange, onEscape }: StylePi
       if (!target) return;
       if (!rootRef.current?.contains(target)) setIsOpen(false);
     };
-    const onEscape = (event: KeyboardEvent) => {
+    const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
         setIsOpen(false);
@@ -57,10 +57,10 @@ export function StylePicker({ onThemeSelected, onOpenChange, onEscape }: StylePi
       }
     };
     window.addEventListener('pointerdown', onPointerDown);
-    window.addEventListener('keydown', onEscape);
+    window.addEventListener('keydown', onKeyDown);
     return () => {
       window.removeEventListener('pointerdown', onPointerDown);
-      window.removeEventListener('keydown', onEscape);
+      window.removeEventListener('keydown',onKeyDown);
       if (previouslyFocused && document.contains(previouslyFocused)) {
         previouslyFocused.focus();
       } else {
