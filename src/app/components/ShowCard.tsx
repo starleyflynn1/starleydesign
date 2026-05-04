@@ -96,7 +96,8 @@ export function ShowCard({
           <div className="show-card-meta-row show-card-meta-primary">
             <CalendarIcon className="show-card-icon-sm" />
             <span className="show-card-meta-value">{date}</span>
-            <span className="show-card-meta-divider" aria-hidden="true"></span>
+          </div>
+          <div className="show-card-meta-row">
             <span className="show-card-meta-value">{scope}</span>
           </div>
           <div className="show-card-meta-row">

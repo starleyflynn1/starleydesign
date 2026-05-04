@@ -117,12 +117,6 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
   return (
     <>
       <main className="app-main backstage-page">
-        <section id="script" className="component-panel section-stack">
-          <h2 className="section-title">Script</h2>
-          <p className="hero-description">
-            Project documentation and technical references.
-          </p>
-        </section>
         <section id="technical-documentation" className="component-panel section-stack script-tech-section">
           <div className="script-tech-header">
             <h3 className="section-title">The Designed Stage</h3>
