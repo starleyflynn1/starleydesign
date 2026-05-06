@@ -1,4 +1,12 @@
-import React, { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from 'react';
 import { Accessibility, Bug, Code2, Copy, Network, Settings2, X } from 'lucide-react';
 
 type SeatStatus = 'available' | 'unavailable' | 'vip' | 'accessible' | 'selected';
@@ -34,13 +42,6 @@ const seatColors = {
   accessible: 'seating-seat-accessible',
   selected: 'seating-seat-selected',
 };
-
-/** Defer geometry reads until after the next paint so they do not run in the same turn as layout-invalidating writes (forced reflow). */
-function runAfterNextPaint(run: () => void) {
-  requestAnimationFrame(() => {
-    requestAnimationFrame(run);
-  });
-}
 
 const DEFAULT_SECTION_TYPES: { left: SectionType; center: SectionType; right: SectionType } = {
   left: 'mixed',
@@ -105,10 +106,15 @@ export function SeatingChart({
   const [isMobileViewport, setIsMobileViewport] = useState(() =>
     typeof window !== 'undefined' ? window.matchMedia('(max-width: 768px)').matches : false
   );
-  const [isFitOverview, setIsFitOverview] = useState(() =>
-    typeof window !== 'undefined' ? window.matchMedia('(max-width: 768px)').matches : false
-  );
+  /** Scaled “whole theater” preview; only used when {@link needsHorizontalScroll} is true unless user chose seat mode. */
+  const [isFitOverview, setIsFitOverview] = useState(false);
+  const [needsHorizontalScroll, setNeedsHorizontalScroll] = useState(false);
+  /** After “Select Seats”, keep interactive mode until layout resets or “View Entire Theater”. */
+  const userChoseSeatSelectionRef = useRef(false);
+  const houseScrollRef = useRef<HTMLDivElement | null>(null);
   const [fitScale, setFitScale] = useState(1);
+  /** Unscaled house size; used with {@link fitScale} to size a clip box so the overview does not leave a full-height layout gap. */
+  const [overviewDims, setOverviewDims] = useState<{ w: number; h: number } | null>(null);
   const recalcFitScaleRef = useRef<() => void>(() => {});
   const ticketCount = controlledTicketCount ?? ticketCountState;
   const updateTicketCount = (count: number) => {
@@ -190,61 +196,195 @@ export function SeatingChart({
     if (typeof window === 'undefined') return;
     const mediaQuery = window.matchMedia('(max-width: 768px)');
     const handleChange = () => {
-      const mobile = mediaQuery.matches;
-      setIsMobileViewport(mobile);
-      if (mobile) setIsFitOverview(true);
-      else {
-        setIsFitOverview(false);
-        setFitScale(1);
-      }
+      setIsMobileViewport(mediaQuery.matches);
     };
     handleChange();
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
-  useEffect(() => {
-    if (!isMobileViewport || !isFitOverview) {
+  const measureHouseOverflow = useCallback(() => {
+    const scrollEl = houseScrollRef.current;
+    const track = fitContentRef.current;
+    if (!scrollEl || !track) return;
+    const needs = track.scrollWidth > scrollEl.clientWidth + 2;
+    setNeedsHorizontalScroll(needs);
+    if (!needs) {
+      setIsFitOverview(false);
       setFitScale(1);
+      return;
+    }
+    // Booking embed (`compactMode`): keep 1:1 + horizontal scroll in the narrow booking column.
+    //
+    // Main Seating (tickets/suggest in chart sidebar): auto-open overview on load so the whole
+    // theater is visible; `recalc` uses viewport width + width-first scaling so it stays readable.
+    if (compactMode) {
+      setIsFitOverview(false);
+      setFitScale(1);
+      return;
+    }
+    if (!userChoseSeatSelectionRef.current) {
+      setIsFitOverview(true);
+    }
+  }, [compactMode]);
+
+  useLayoutEffect(() => {
+    measureHouseOverflow();
+  }, [
+    measureHouseOverflow,
+    rowCount,
+    seatsPerRow,
+    compactMode,
+    hideTools,
+    hideQuickControls,
+    hideSummary,
+    isToolsOpen,
+    generatedSeats.length,
+  ]);
+
+  useEffect(() => {
+    userChoseSeatSelectionRef.current = false;
+  }, [rowCount, seatsPerRow, compactMode]);
+
+  useLayoutEffect(() => {
+    if (typeof ResizeObserver === 'undefined') return;
+    const scrollEl = houseScrollRef.current;
+    const track = fitContentRef.current;
+    if (!scrollEl || !track) return;
+
+    const ro = new ResizeObserver(() => {
+      measureHouseOverflow();
+    });
+    ro.observe(scrollEl);
+    ro.observe(track);
+    window.addEventListener('resize', measureHouseOverflow);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', measureHouseOverflow);
+    };
+  }, [
+    measureHouseOverflow,
+    rowCount,
+    seatsPerRow,
+    compactMode,
+    hideTools,
+    hideQuickControls,
+    hideSummary,
+    isToolsOpen,
+  ]);
+
+  useEffect(() => {
+    if (!isFitOverview) {
+      setFitScale(1);
+      setOverviewDims(null);
       return;
     }
 
     const recalc = () => {
       const viewport = fitViewportRef.current;
       const content = fitContentRef.current;
-      if (!viewport || !content) return;
-      const availableWidth = Math.max(0, viewport.clientWidth - 8);
-      const stageTopbar = content.querySelector('.seating-stage-topbar') as HTMLElement | null;
-      const grid = content.querySelector('.seating-grid') as HTMLElement | null;
-      const legend = content.querySelector('.seating-legend') as HTMLElement | null;
-      const contentWidth = Math.max(
-        content.scrollWidth,
-        stageTopbar?.scrollWidth ?? 0,
-        grid?.scrollWidth ?? 0,
-        legend?.scrollWidth ?? 0
+      const house = houseScrollRef.current;
+      if (!viewport || !content || !house) return;
+
+      const cw = content.offsetWidth;
+      const ch = content.offsetHeight;
+      if (!cw || !ch) {
+        return;
+      }
+
+      const houseRect = house.getBoundingClientRect();
+      const viewportRect = viewport.getBoundingClientRect();
+      const quickInSidebar = !hideQuickControls && !hideSummary;
+
+      /**
+       * Width budget: use the fit viewport column width. Do not max with `house.clientWidth` after the
+       * overview clip applies — the house shrinks with scale and would retrigger ResizeObserver with a
+       * smaller width, causing a post-paint “shrink” loop.
+       */
+      const padX = quickInSidebar ? 16 : 12;
+      const viewportW = Math.max(0, Math.floor(viewportRect.width) - padX);
+      /**
+       * Sidebar overview uses width from the fit column only. On the first frame after lazy mount /
+       * `isFitOverview` toggles, `viewportRect.width` can still be 0 — that produced `sx ≈ 0` and a
+       * clamped scale of 0.12 (“tiny stage”). Skip until the column has a real width.
+       */
+      if (quickInSidebar && viewportRect.width < 4) {
+        return;
+      }
+      let availableWidth = viewportW;
+      if (quickInSidebar) {
+        /** Prefer the chart split column rect — more stable than the inner fit viewport right after a tab switch / defer mount. */
+        const chartColumn =
+          house.closest('.seating-chart-body') ?? house.closest('.seating-main-column');
+        if (chartColumn instanceof HTMLElement) {
+          const colW = Math.max(0, Math.floor(chartColumn.getBoundingClientRect().width) - padX - 8);
+          availableWidth = Math.max(viewportW, colW);
+        }
+      } else {
+        availableWidth = Math.max(viewportW, Math.max(0, house.clientWidth - 8));
+      }
+
+      const houseTop = houseRect.top;
+      const heightFromWindow = window.innerHeight - houseTop - 20;
+      let maxByViewport = Math.max(160, heightFromWindow);
+      if (compactMode) {
+        const host = house.closest('.booking-seat-main');
+        if (host instanceof HTMLElement) {
+          const hostBottom = Math.min(window.innerHeight - 16, host.getBoundingClientRect().bottom);
+          maxByViewport = Math.max(160, hostBottom - houseTop - 12);
+        }
+      } else if (quickInSidebar) {
+        /** Panel bottom can collapse when inner content shrinks; keep a window-based floor so scale stays stable. */
+        const panelBottom = Math.min(window.innerHeight - 12, viewportRect.bottom);
+        const heightFromPanel = panelBottom - houseTop - 10;
+        /**
+         * After navigating from Booking → Seating, `houseTop` / panel rects can leave a tiny “remaining”
+         * height even while the overview panel still has lots of empty space — that over-shrinks the map.
+         */
+        const minVerticalBudget = Math.min(window.innerHeight * 0.58, Math.max(300, window.innerHeight - 120));
+        maxByViewport = Math.max(minVerticalBudget, 220, heightFromWindow, heightFromPanel);
+      }
+      const maxByVh = window.innerHeight * 0.78;
+      const availableHeight = Math.max(
+        quickInSidebar ? 200 : 120,
+        Math.min(maxByViewport, maxByVh)
       );
-      if (!contentWidth || !availableWidth) {
-        setFitScale(1);
+
+      const sx = availableWidth / cw;
+      const sy = availableHeight / ch;
+      let next: number;
+      if (quickInSidebar) {
+        /** Fill the chart column width first (same box as the theater panel); shrink only if the scaled house would exceed the panel height. */
+        next = Math.min(1, sx * 0.98);
+        const scaledH = ch * next;
+        if (scaledH > availableHeight) {
+          next = Math.min(next, (availableHeight / ch) * 0.98);
+        }
+      } else {
+        next = Math.min(sx, sy) * 0.98;
+      }
+      if (!Number.isFinite(next) || next <= 0) {
         return;
       }
-      // Keep a little horizontal breathing room so content stays visually
-      // inside the card edge on narrow mobile viewports.
-      const fittedScale = (availableWidth / contentWidth) * 0.95;
-      const next = Math.max(0.62, Math.min(0.95, fittedScale));
-      if (!Number.isFinite(next)) {
-        setFitScale(1);
-        return;
-      }
-      setFitScale((prev) => (Math.abs(prev - next) < 0.002 ? prev : next));
+      /** Sidebar “whole theater” overview: avoid postage-stamp scale on desktop; embed / non-sidebar keep a lower floor. */
+      const minOverviewScale = quickInSidebar ? 0.32 : 0.12;
+      const clamped = Math.max(minOverviewScale, Math.min(1, next));
+      setOverviewDims({ w: cw, h: ch });
+      setFitScale((prev) => (Math.abs(prev - clamped) < 0.002 ? prev : clamped));
     };
     recalcFitScaleRef.current = recalc;
 
-    let chainRaf = 0;
+    /**
+     * Two animation frames before measuring: one frame is often too early after overview opens or the
+     * chart chunk hydrates (column width / rects not final). ResizeObserver was removed to avoid
+     * feedback loops; this stays a fixed, bounded deferral — not continuous re-measurement.
+     */
+    let rafId = 0;
     const scheduleRecalc = () => {
-      cancelAnimationFrame(chainRaf);
-      chainRaf = requestAnimationFrame(() => {
-        chainRaf = requestAnimationFrame(() => {
-          chainRaf = 0;
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        rafId = requestAnimationFrame(() => {
+          rafId = 0;
           recalc();
         });
       });
@@ -252,52 +392,26 @@ export function SeatingChart({
 
     scheduleRecalc();
     window.addEventListener('resize', scheduleRecalc);
+    const vv = typeof window !== 'undefined' ? window.visualViewport : null;
+    if (vv) {
+      vv.addEventListener('resize', scheduleRecalc);
+    }
     return () => {
-      cancelAnimationFrame(chainRaf);
+      cancelAnimationFrame(rafId);
       window.removeEventListener('resize', scheduleRecalc);
+      vv?.removeEventListener('resize', scheduleRecalc);
     };
-  }, [isMobileViewport, isFitOverview, rowCount, seatsPerRow, compactMode, sectionTypes]);
+  }, [isFitOverview, rowCount, seatsPerRow, compactMode, sectionTypes, hideQuickControls, hideSummary]);
   useEffect(() => {
-    if (!isMobileViewport || !isFitOverview) return;
-    if (typeof ResizeObserver === 'undefined') return;
-    const viewport = fitViewportRef.current;
-    const content = fitContentRef.current;
-    if (!viewport || !content) return;
-
-    let chainRaf = 0;
-    const scheduleRecalc = () => {
-      cancelAnimationFrame(chainRaf);
-      chainRaf = requestAnimationFrame(() => {
-        chainRaf = requestAnimationFrame(() => {
-          chainRaf = 0;
-          recalcFitScaleRef.current();
-        });
-      });
-    };
-
-    const observer = new ResizeObserver(() => {
-      scheduleRecalc();
-    });
-    observer.observe(viewport);
-    return () => {
-      cancelAnimationFrame(chainRaf);
-      observer.disconnect();
-    };
-  }, [isMobileViewport, isFitOverview]);
-  useEffect(() => {
-    if (!isMobileViewport || !isFitOverview) return;
-    runAfterNextPaint(() => {
-      recalcFitScaleRef.current();
-    });
-  }, [isMobileViewport, isFitOverview, rowCount, seatsPerRow, sectionTypes]);
-  useEffect(() => {
-    if (!isMobileViewport || !isFitOverview) return;
+    if (!isFitOverview) return;
     const raf = requestAnimationFrame(() => {
+      const scrollEl = houseScrollRef.current;
       const viewport = fitViewportRef.current;
+      if (scrollEl) scrollEl.scrollLeft = 0;
       if (viewport) viewport.scrollLeft = 0;
     });
     return () => cancelAnimationFrame(raf);
-  }, [isMobileViewport, isFitOverview]);
+  }, [isFitOverview]);
 
   useEffect(() => {
     setSelectedSeats((prev) => {
@@ -372,18 +486,6 @@ export function SeatingChart({
     const second = Math.min(seatsPerRow - 2, Math.floor((seatsPerRow * 2) / 3));
     return first === second ? [first] : [first, second];
   }, [seatsPerRow]);
-  const stageWidthPx = useMemo(() => {
-    const stageStartSeat = 2;
-    const stageEndSeat = Math.max(stageStartSeat, seatsPerRow - 1);
-    const seatCount = stageEndSeat - stageStartSeat + 1;
-    const seatSizePx = compactMode ? 26 : 32;
-    const seatGapPx = compactMode ? 6 : 8;
-    const aisleWidthPx = compactMode ? 24 : 32;
-    const aisleCount = aisleBreaks.filter((breakSeat) => breakSeat >= stageStartSeat && breakSeat < stageEndSeat).length;
-
-    return seatCount * seatSizePx + (seatCount - 1) * seatGapPx + aisleCount * aisleWidthPx;
-  }, [seatsPerRow, aisleBreaks, compactMode]);
-
   const getSeatLocationLabel = (seat: Seat) => `Row ${seat.row}, Seat ${seat.number}`;
 
   const findSuggestedSeatIds = (count: number): string[] => {
@@ -626,20 +728,34 @@ try {
     nextSeatButton?.focus();
   };
 
+  /** Right column beside seat rows (summary or Tools): aligns tops with row A; same horizontal inset as Tools-open. */
+  const showSeatingSidePanel =
+    (!hideTools && isToolsOpen) || (!hideSummary && !isToolsOpen);
+
+  /** Booking-style: tickets + suggest + reset live in the same card as selected seats (no duplicate bar above the chart). */
+  const combinedBookingSidebar = !hideQuickControls && !hideSummary;
+
+  const selectedTotalFormatted = selectedSeats
+    .reduce((sum, seat) => sum + (seat.price || 0), 0)
+    .toFixed(2);
+
   return (
     <div
-      className={`seating-root ${compactMode ? 'seating-root-compact' : ''} ${!hideTools && isToolsOpen ? 'seating-root-tools-open' : ''}`}
+      className={`seating-root ${compactMode ? 'seating-root-compact' : ''}`}
       onMouseUp={() => setIsDragSelecting(false)}
       onMouseLeave={() => setIsDragSelecting(false)}
     >
       <div className="seating-main-column">
-      {isMobileViewport && isFitOverview && (
+      {isFitOverview && needsHorizontalScroll && (
         <div className="seating-fit-banner" role="status" aria-live="polite">
           <span>Theater formatted to fit your screen.</span>
           <button
             type="button"
             className="seating-fit-primary-btn"
-            onClick={() => setIsFitOverview(false)}
+            onClick={() => {
+              userChoseSeatSelectionRef.current = true;
+              setIsFitOverview(false);
+            }}
           >
             Select Seats
           </button>
@@ -648,47 +764,114 @@ try {
       <div
         ref={fitViewportRef}
         className={`seating-fit-viewport ${
-          isMobileViewport && isFitOverview
-            ? 'seating-fit-viewport-overview'
-            : isMobileViewport
-            ? 'seating-fit-viewport-scroll'
-            : ''
-        }`}
+          isFitOverview ? 'seating-fit-viewport-overview' : ''
+        } ${!isFitOverview ? 'seating-fit-viewport--house-scroll' : ''}`}
       >
-      <div
-        ref={fitContentRef}
-        className="seating-fit-content"
-        style={
-          isMobileViewport && isFitOverview
-            ? {
-                transform: `scale(${fitScale})`,
-                transformOrigin: 'top center',
-                pointerEvents: 'none',
-              }
-            : undefined
-        }
-      >
-      <div className="seating-stage-wrap">
-        {!hideTools && !isToolsOpen && (
-          <div className="seating-tools-row">
+      {!isFitOverview && needsHorizontalScroll && (
+        <div className="seating-fit-actions">
+          <button
+            type="button"
+            className="seating-fit-secondary-btn"
+            onClick={() => {
+              userChoseSeatSelectionRef.current = false;
+              setIsFitOverview(true);
+            }}
+          >
+            View Entire Theater
+          </button>
+        </div>
+      )}
+      {!combinedBookingSidebar && !hideQuickControls && (
+        <div className="seating-controls">
+          <div className="seating-controls-quick">
+            <div className="seating-controls-tickets-tools-row">
+              <label className="seating-ticket-count-label seating-controls-tickets-field">
+                Tickets
+                <select
+                  value={ticketCount}
+                  onChange={(event) => updateTicketCount(Number(event.target.value))}
+                  className="seating-ticket-count-select"
+                >
+                  {[1, 2, 3, 4, 5, 6].map((count) => (
+                    <option key={count} value={count}>
+                      {count}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {!hideTools && !isToolsOpen && (
+                <button
+                  className="seating-tools-btn seating-controls-tools-inline"
+                  type="button"
+                  onClick={() => setIsToolsOpen(true)}
+                  aria-pressed={false}
+                >
+                  <Settings2 className="seating-tools-btn-icon" aria-hidden />
+                  Tools
+                </button>
+              )}
+            </div>
             <button
-              className="seating-tools-btn seating-tools-btn-desktop"
+              className={`seating-suggest-btn show-card-btn ${isSuggesting ? 'seating-suggest-btn-loading' : ''}`}
               type="button"
-              onClick={() => setIsToolsOpen(true)}
-              aria-pressed={false}
+              onClick={handleSuggestBest}
+              disabled={isSuggesting}
             >
-              <Settings2 className="w-4 h-4" />
-              Tools
+              {isSuggesting ? 'Calculating...' : 'Suggest Best Seats'}
+            </button>
+            <button className="seating-reset-btn" type="button" onClick={resetAssignments}>
+              Reset
             </button>
           </div>
-        )}
-        <div className="seating-stage-topbar">
-          <div className="seating-stage" style={{ width: `${stageWidthPx}px` }}>
-            <span className="seating-stage-label">Stage</span>
-          </div>
         </div>
-      </div>
+      )}
+      <div
+        className={`seating-chart-body ${showSeatingSidePanel ? 'seating-chart-body--split' : ''}`}
+      >
+        <div
+          ref={houseScrollRef}
+          className={`seating-house-scroll ${
+            isFitOverview ? 'seating-house-scroll--overview' : ''
+          }`}
+        >
+          <div
+            className="seating-overview-clip"
+            style={
+              isFitOverview && overviewDims
+                ? {
+                    width: overviewDims.w * fitScale,
+                    height: overviewDims.h * fitScale,
+                    overflow: 'hidden',
+                    marginLeft: 'auto',
+                    marginRight: 'auto',
+                    maxWidth: '100%',
+                    boxSizing: 'border-box',
+                  }
+                : { display: 'contents' }
+            }
+          >
+          <div
+            ref={fitContentRef}
+            className="seating-house-track seating-fit-content"
+            style={
+              isFitOverview
+                ? {
+                    transform: `scale(${fitScale})`,
+                    transformOrigin: 'top left',
+                    pointerEvents: 'none',
+                  }
+                : undefined
+            }
+          >
+            <div className="seating-stage-wrap">
+              <div className="seating-stage-topbar">
+                <div className="seating-stage seating-stage--house-width">
+                  <span className="seating-stage-label">Stage</span>
+                </div>
+              </div>
+            </div>
 
+            <div className="seating-grid-legend-column">
       <p id="seating-grid-help" className="sr-only">
         Seating chart keyboard controls: use arrow keys to move between seats, and press Enter or Space to select a seat.
       </p>
@@ -826,23 +1009,116 @@ try {
           <span className="seating-legend-label">Selected</span>
         </div>
       </div>
-      </div>
-      </div>
-      {isMobileViewport && !isFitOverview && (
-        <div className="seating-fit-actions">
-          <button
-            type="button"
-            className="seating-fit-secondary-btn"
-            onClick={() => setIsFitOverview(true)}
-          >
-            View Entire Theater
-          </button>
+            </div>
+          </div>
+          </div>
         </div>
-      )}
-      </div>
 
-      {!hideTools && (
-      <div className={`seating-tools-sidebar ${isToolsOpen ? 'seating-tools-sidebar-open' : 'seating-tools-sidebar-closed'}`}>
+      {!hideSummary && !isToolsOpen && (
+        <aside
+          className={`seating-chart-side-panel ${combinedBookingSidebar ? 'booking-seat-sidebar' : 'seating-summary-sidebar'}`}
+          aria-label={combinedBookingSidebar ? 'Tickets and selected seats' : 'Selected seats summary'}
+        >
+          {combinedBookingSidebar ? (
+            <>
+              <div className="booking-seat-sidebar-controls">
+                <div className="booking-seat-sidebar-tickets-tools-row">
+                  <label className="seating-ticket-count-label booking-seat-sidebar-tickets-field">
+                    Tickets
+                    <select
+                      value={ticketCount}
+                      onChange={(event) => updateTicketCount(Number(event.target.value))}
+                      className="seating-ticket-count-select booking-seat-ticket-select"
+                    >
+                      {[1, 2, 3, 4, 5, 6].map((count) => (
+                        <option key={count} value={count}>
+                          {count}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  {!hideTools && (
+                    <button
+                      className="seating-tools-btn seating-sidebar-tools-btn"
+                      type="button"
+                      onClick={() => setIsToolsOpen(true)}
+                      aria-pressed={false}
+                    >
+                      <Settings2 className="seating-tools-btn-icon" aria-hidden />
+                      Tools
+                    </button>
+                  )}
+                </div>
+                <button
+                  className={`seating-suggest-btn show-card-btn booking-seat-sidebar-btn ${isSuggesting ? 'seating-suggest-btn-loading' : ''}`}
+                  type="button"
+                  onClick={handleSuggestBest}
+                  disabled={isSuggesting}
+                >
+                  {isSuggesting ? 'Calculating...' : 'Suggest Best Seats'}
+                </button>
+                <button
+                  className="seating-reset-btn booking-seat-sidebar-btn booking-seat-sidebar-reset"
+                  type="button"
+                  onClick={resetAssignments}
+                >
+                  Reset
+                </button>
+              </div>
+              <div className="booking-seat-sidebar-output">
+                <div className="booking-seat-sidebar-title">Selected Seats</div>
+                <div
+                  className={`booking-seat-sidebar-list ${selectedSeats.length > 0 ? 'booking-seat-sidebar-list-selected' : ''}`}
+                >
+                  {selectedSeats.length > 0 ? selectedSeats.map((s) => s.id).join(', ') : 'None selected'}
+                </div>
+                <div className="booking-seat-sidebar-total">
+                  <span>Total</span>
+                  <strong>${selectedTotalFormatted}</strong>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="seating-summary">
+              {selectedSeats.length > 0 ? (
+                <div className="seating-summary-row">
+                  <div>
+                    <div className="seating-summary-label">Selected Seats</div>
+                    <div className="seating-summary-tags">
+                      {selectedSeats.map((seat) => (
+                        <span key={seat.id} className="seating-seat-tag">
+                          {seat.id}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="seating-total-wrap">
+                    <div className="seating-summary-label">Total</div>
+                    <div className="seating-total-value">${selectedTotalFormatted}</div>
+                  </div>
+                </div>
+              ) : (
+                <div className="seating-summary-row seating-summary-row-empty">
+                  <div>
+                    <div className="seating-summary-label">Selected Seats</div>
+                    <p className="seating-summary-empty-hint">None selected</p>
+                  </div>
+                  <div className="seating-total-wrap">
+                    <div className="seating-summary-label">Total</div>
+                    <div className="seating-total-value">${selectedTotalFormatted}</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </aside>
+      )}
+
+      {!hideTools && isToolsOpen && (
+      <div
+        className="seating-tools-sidebar seating-tools-sidebar-open seating-chart-side-panel"
+        style={{ display: 'flex', flexDirection: 'column' }}
+      >
           <div className="seating-tools-header">
             <div className="seating-tools-title">Tools</div>
             <div className="seating-tools-actions">
@@ -1016,69 +1292,9 @@ try {
       </div>
       )}
 
-      {!hideQuickControls && (
-      <div className="seating-controls">
-        {!hideTools && !isToolsOpen && (
-          <button
-            className="seating-tools-btn seating-tools-btn-mobile"
-            type="button"
-            onClick={() => setIsToolsOpen(true)}
-            aria-pressed={false}
-          >
-            <Settings2 className="w-4 h-4" />
-            Tools
-          </button>
-        )}
-        <label className="seating-ticket-count-label">
-          Tickets
-          <select
-            value={ticketCount}
-            onChange={(event) => updateTicketCount(Number(event.target.value))}
-            className="seating-ticket-count-select"
-          >
-            {[1, 2, 3, 4, 5, 6].map((count) => (
-              <option key={count} value={count}>
-                {count}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button
-          className={`seating-suggest-btn ${isSuggesting ? 'seating-suggest-btn-loading' : ''}`}
-          type="button"
-          onClick={handleSuggestBest}
-          disabled={isSuggesting}
-        >
-          {isSuggesting ? 'Calculating...' : 'Suggest Best Seats'}
-        </button>
-        <button className="seating-reset-btn" type="button" onClick={resetAssignments}>
-          Reset
-        </button>
       </div>
-      )}
-
-      {!hideSummary && selectedSeats.length > 0 && (
-        <div className="seating-summary">
-          <div className="seating-summary-row">
-            <div>
-              <div className="seating-summary-label">Selected Seats</div>
-              <div className="seating-summary-tags">
-                {selectedSeats.map((seat) => (
-                  <span key={seat.id} className="seating-seat-tag">
-                    {seat.id}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div className="seating-total-wrap">
-              <div className="seating-summary-label">Total</div>
-              <div className="seating-total-value">
-                ${selectedSeats.reduce((sum, seat) => sum + (seat.price || 0), 0)}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
+      </div>
 
       {isArchitectureOpen && (
         <div

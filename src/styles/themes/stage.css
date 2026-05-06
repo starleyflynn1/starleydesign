@@ -100,6 +100,12 @@
   --spacing-lg: 2rem;
   --spacing-xl: 3rem;
   --spacing-2xl: 4rem;
+
+  /**
+   * Other themes set a document font on `.theme-*`; Stage did not, so body UI fell back to generic system sans.
+   * Use the shared `--font-body` stack (see fonts.css); headings keep `--font-display` via `.section-title` etc.
+   */
+  font-family: var(--font-body);
 }
 
 /* ============================================================

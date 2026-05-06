@@ -122,12 +122,12 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
             <h3 className="section-title">The Designed Stage</h3>
             <p className="hero-description">
               Visual blueprints mapping the sophisticated interaction systems that bring The Designed Stage to life,
-              bridging technical complexity with intuitive <strong>UX</strong>.
+              bridging technical complexity with intuitive UX.
               {' '}
               <a href="/backstage" className="link-button">
-                Step Backstage
+               <strong>Step Backstage</strong> 
               </a>
-              {' '}to explore the underlying <strong>schemas</strong>, environmental <strong>persistence</strong>, and accessibility guardrails of the
+              {' '}to explore the underlying <strong>schemas</strong>, environmental persistence, and <strong>accessibility guardrails </strong> of the
               production.
             </p>
           </div>
@@ -144,15 +144,15 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
                 <strong>The Orchestration Layer</strong>
                 <br />
                 This is the master script that handles three critical cues: <br />
-                <strong>State Consistency</strong>: No seat is spotlighted as "Selected" until the <strong>backend</strong> provides the cue. <br />
-                <strong>Side Effect Management</strong>: Coordinating the complex "backstage" handshakes between <strong>hold requests</strong> and
-                <strong>payment gateways</strong>. <br />
+                <strong>State Consistency</strong>: No seat is spotlighted as "Selected" until the backend provides the cue. <br />
+                <strong>Side Effect Management</strong>: Coordinating the complex "backstage" handshakes between hold requests and{' '}
+                payment gateways. <br />
                 <strong>Conflict Resolution</strong>: Acting as the arbiter if two patrons attempt to claim the same seat simultaneously.
               </p>
               <p className="script-tech-copy">
                 <strong>The Box Office Lease (Temporary Holds)</strong>
                 <br />
-                Inventory is protected by treating seat selection as a <strong>Lease Pattern</strong>. <br />
+                Inventory is protected by treating seat selection as a Lease Pattern. <br />
                 <strong>Optimistic UI</strong>: To keep the performance fluid, the store updates the seat to "Pending" the moment a
                 patron clicks. <br />
                 <strong>Countdown to Curtains</strong>: The store manages a high-integrity <strong>TTL</strong> (<strong>Time-to-Live</strong>) buffer. It syncs a
@@ -164,7 +164,7 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
                 <br />
                 A live performance requires everyone to see the same house. Utilizing <strong>WebSockets</strong> or <strong>SSE</strong>, the store
                 ensures inventory is a live reflection of reality. When a seat is claimed, every active session
-                receives an "Inventory Update" to recalibrate. This prevents the "broken fourth wall" of a patron reaching <strong>checkout</strong> only to find their seat was taken
+                receives an "Inventory Update" to recalibrate. This prevents the "broken fourth wall" of a patron reaching checkout only to find their seat was taken
                 minutes ago.
               </p>
               <p className="script-tech-copy">
@@ -203,8 +203,8 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
               <p className="script-tech-copy">
                 <strong>Ensemble Blocking &amp; Aisle Cues</strong>
                 <br />
-                Only fully contiguous windows are cast. Groups that cross a configured <strong>aisle break</strong> receive a heavy
-                &quot;blocking penalty,&quot; as the algorithm prioritizes keeping the party together in a single, uninterrupted row.
+                Only fully contiguous windows are cast. Groups that cross a configured aisle break receive a heavy
+                blocking penalty, as the algorithm prioritizes keeping the party together in a single, uninterrupted row.
               </p>
               <p className="script-tech-copy">
                 <strong>Managing the House Balance</strong>
@@ -216,7 +216,7 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
               <p className="script-tech-copy">
                 <strong>Auto-Selection</strong>
                 <br />
-                The highest-scoring group is spotlighted as the primary suggestion. This ensures a fast-paced &quot;Opening Night&quot;
+                The highest-scoring group is spotlighted as the primary suggestion. This ensures a fast-paced Opening Night
                 experience, balancing immersive sightline quality with the logistical needs of a live house.
               </p>
               <div className="script-tech-code-row">
@@ -263,7 +263,7 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
               <h4 className="spotlight-text">Interactive Debug Snapshot</h4>
               <p className="script-tech-copy">
                 Built-in developer diagnostics provide real-time visibility into <strong>seat logic</strong> and <strong>ticket constraints</strong>.
-                This transparency bridges the gap between design and engineering, facilitating seamless <strong>QA</strong>, clear demo
+                This transparency bridges the gap between design and engineering, facilitating seamless <strong>quality assurance</strong>, clear demo
                 narration, and deep-dive architecture walkthroughs.
               </p>
               <div className="script-tech-code-row">
@@ -443,8 +443,8 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
             <article className="script-tech-card">
               <h4 className="spotlight-text">Requirement Discovery and Product Alignment</h4>
               <p className="script-tech-copy">
-                Work starts with a clearly defined problem statement and shared success metrics. I partner with <strong>PMs</strong>,
-                <strong>UX</strong>, and domain stakeholders to align on user outcomes, edge cases, and <strong>non-functional constraints</strong> so
+                Work starts with a clearly defined problem statement and shared success metrics. I partner with PMs, UX, and
+                domain stakeholders to align on user outcomes, edge cases, and <strong>non-functional constraints</strong> so
                 implementation scope and <strong>Definition of Done</strong> remain explicit from day one.
               </p>
             </article>
@@ -471,7 +471,7 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
               <h4 className="spotlight-text">Layered Test Cycle</h4>
               <p className="script-tech-copy">
                 Validation follows a layered strategy: <strong>unit tests</strong> for core logic, <strong>integration tests</strong> for service
-                boundaries, and <strong>end-to-end</strong> checks for real user journeys. Pre-release confidence is reinforced in
+                boundaries, and <strong>end-to-end</strong> checks for real user journeys. Pre-release confidence is reinforced in{' '}
                 <strong>staging</strong> and <strong>canary</strong> environments using production-like configuration patterns.
               </p>
             </article>
@@ -489,7 +489,7 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
               <h4 className="spotlight-text">Observability and Post-Launch Learning</h4>
               <p className="script-tech-copy">
                 After release, ownership shifts to operational visibility and continuous improvement. <strong>Dashboards</strong>,
-                <strong>alerting</strong>, and <strong>incident review loops</strong> feed directly into backlog refinement so each cycle improves system
+                <strong> alerting</strong>, and <strong>incident review loops</strong> feed directly into backlog refinement so each cycle improves system
                 resilience, developer velocity, and user trust.
               </p>
             </article>

@@ -41,8 +41,8 @@ export function BackstagePage() {
             <h4 className="spotlight-text feature-card-title">Optimistic UI &amp; Resilience</h4>
             <p className="feature-copy">
               Engineered for zero-latency, the interface reflects audience actions
-              instantaneously. The implementation supports robust <strong>rollback semantics</strong> 
-              and <strong>optimistic hold/release logic</strong> for asynchronous <strong>API</strong> conflicts.
+              instantaneously. The implementation supports robust <strong>rollback semantics</strong> and <strong>optimistic hold/release logic</strong> for
+              asynchronous <strong>API</strong> conflicts.
             </p>
           </article>
         </div>
@@ -59,7 +59,7 @@ export function BackstagePage() {
           <article className="feature-item">
             <h4 className="spotlight-text feature-card-title">CSS Variable Architecture</h4>
             <p className="feature-copy">
-            The system leverages a <strong>token-based</strong> approach where atmospheric modes are defined by <strong>semantic tokens</strong> 
+            The system leverages a <strong>token-based</strong> approach where atmospheric modes are defined by <strong>semantic tokens</strong>{' '}
              rather than static hex codes. This strategy eliminates CSS bloat and reduces technical debt
             through a modular framework designed for system-wide <strong>re-skinning</strong>.
             </p>
@@ -67,7 +67,7 @@ export function BackstagePage() {
           <article className="feature-item">
             <h4 className="spotlight-text feature-card-title">Persistence &amp; Middleware</h4>
             <p className="feature-copy">
-              Designed to support <strong>persistence middleware</strong> layers, the current implementation uses 
+              Designed to support <strong>persistence middleware</strong> layers, the current implementation uses{' '}
               <strong>localStorage</strong> and custom <strong>state synchronization hooks</strong> to ensure the user&apos;s
               preferred lighting and motion preference persist.
             </p>

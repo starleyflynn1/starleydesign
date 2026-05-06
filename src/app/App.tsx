@@ -1,6 +1,6 @@
 import React from 'react';
-import { flushSync } from 'react-dom';
-import { Suspense, lazy, useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { flushSync, createPortal } from 'react-dom';
+import { Suspense, lazy, useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } from 'react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { TheaterHeader } from './components/TheaterHeader';
 import { TheaterIcon } from './components/AppIcons';
@@ -28,6 +28,8 @@ export default function App() {
   const [exitDialogAnchorTop, setExitDialogAnchorTop] = useState<number | null>(null);
   const [performances, setPerformances] = useState<Performance[]>([]);
   const isPageTransitioningRef = useRef(false);
+  /** Snapshot scroll when exit confirmation opens — restore in layout effect to avoid jump from scroll lock. */
+  const exitDialogScrollYRef = useRef(0);
   const resumeUrl = '/Starley-F-Resume.pdf';
 
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
@@ -76,6 +78,10 @@ export default function App() {
 
     const syncViewWithHash = () => {
       const hash = window.location.hash;
+      if (hash === '#stage') {
+        setCurrentView('home');
+        return;
+      }
       if (hash === '#seating-chart' || hash === '#seating') {
         setCurrentView('seating');
         return;
@@ -125,43 +131,140 @@ export default function App() {
   const bookingShowTitles = useMemo(() => new Set(BOOKING_SHOWS.map((show) => show.title)), []);
   const isBookingFlowActive = currentPage === 'home' && currentView === 'booking';
   const hideFooterForBooking = currentPage === 'home' && currentView === 'booking';
-  const exitBookingFlow = useCallback((href?: string | null, shouldScrollToStage = true) => {
-    setBookingStep(1);
-    setBookingShowOverride(undefined);
+  const runUsherSpotlightTransition = useCallback((navigate: () => void) => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      navigate();
+      return;
+    }
 
-    if (typeof window === 'undefined') return;
-    if (!href || href === '/#stage') {
-      setCurrentView('home');
-      window.history.replaceState(null, '', '/#stage');
-      if (shouldScrollToStage) {
-        requestAnimationFrame(() => {
-          document.getElementById('stage')?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-          });
-        });
+    const reduceMotionSetting = localStorage.getItem('theater-reduce-motion') === 'true';
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotionSetting || prefersReducedMotion) {
+      navigate();
+      return;
+    }
+
+    const overlay = document.createElement('div');
+    const originX = Math.round(window.innerWidth / 2);
+    const originY = Math.round(window.innerHeight * 0.2);
+    const radius = Math.hypot(Math.max(originX, window.innerWidth - originX), Math.max(originY, window.innerHeight - originY));
+    overlay.style.position = 'fixed';
+    overlay.style.inset = '0';
+    overlay.style.pointerEvents = 'none';
+    overlay.style.zIndex = '9999';
+    overlay.style.background = `radial-gradient(circle at ${originX}px ${originY}px, color-mix(in oklab, var(--spotlight) 34%, transparent) 0%, color-mix(in oklab, var(--spotlight) 14%, transparent) 42%, transparent 70%)`;
+    overlay.style.clipPath = `circle(0px at ${originX}px ${originY}px)`;
+    overlay.style.opacity = '0.92';
+    document.body.appendChild(overlay);
+
+    const reveal = overlay.animate(
+      [
+        { clipPath: `circle(0px at ${originX}px ${originY}px)`, opacity: 0.98, filter: 'blur(3.6px) saturate(1.12) brightness(1.08)' },
+        {
+          clipPath: `circle(${Math.round(radius * 0.28)}px at ${originX}px ${originY}px)`,
+          opacity: 0.93,
+          filter: 'blur(2.8px) saturate(1.1) brightness(1.06)',
+          offset: 0.24,
+        },
+        {
+          clipPath: `circle(${Math.round(radius * 0.78)}px at ${originX}px ${originY}px)`,
+          opacity: 0.76,
+          filter: 'blur(1.5px) saturate(1.05) brightness(1.03)',
+          offset: 0.62,
+        },
+        { clipPath: `circle(${Math.round(radius * 1.28)}px at ${originX}px ${originY}px)`, opacity: 0, filter: 'blur(0px) saturate(1) brightness(1)' },
+      ],
+      {
+        duration: 2400,
+        easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+        fill: 'forwards',
       }
-      return;
-    }
-    if (href.includes('#seating')) {
-      setCurrentView('seating');
-      window.history.replaceState(null, '', '/#seating');
-      return;
-    }
-    if (href.includes('#calendar')) {
-      setCurrentView('calendar');
-      window.history.replaceState(null, '', '/#calendar');
-      return;
-    }
-    setCurrentView('home');
-    window.location.assign(href);
+    );
+
+    window.setTimeout(() => {
+      navigate();
+    }, 420);
+
+    reveal.finished
+      .catch(() => undefined)
+      .finally(() => {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      });
   }, []);
+
+  const exitBookingFlow = useCallback(
+    (href?: string | null) => {
+      const execute = () => {
+        setBookingStep(1);
+        setBookingShowOverride(undefined);
+
+        if (typeof window === 'undefined') return;
+        if (!href || href === '/#stage') {
+          /** Keep viewport position: URL #stage + layout updates can trigger anchor scroll or scroll anchoring. */
+          const prevScrollY = window.scrollY;
+          setCurrentView('home');
+          window.history.replaceState(null, '', '/#stage');
+          const restoreScroll = () => {
+            window.scrollTo({ top: prevScrollY, left: 0, behavior: 'auto' });
+          };
+          queueMicrotask(restoreScroll);
+          requestAnimationFrame(() => {
+            restoreScroll();
+            requestAnimationFrame(restoreScroll);
+          });
+          return;
+        }
+        if (href.includes('#seating')) {
+          flushSync(() => {
+            setCurrentView('seating');
+          });
+          window.history.replaceState(null, '', '/#seating');
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              document.getElementById('booking-flow')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              });
+            });
+          });
+          return;
+        }
+        if (href.includes('#calendar')) {
+          flushSync(() => {
+            setCurrentView('calendar');
+          });
+          window.history.replaceState(null, '', '/#calendar');
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              document.getElementById('booking-flow')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              });
+            });
+          });
+          return;
+        }
+        setCurrentView('home');
+        window.location.assign(href);
+      };
+
+      if (typeof window === 'undefined') {
+        execute();
+        return;
+      }
+      runUsherSpotlightTransition(execute);
+    },
+    [runUsherSpotlightTransition]
+  );
   const confirmExitBooking = useCallback(
     (href: string) => {
       if (!isBookingFlowActive) return true;
       if (bookingStep >= BOOKING_STEPS.length) return true;
       if (href.includes('#booking-flow') || href.includes('#booking')) {
         return true;
+      }
+      if (typeof window !== 'undefined') {
+        exitDialogScrollYRef.current = window.scrollY;
       }
       setPendingExitHref(href);
       setIsExitBookingDialogOpen(true);
@@ -197,7 +300,7 @@ export default function App() {
 
       event.preventDefault();
       if (confirmExitBooking('/#stage')) {
-        exitBookingFlow('/#stage', false);
+        exitBookingFlow('/#stage');
       }
     };
 
@@ -264,79 +367,33 @@ export default function App() {
       window.removeEventListener('resize', updateExitDialogAnchor);
     };
   }, [isExitBookingDialogOpen]);
-  useEffect(() => {
-    if (typeof document === 'undefined') return;
+  useLayoutEffect(() => {
+    if (typeof document === 'undefined' || typeof window === 'undefined') return;
     if (!isExitBookingDialogOpen) return;
 
-    const previousOverflow = document.body.style.overflow;
-    const previousTouchAction = document.body.style.touchAction;
-    document.body.style.overflow = 'hidden';
-    document.body.style.touchAction = 'none';
+    const html = document.documentElement;
+    const body = document.body;
+    const scrollbarWidth = Math.max(0, window.innerWidth - html.clientWidth);
+
+    const previousOverflow = body.style.overflow;
+    const previousTouchAction = body.style.touchAction;
+    const previousPaddingRight = body.style.paddingRight;
+
+    body.style.overflow = 'hidden';
+    body.style.touchAction = 'none';
+    if (scrollbarWidth > 0) {
+      body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+
+    const y = exitDialogScrollYRef.current;
+    window.scrollTo({ top: y, left: 0, behavior: 'auto' });
+
     return () => {
-      document.body.style.overflow = previousOverflow;
-      document.body.style.touchAction = previousTouchAction;
+      body.style.overflow = previousOverflow;
+      body.style.touchAction = previousTouchAction;
+      body.style.paddingRight = previousPaddingRight;
     };
   }, [isExitBookingDialogOpen]);
-  const runUsherSpotlightTransition = useCallback((navigate: () => void) => {
-    if (typeof window === 'undefined' || typeof document === 'undefined') {
-      navigate();
-      return;
-    }
-
-    const reduceMotionSetting = localStorage.getItem('theater-reduce-motion') === 'true';
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduceMotionSetting || prefersReducedMotion) {
-      navigate();
-      return;
-    }
-
-    const overlay = document.createElement('div');
-    const originX = Math.round(window.innerWidth / 2);
-    const originY = Math.round(window.innerHeight * 0.2);
-    const radius = Math.hypot(Math.max(originX, window.innerWidth - originX), Math.max(originY, window.innerHeight - originY));
-    overlay.style.position = 'fixed';
-    overlay.style.inset = '0';
-    overlay.style.pointerEvents = 'none';
-    overlay.style.zIndex = '9999';
-    overlay.style.background = `radial-gradient(circle at ${originX}px ${originY}px, color-mix(in oklab, var(--spotlight) 34%, transparent) 0%, color-mix(in oklab, var(--spotlight) 14%, transparent) 42%, transparent 70%)`;
-    overlay.style.clipPath = `circle(0px at ${originX}px ${originY}px)`;
-    overlay.style.opacity = '0.92';
-    document.body.appendChild(overlay);
-
-    const reveal = overlay.animate(
-      [
-        { clipPath: `circle(0px at ${originX}px ${originY}px)`, opacity: 0.98, filter: 'blur(3.6px) saturate(1.12) brightness(1.08)' },
-        {
-          clipPath: `circle(${Math.round(radius * 0.28)}px at ${originX}px ${originY}px)`,
-          opacity: 0.93,
-          filter: 'blur(2.8px) saturate(1.1) brightness(1.06)',
-          offset: 0.24,
-        },
-        {
-          clipPath: `circle(${Math.round(radius * 0.78)}px at ${originX}px ${originY}px)`,
-          opacity: 0.76,
-          filter: 'blur(1.5px) saturate(1.05) brightness(1.03)',
-          offset: 0.62,
-        },
-        { clipPath: `circle(${Math.round(radius * 1.28)}px at ${originX}px ${originY}px)`, opacity: 0, filter: 'blur(0px) saturate(1) brightness(1)' },
-      ],
-      {
-        duration: 2400,
-        easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
-        fill: 'forwards',
-      }
-    );
-
-    window.setTimeout(() => {
-      navigate();
-    }, 420);
-
-    reveal.finished
-      .catch(() => undefined)
-      .finally(() => {
-        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-      });
-  }, []);
 
   const runThemeMatchedPageTransition = useCallback((destination: string) => {
     if (typeof window === 'undefined' || typeof document === 'undefined') {
@@ -439,9 +496,26 @@ export default function App() {
       const currentPath = normalizePath(window.location.pathname);
       if (!isAppPagePath(targetPath)) return;
       if (targetPath === currentPath) {
-        if (url.hash === '#stage' && !isExitBookingDialogOpen) {
+        if (url.hash === '#stage') {
           document.body.style.overflow = '';
           document.body.style.touchAction = '';
+          if (isExitBookingDialogOpen) {
+            event.preventDefault();
+            return;
+          }
+          /**
+           * Same-path links do not run confirmExitBooking below; without preventDefault the browser
+           * performs the default hash navigation and scrolls to #stage (often smoothly).
+           */
+          if (isBookingFlowActive) {
+            if (!confirmExitBooking('/#stage')) {
+              event.preventDefault();
+              return;
+            }
+            event.preventDefault();
+            exitBookingFlow('/#stage');
+            return;
+          }
         }
         return;
       }
@@ -458,7 +532,13 @@ export default function App() {
 
     document.addEventListener('click', handleDocumentClick, true);
     return () => document.removeEventListener('click', handleDocumentClick, true);
-  }, [confirmExitBooking, isExitBookingDialogOpen, runThemeMatchedPageTransition]);
+  }, [
+    confirmExitBooking,
+    exitBookingFlow,
+    isBookingFlowActive,
+    isExitBookingDialogOpen,
+    runThemeMatchedPageTransition,
+  ]);
 
   return (
     <ThemeProvider>
@@ -477,12 +557,12 @@ export default function App() {
                     const bookingUrl = `/?bookingCategory=${encodeURIComponent(
                       BOOKING_SHOWS_CATEGORY
                     )}&bookingShow=${encodeURIComponent(action.title)}#booking-flow`;
+                    window.history.replaceState(null, '', bookingUrl);
                     flushSync(() => {
                       setBookingShowOverride(action.title);
                       setBookingStep(1);
                       setCurrentView('booking');
                     });
-                    window.history.replaceState(null, '', bookingUrl);
                     requestAnimationFrame(() => {
                       document.getElementById('booking-flow')?.scrollIntoView({
                         behavior: 'smooth',
@@ -503,6 +583,7 @@ export default function App() {
                 runUsherSpotlightTransition(() => {
                   const hash = destination.slice(1);
                   if (typeof window !== 'undefined') {
+                    window.history.replaceState(null, '', destination);
                     flushSync(() => {
                       if (hash === '#seating-chart' || hash === '#seating') {
                         setCurrentView('seating');
@@ -514,13 +595,12 @@ export default function App() {
                         setCurrentView('home');
                       }
                     });
-                    window.history.replaceState(null, '', destination);
                     requestAnimationFrame(() => {
-                      const target =
-                        document.querySelector(hash) ??
-                        (hash === '#seating-chart' || hash === '#seating' || hash === '#calendar'
-                          ? document.getElementById('booking-flow')
-                          : null);
+                      const usePanelTop =
+                        hash === '#seating-chart' || hash === '#seating' || hash === '#calendar';
+                      const target = usePanelTop
+                        ? document.getElementById('booking-flow')
+                        : document.querySelector(hash);
                       target?.scrollIntoView({
                         behavior: 'smooth',
                         block: 'start',
@@ -549,51 +629,54 @@ export default function App() {
           />
         )}
       </Suspense>
-      {isExitBookingDialogOpen && (
-        <div
-          className="booking-exit-dialog-wrap"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="exit-booking-title"
-        >
-          <button
-            className="booking-exit-dialog-backdrop"
-            type="button"
-            aria-label="Close exit booking dialog"
-            onClick={handleCancelExitBooking}
-          />
+      {typeof document !== 'undefined' &&
+        isExitBookingDialogOpen &&
+        createPortal(
           <div
-            className="booking-exit-dialog-card"
-            style={
-              exitDialogAnchorTop !== null
-                ? ({
-                    position: 'fixed',
-                    top: `${exitDialogAnchorTop}px`,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: 'calc(100% - 1.5rem)',
-                    maxWidth: '24rem',
-                  } as React.CSSProperties)
-                : undefined
-            }
+            className="booking-exit-dialog-wrap"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="exit-booking-title"
           >
-            <h2 id="exit-booking-title" className="booking-exit-dialog-title">
-              Exit Booking?
-            </h2>
-            <p className="booking-exit-dialog-copy">
-              Your current booking progress will be cleared.
-            </p>
-            <div className="booking-exit-dialog-actions">
-              <button type="button" className="booking-exit-dialog-btn booking-exit-dialog-btn-secondary" onClick={handleCancelExitBooking}>
-                Stay
-              </button>
-              <button type="button" className="booking-exit-dialog-btn booking-exit-dialog-btn-primary" onClick={handleConfirmExitBooking}>
-                Exit
-              </button>
+            <button
+              className="booking-exit-dialog-backdrop"
+              type="button"
+              aria-label="Close exit booking dialog"
+              onClick={handleCancelExitBooking}
+            />
+            <div
+              className="booking-exit-dialog-card"
+              style={
+                exitDialogAnchorTop !== null
+                  ? ({
+                      position: 'fixed',
+                      top: `${exitDialogAnchorTop}px`,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: 'calc(100% - 1.5rem)',
+                      maxWidth: '24rem',
+                    } as React.CSSProperties)
+                  : undefined
+              }
+            >
+              <h2 id="exit-booking-title" className="booking-exit-dialog-title">
+                Exit Booking?
+              </h2>
+              <p className="booking-exit-dialog-copy">
+                Your current booking progress will be cleared.
+              </p>
+              <div className="booking-exit-dialog-actions">
+                <button type="button" className="booking-exit-dialog-btn booking-exit-dialog-btn-secondary" onClick={handleCancelExitBooking}>
+                  Stay
+                </button>
+                <button type="button" className="booking-exit-dialog-btn booking-exit-dialog-btn-primary" onClick={handleConfirmExitBooking}>
+                  Exit
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
 
       {currentPage === 'home' && (
         <StagePage
@@ -608,6 +691,7 @@ export default function App() {
             (bookingCategoryFromQuery === BOOKING_SHOWS_CATEGORY ? bookingShowFromQuery : undefined)
           }
           confirmExitNavigation={confirmExitBooking}
+          runSpotlightTransition={runUsherSpotlightTransition}
           setCurrentView={setCurrentView}
           setBookingStep={setBookingStep}
         />

@@ -102,7 +102,42 @@
     background: color-mix(in oklab, var(--card) 90%, var(--background) 10%);
     border: 1px solid color-mix(in oklab, var(--foreground) 18%, transparent);
   }
+/* Seating System Specific Architecture */
+.seating-root { @apply flex relative w-full overflow-hidden;}
+.seating-main-column { @apply flex-1 transition-all duration-300 ease-in-out;
+  height: min-content; 
+  padding-bottom: 2rem; /* Define a deliberate, consistent bottom buffer */ }
 
+/* Split chart + sidebar: allow the house column to shrink so horizontal scroll stays inside it. */
+.seating-main-column:has(.seating-chart-body--split) {
+  min-width: 0;
+}
+
+.seating-stage {
+    @apply flex items-center justify-center w-full px-10 py-2.5; 
+    @apply bg-gradient-to-b from-spotlight/40 via-spotlight/18 to-transparent rounded-t-lg border-t-2 border-spotlight/70;
+    box-shadow:
+    0 -6px 20px color-mix(in oklab, var(--spotlight) 35%, transparent),
+    0 0 22px color-mix(in oklab, var(--spotlight) 22%, transparent);
+}
+.seating-grid-container {
+  /* Use grid or flex with a gap instead of margins on individual seats */
+  display: grid;
+  row-gap: 0.5rem; 
+  /* Prevent the container from expanding past its content */
+  align-content: start; 
+}
+
+.seating-seat-selected {
+  @apply text-white cursor-pointer scale-[1.03];
+  background: var(--seat-selected, var(--selection-accent, var(--velvet)));
+  box-shadow:
+    0 0 0 2px var(--seating-selected-ring, color-mix(in oklab, var(--seat-selected, var(--selection-accent, var(--velvet))) 55%, transparent)),
+    0 0 12px var(--seating-selected-glow, color-mix(in oklab, var(--seat-selected, var(--selection-accent, var(--velvet))) 70%, transparent)),
+    inset 0 0 0 1px var(--seating-selected-inset, color-mix(in oklab, white 35%, transparent));
+  transform: scale(var(--seating-selected-scale, 1.03));
+  filter: var(--seating-selected-filter, saturate(1.08));
+}
   /* Avoid content-visibility on main sections: intrinsic-size guesses caused CLS when layout finalized. */
   .component-panel-booking {
     @apply p-4 md:p-5;
@@ -142,6 +177,10 @@
     min-height: 0;
     overflow: hidden;
   }
+  /** Step validation hint sits under the progress stepper (same column as the flow) so the sticky nav stays compact and doesn’t jump-scroll when it appears. */
+  .booking-flow-header {
+    @apply flex flex-col gap-2 shrink-0 w-full;
+  }
   .booking-step-panel { @apply rounded-lg border border-border bg-card p-4 md:p-6; }
   .booking-step-panel-scroll {
     @apply p-4 md:p-4;
@@ -167,12 +206,22 @@
   .booking-step-heading { @apply text-lg font-semibold; }
   .booking-step-copy { @apply text-sm text-muted-foreground; }
   .booking-field-label { @apply block text-sm font-medium text-foreground/90 mb-1; }
-  .booking-show-select,
   .booking-field {
     @apply w-full rounded-md px-3 py-2 text-sm;
     color: var(--foreground);
     background: color-mix(in oklab, var(--card) 90%, var(--background) 10%);
     border: 1px solid color-mix(in oklab, var(--foreground) 22%, transparent);
+  }
+  .booking-show-select {
+    @apply w-full rounded-md px-3 py-2 text-sm;
+    color: var(--foreground);
+    background: #ffffff;
+    border: 1px solid color-mix(in oklab, var(--foreground) 22%, transparent);
+    color-scheme: light;
+  }
+  .dark .booking-show-select {
+    background: color-mix(in oklab, var(--card) 92%, var(--background) 8%);
+    color-scheme: dark;
   }
   .booking-field:disabled { @apply cursor-not-allowed; opacity: 0.85; }
   .booking-field-label,
@@ -267,32 +316,37 @@
     @apply rounded-lg border border-border bg-card p-6 space-y-3;
     height: fit-content;
   }
-  .booking-seat-sidebar-controls { @apply space-y-2 pb-1 border-b border-border/70; }
+  .booking-seat-sidebar-controls { @apply space-y-3 pb-3 border-b border-border/70; }
+  .booking-seat-sidebar-tickets-tools-row {
+    @apply flex items-center justify-between gap-2 w-full min-w-0;
+    min-height: 2.25rem;
+  }
+  /* Label + select stay adjacent; row justify-between floats Tools to the right */
+  .booking-seat-sidebar-tickets-field {
+    @apply inline-flex min-w-0 items-center gap-2 text-sm self-center;
+  }
   .booking-seat-ticket-row {
     @apply flex items-center justify-between;
     margin-bottom: 24px;
   }
   .booking-seat-ticket-select {
-    @apply rounded-md px-3 py-2;
+    @apply rounded-md px-3 py-1.5 text-sm;
     min-width: 88px;
+    min-height: 2rem;
+    box-sizing: border-box;
   }
   .booking-seat-sidebar-btn { @apply w-full; }
-  .booking-seat-sidebar-suggest {
-    @apply font-semibold;
-    background: color-mix(in oklab, var(--selection-accent, var(--velvet)) 90%, black 10%);
-    color: white;
-    border-color: color-mix(in oklab, var(--selection-accent, var(--velvet)) 68%, transparent);
-  }
-  .booking-seat-sidebar-suggest:hover {
-    background: color-mix(in oklab, var(--selection-accent, var(--velvet)) 82%, black 18%);
+  /** Output block (selected seats + total): extra top spacing after controls for a clearer “controls vs output” break. */
+  .booking-seat-sidebar-output {
+    @apply flex flex-col gap-2;
+    padding-top: 1.25rem;
   }
   .booking-seat-sidebar-reset {
-    @apply text-sm;
-    min-height: 34px;
-    padding-top: 0.4rem;
-    padding-bottom: 0.4rem;
+    @apply text-sm rounded-md py-2;
+    min-height: 2.375rem;
     background: transparent;
     border-style: dashed;
+    border-width: 1px;
     border-color: color-mix(in oklab, var(--foreground) 24%, transparent);
     color: color-mix(in oklab, var(--foreground) 80%, transparent);
   }
@@ -300,7 +354,8 @@
     background: color-mix(in oklab, var(--foreground) 8%, transparent);
     color: var(--foreground);
   }
-  .booking-seat-sidebar-title { @apply text-sm font-semibold; }
+  /** Match the “Total” label row (`.booking-seat-sidebar-total` text-sm + foreground). */
+  .booking-seat-sidebar-title { @apply text-sm font-normal text-foreground; }
   .booking-seat-sidebar-list {
     @apply text-sm text-muted-foreground break-words;
     max-height: 4.75rem;
@@ -308,8 +363,7 @@
     padding-right: 0.25rem;
   }
   .booking-seat-sidebar-list-selected {
-    color: var(--foreground);
-    font-weight: 600;
+    @apply font-normal text-foreground;
   }
   .booking-seat-sidebar-total { @apply flex items-center justify-between text-sm; }
   .booking-confetti {
@@ -346,17 +400,25 @@
   }
   @media (min-width: 1024px) {
     .booking-seat-layout {
-      grid-template-columns: fit-content(100%) 280px;
+      /* minmax(0,1fr) lets the chart column shrink so it never intrudes into the sidebar column */
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 300px);
       align-items: start;
-      justify-content: center;
-      column-gap: 0.75rem;
+      justify-content: stretch;
+      width: 100%;
+      column-gap: 1rem;
     }
     .booking-seat-main {
-      width: fit-content;
+      min-width: 0;
+      width: 100%;
       max-width: 100%;
-      justify-self: center;
+      justify-self: stretch;
     }
-    .booking-seat-sidebar { @apply sticky top-20; }
+    .booking-seat-sidebar {
+      @apply sticky top-20;
+      min-width: 0;
+      position: relative;
+      z-index: 2;
+    }
   }
   .booking-nav {
     @apply flex items-center justify-center gap-4;
@@ -380,9 +442,8 @@
     margin-top: 0.1rem;
     margin-bottom: 0;
   }
-  .booking-next-hint-popover {
-    @apply w-full text-center text-xs font-medium rounded-md px-3 py-2;
-    margin-top: 0.35rem;
+  .booking-next-hint-banner {
+    @apply w-full max-w-4xl mx-auto text-center text-xs font-medium rounded-md px-3 py-2;
     color: var(--foreground);
     background: color-mix(in oklab, var(--spotlight) 22%, var(--card) 78%);
     border: 1px solid color-mix(in oklab, var(--spotlight) 48%, transparent);
@@ -1070,6 +1131,8 @@
     width: 100%;
     min-width: 0;
     box-sizing: border-box;
+    position: relative;
+    z-index: 0;
   }
   .seating-fit-viewport-inner {
     min-width: 0;
@@ -1080,16 +1143,38 @@
     min-width: 0;
     box-sizing: border-box;
   }
-  .seating-fit-viewport-scroll {
+  /* Horizontal scroll lives on .seating-house-scroll only — sidebar stays fixed beside it. */
+  .seating-fit-viewport--house-scroll {
+    overflow-x: visible;
+    overflow-y: visible;
+  }
+  .seating-house-scroll {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: visible;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 0.25rem;
+    box-sizing: border-box;
+  }
+  .seating-house-scroll--overview {
+    overflow-x: visible;
+    overflow-y: visible;
+    min-height: 0;
+  }
+  /* Sized by JS to scaled bounds so overview does not reserve pre-transform layout height. */
+  .seating-overview-clip {
+    flex-shrink: 0;
+    box-sizing: border-box;
   }
   .seating-fit-viewport-overview {
     display: flex;
-    justify-content: center;
-    overflow: hidden;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 0.35rem;
+    overflow: visible;
     width: 100%;
     max-width: 100%;
     min-width: 0;
@@ -1103,19 +1188,30 @@
     width: max-content;
     margin: 0 auto;
   }
-  .seating-fit-viewport-scroll .seating-fit-content {
-    margin: 0;
+  .seating-house-scroll .seating-house-track.seating-fit-content {
+    margin-left: 0;
+    margin-right: 0;
   }
   .seating-fit-viewport-overview .seating-grid {
     overflow: visible;
   }
   .seating-fit-banner {
     @apply flex items-center justify-between gap-3 rounded-md px-3 py-2 text-xs;
+    position: relative;
+    z-index: 2;
     border: 1px solid color-mix(in oklab, var(--spotlight) 40%, transparent);
     background: color-mix(in oklab, var(--spotlight) 16%, var(--card) 84%);
     color: var(--foreground);
   }
-  .seating-fit-actions { @apply flex justify-center; }
+  .seating-fit-actions {
+    @apply flex justify-center;
+  }
+  .seating-fit-viewport > .seating-fit-actions {
+    @apply w-full shrink-0;
+    padding-bottom: 0.625rem;
+    position: relative;
+    z-index: 1;
+  }
   .seating-fit-primary-btn,
   .seating-fit-secondary-btn {
     @apply inline-flex items-center justify-center rounded-md px-3 py-2 text-sm font-semibold;
@@ -1135,9 +1231,15 @@
   .seating-fit-secondary-btn:hover {
     background: color-mix(in oklab, var(--foreground) 14%, transparent);
   }
-  .seating-stage-wrap { @apply text-center; }
-  .seating-tools-row { @apply flex justify-end w-full px-2 sm:px-4 pb-2; }
-  .seating-stage-topbar { @apply flex items-center justify-center gap-3 w-full px-2 sm:px-4; }
+  .seating-stage-wrap {
+    @apply text-center;
+    position: relative;
+    z-index: 0;
+  }
+  .seating-tools-row {
+    @apply flex justify-end w-full px-2 sm:px-4 pb-2 relative z-10;
+  }
+  .seating-stage-topbar { @apply flex w-full px-2 sm:px-4; }
   .seating-stage {
     @apply inline-block px-10 py-2.5 bg-gradient-to-b from-spotlight/40 via-spotlight/18 to-transparent rounded-t-lg border-t-2 border-spotlight/70;
     box-shadow:
@@ -1148,7 +1250,12 @@
     @apply text-base uppercase tracking-[0.16em] text-spotlight;
     text-shadow: 0 0 12px color-mix(in oklab, var(--spotlight) 45%, transparent);
   }
-  .seating-grid { @apply space-y-2 overflow-x-auto pb-1; }
+  .seating-stage--house-width {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .seating-grid { @apply space-y-2 pb-1; overflow-x: visible; }
   .seating-row { @apply flex items-center justify-center gap-2; min-width: max-content; }
   .seating-row-label { @apply w-8 text-center text-sm text-spotlight/70; }
   .seating-row-seats { @apply flex items-center gap-2; }
@@ -1234,45 +1341,79 @@
   .seating-legend-dot-accessible { @apply relative grid place-items-center; }
   .seating-legend-accessible-icon { @apply w-3 h-3 text-white; }
   .seating-legend-label { @apply text-sm; }
-  .seating-controls { @apply flex flex-wrap items-center justify-center gap-3 mt-2; }
+  .seating-controls {
+    @apply w-full;
+  }
+  .seating-controls-quick {
+    @apply flex flex-col gap-3 w-full;
+  }
+  .seating-controls-tickets-tools-row {
+    @apply flex items-center justify-between gap-2 w-full min-w-0;
+    min-height: 2.25rem;
+  }
+  .seating-controls-tickets-field {
+    @apply inline-flex min-w-0 items-center gap-2 self-center;
+  }
+  /* Quick actions live above the scaled chart; keep clickable in overview (fit-content is pointer-events: none). */
+  .seating-fit-viewport > .seating-controls {
+    @apply shrink-0 mb-3;
+    position: relative;
+    z-index: 2;
+  }
+  /* Match `.booking-seat-ticket-select` / `.seating-ticket-count-select`: px-3 py-1.5 text-sm, min-height 2rem */
   .seating-tools-btn {
-    @apply inline-flex items-center justify-center gap-1 rounded-full px-3 py-1.5 text-xs;
+    @apply inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium shrink-0;
+    min-height: 2rem;
+    box-sizing: border-box;
     color: var(--seating-control-fg, var(--foreground));
     background: var(--seating-control-bg, color-mix(in oklab, var(--foreground) 8%, var(--card) 92%));
     border: 1px solid var(--seating-control-border, color-mix(in oklab, var(--foreground) 24%, transparent));
+  }
+  .seating-tools-btn-icon {
+    @apply w-4 h-4 shrink-0;
+  }
+  .seating-sidebar-tools-btn {
+    flex-shrink: 0;
+    align-self: center;
+  }
+  .seating-controls-tools-inline {
+    flex-shrink: 0;
+    align-self: center;
   }
   .seating-tools-btn:hover {
     background: var(--seating-control-hover-bg, color-mix(in oklab, var(--foreground) 14%, var(--card) 86%));
     color: var(--seating-control-hover-fg, var(--seating-control-fg, var(--foreground)));
   }
-  .seating-tools-btn-desktop { @apply inline-flex; }
-  .seating-tools-btn-mobile { @apply hidden; }
   .seating-tools-btn-on { @apply border-spotlight/70 bg-spotlight/20 text-spotlight; }
   .seating-ticket-count-label { @apply inline-flex items-center gap-2 text-sm; }
   .seating-ticket-count-select {
-    @apply rounded-md px-2 py-1 text-sm;
+    @apply rounded-md px-3 py-1.5 text-sm;
+    min-height: 2rem;
+    box-sizing: border-box;
     color: var(--seating-control-fg, var(--foreground));
-    background: var(--seating-control-bg, color-mix(in oklab, var(--foreground) 8%, var(--card) 92%));
+    background: #ffffff;
     border: 1px solid var(--seating-control-border, color-mix(in oklab, var(--foreground) 24%, transparent));
     color-scheme: light;
   }
   .seating-ticket-count-select option {
-    background: color-mix(in oklab, var(--card) 90%, var(--background) 10%);
+    background: #ffffff;
     color: var(--foreground);
   }
   .dark .seating-ticket-count-select {
     color-scheme: dark;
+    background: var(--seating-control-bg, color-mix(in oklab, var(--foreground) 8%, var(--card) 92%));
+  }
+  .dark .seating-ticket-count-select option {
+    background: var(--card);
+    color: var(--foreground);
   }
   .seating-suggest-btn {
-    @apply px-4 py-2.5 rounded-md text-sm min-h-[44px] min-w-[44px] inline-flex items-center justify-center;
+    @apply px-4 py-2 rounded-md text-sm inline-flex items-center justify-center w-full;
+    min-height: 2.375rem;
+    box-sizing: border-box;
     color: var(--seating-accent-fg, var(--foreground));
     background: var(--seating-accent-bg, color-mix(in oklab, var(--spotlight) 20%, var(--card) 80%));
     border: 1px solid var(--seating-accent-border, color-mix(in oklab, var(--spotlight) 50%, transparent));
-  }
-  @media (min-width: 1025px) {
-    .seating-controls .seating-suggest-btn {
-      margin-left: 0.2rem;
-    }
   }
   .seating-suggest-btn:hover {
     background: var(--seating-accent-hover-bg, color-mix(in oklab, var(--spotlight) 30%, var(--card) 70%));
@@ -1287,12 +1428,12 @@
   }
   .seating-debug-toggle-on { @apply border-spotlight/70 bg-spotlight/20 text-spotlight; }
   .seating-tools-sidebar {
-    @apply absolute right-2 sm:right-4 top-0 z-40 w-[min(94vw,440px)] rounded-lg border border-border px-4 pt-4 pb-4 space-y-4 shadow-2xl transition-all duration-300 ease-out transform-gpu origin-top-right;
+    @apply relative right-2 sm:right-4 top-0 z-40 w-[min(94vw,440px)] rounded-lg border border-border px-4 pt-4 pb-4 space-y-4 shadow-2xl transition-all duration-300 ease-out transform-gpu origin-top-right;
     color: var(--seating-panel-fg, var(--foreground));
     background: var(--seating-panel-bg, color-mix(in oklab, var(--card) 82%, var(--foreground) 18%));
     border-color: var(--seating-panel-border, color-mix(in oklab, var(--foreground) 26%, transparent));
     max-height: none;
-    overflow: visible;
+    overflow: hidden;
   }
   /* Shared hardening: prevent theme-wide button styles from breaking tools a11y states. */
   .seating-tools-sidebar button,
@@ -1360,51 +1501,97 @@
     color: var(--seating-control-hover-fg, var(--seating-control-fg, var(--foreground)));
   }
   .seating-reset-btn {
-    @apply inline-flex items-center justify-center rounded-md px-4 py-2.5 text-sm min-h-[44px] min-w-[44px];
+    @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm w-full;
+    min-height: 2.375rem;
+    box-sizing: border-box;
     color: var(--seating-control-fg, var(--foreground));
     background: transparent;
-    border: 2px solid color-mix(in oklab, var(--foreground) 44%, transparent);
+    border: 1px solid color-mix(in oklab, var(--foreground) 34%, transparent);
   }
   .seating-reset-btn:hover {
     background: color-mix(in oklab, var(--seating-control-hover-bg, var(--foreground)) 14%, transparent);
     color: var(--seating-control-hover-fg, var(--seating-control-fg, var(--foreground)));
   }
 
-  @media (min-width: 1025px) {
-    .seating-root.seating-root-tools-open {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
-      align-items: start;
-      column-gap: 1rem;
+  /* Chart area + summary/tools: house scrolls horizontally; panel stays in view (sticky on scroll). */
+  .seating-chart-body {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
+  }
+  @media (min-width: 1024px) {
+    .seating-chart-body--split {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 1rem;
     }
-
-    .seating-root.seating-root-tools-open .seating-main-column {
+    .seating-chart-body--split .seating-house-scroll {
+      flex: 1 1 minmax(0, 1fr);
+      min-width: 0;
+      align-self: flex-start;
+      max-height: none;
+    }
+    .seating-grid-legend-column {
       min-width: 0;
     }
-
-    .seating-root.seating-root-tools-open .seating-tools-sidebar {
+    .seating-chart-body--split .seating-chart-side-panel {
       position: sticky;
-      top: 0;
-      right: auto;
-      width: 100%;
+      top: 5.25rem;
+      align-self: flex-start;
+      flex: 0 0 clamp(320px, 28vw, 380px);
+      width: clamp(320px, 28vw, 380px);
       max-width: 380px;
-      max-height: calc(100vh - 7rem);
+      min-width: 0;
+      max-height: calc(100vh - 6rem);
       overflow: auto;
+      z-index: 2;
+    }
+    /* In-flow tools/summary: drop overlay offsets from base .seating-tools-sidebar */
+    .seating-chart-body--split .seating-tools-sidebar {
+      right: auto;
+      top: auto;
+      width: 100%;
+      max-width: none;
       transform: none;
       opacity: 1;
       pointer-events: auto;
-      z-index: 20;
     }
   }
 
-  @media (max-width: 1024px) {
-    .seating-tools-btn-desktop { @apply hidden; }
-    .seating-tools-btn-mobile { @apply inline-flex w-full; }
-    .seating-controls { @apply flex-col items-stretch gap-2; }
-    .seating-controls .seating-ticket-count-label { @apply justify-between w-full; }
-    .seating-controls .seating-ticket-count-select { @apply w-24; }
-    .seating-controls .seating-suggest-btn,
-    .seating-controls .seating-reset-btn { @apply w-full; }
+  @media (max-width: 1023px) {
+    .seating-chart-body--split {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+    }
+    /* Match booking step 3: panel above the chart on small screens; house scrolls horizontally underneath. */
+    .seating-chart-body--split > .seating-chart-side-panel.booking-seat-sidebar,
+    .seating-chart-body--split > .seating-tools-sidebar {
+      order: -1;
+    }
+    .seating-summary-sidebar {
+      width: 100%;
+      max-width: 100%;
+    }
+    .seating-controls {
+      @apply max-w-md mx-auto;
+    }
+    .seating-controls-tickets-tools-row {
+      @apply flex-wrap items-center gap-y-2 justify-between;
+    }
+    .seating-controls-tickets-field {
+      @apply inline-flex min-w-0 items-center gap-2;
+    }
+    .seating-controls-tickets-tools-row .seating-controls-tools-inline {
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .seating-controls-quick .seating-ticket-count-select { @apply w-24; }
+    .seating-controls-quick .seating-suggest-btn,
+    .seating-controls-quick .seating-reset-btn { @apply w-full; }
     .seating-tools-sidebar {
       @apply static mt-3 w-full max-w-none shadow-md;
       right: auto;
@@ -1616,6 +1803,11 @@
   }
   .seating-summary { @apply p-4 bg-card rounded-lg border border-border; }
   .seating-summary-row { @apply flex items-center justify-between gap-4; }
+  .seating-summary-row-empty { @apply items-start; }
+  .seating-summary-empty-hint {
+    @apply text-sm mt-1;
+    color: var(--text-muted-aa, color-mix(in oklab, var(--foreground) 65%, transparent));
+  }
   .seating-summary-label { @apply text-sm; color: var(--seating-panel-subtitle-fg, color-mix(in oklab, var(--foreground) 80%, transparent)); }
   .seating-summary-tags { @apply flex flex-wrap gap-2 mt-1 text-sm text-foreground; }
   .seating-seat-tag { @apply px-0 py-0 bg-transparent text-inherit border-0 rounded-none; }
@@ -1719,6 +1911,42 @@
   }
   html.theme-stage .show-card .show-card-btn {
     font-family: var(--font-display);
+  }
+  /** Same primary colors as View Script; typography matches other seating controls (Tools, Reset). */
+  .seating-suggest-btn.show-card-btn {
+    @apply mt-0 font-medium;
+    min-height: 2.375rem;
+    text-transform: none;
+    letter-spacing: normal;
+    font-family: inherit;
+  }
+  /* Themes style `.show-card-btn` for cards; keep seating primary CTA label style aligned with Tools / Reset. */
+  .theme-terminal .seating-suggest-btn.show-card-btn,
+  .theme-coastal .seating-suggest-btn.show-card-btn,
+  .theme-archive .seating-suggest-btn.show-card-btn,
+  .theme-blueprint .seating-suggest-btn.show-card-btn,
+  .theme-neon .seating-suggest-btn.show-card-btn {
+    text-transform: none;
+    letter-spacing: normal;
+    font-family: inherit;
+    font-weight: 500;
+  }
+  .theme-terminal .seating-suggest-btn.show-card-btn::after,
+  .theme-terminal .seating-suggest-btn.show-card-btn:hover::after {
+    content: none !important;
+    animation: none !important;
+  }
+  .dark.theme-neon .seating-suggest-btn.show-card-btn {
+    text-transform: none;
+    letter-spacing: normal;
+    font-family: inherit;
+    font-weight: 500;
+  }
+  .dark.theme-archive .seating-suggest-btn.show-card-btn {
+    text-transform: none;
+    letter-spacing: normal;
+    font-family: inherit;
+    font-weight: 500;
   }
   .show-badge-selling-fast { @apply bg-accent-primary/20 text-accent-primary border-accent-primary/30; }
   .show-badge-last-seats { @apply bg-accent-primary/30 text-accent-primary border-accent-primary/50; }
@@ -2000,11 +2228,15 @@
 
   #stage,
   #now-playing,
-  #booking-flow,
   #calendar,
-  #seating,
   #seating-chart {
     scroll-margin-top: 5.25rem;
+  }
+
+  /** Extra offset so sticky header + panel title + segment tabs stay in view */
+  #booking-flow,
+  #seating {
+    scroll-margin-top: 6.75rem;
   }
 
   /* Idle-deferred SeatingChart (main tab): reserve height to limit layout shift before chunk loads */
@@ -2045,7 +2277,16 @@
   /* Final Stage lock: prevent runtime token shifts/cascade order from changing key typography and CTA color. */
   html.theme-stage .show-card .show-card-btn,
   html.theme-stage .show-card .show-card-btn:hover,
-  html.theme-stage .show-card .show-card-btn:focus-visible {
+  html.theme-stage .show-card .show-card-btn:focus-visible,
+  html.theme-stage .seating-chart-side-panel .show-card-btn,
+  html.theme-stage .seating-chart-side-panel .show-card-btn:hover,
+  html.theme-stage .seating-chart-side-panel .show-card-btn:focus-visible,
+  html.theme-stage .booking-seat-sidebar .show-card-btn,
+  html.theme-stage .booking-seat-sidebar .show-card-btn:hover,
+  html.theme-stage .booking-seat-sidebar .show-card-btn:focus-visible,
+  html.theme-stage .seating-controls .show-card-btn,
+  html.theme-stage .seating-controls .show-card-btn:hover,
+  html.theme-stage .seating-controls .show-card-btn:focus-visible {
     font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "URW Palladio L", P052, Georgia, serif !important;
     background-image: none !important;
     background-color: #c41e3a !important;
@@ -2055,9 +2296,20 @@
     letter-spacing: 0.035em;
   }
 
-  html.theme-stage .show-card .show-card-btn:hover {
+  html.theme-stage .show-card .show-card-btn:hover,
+  html.theme-stage .seating-chart-side-panel .show-card-btn:hover,
+  html.theme-stage .booking-seat-sidebar .show-card-btn:hover,
+  html.theme-stage .seating-controls .show-card-btn:hover {
     background-color: #a31730 !important;
     border-color: #7a0f22 !important;
+  }
+
+  html.theme-stage .seating-controls .seating-suggest-btn.show-card-btn,
+  html.theme-stage .booking-seat-sidebar .seating-suggest-btn.show-card-btn,
+  html.theme-stage .seating-chart-side-panel .seating-suggest-btn.show-card-btn {
+    font-family: inherit !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
   }
 
   html.theme-stage .theater-live-pill {
@@ -2066,4 +2318,12 @@
     border: 1px solid #8f1228 !important;
   }
 
+}
+
+/* Unlayered: themes hoist generic buttons with translateY on :hover (loaded after this file); !important keeps quick actions fixed. */
+.seating-root .seating-controls button,
+.seating-root .seating-controls button:hover,
+.seating-root .seating-controls button:active,
+.seating-root .seating-controls button:focus-visible {
+  transform: none !important;
 }

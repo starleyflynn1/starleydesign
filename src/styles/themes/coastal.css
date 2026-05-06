@@ -189,6 +189,11 @@
   color: var(--foreground);
 }
 
+/* Keep spotlight headings readable on Coastal light surfaces. */
+.theme-coastal:not(.dark) .spotlight-text {
+  color: var(--foreground);
+}
+
 .theme-coastal .theater-icon-btn,
 .theme-coastal .theater-mobile-search-btn,
 .theme-coastal .theater-mobile-menu-btn,

@@ -22,6 +22,7 @@ interface StagePageProps {
   bookingStep: number;
   initialBookingShow?: string;
   confirmExitNavigation?: (href: string) => boolean;
+  runSpotlightTransition?: (navigate: () => void) => void;
   setCurrentView: (view: 'home' | 'booking' | 'seating' | 'calendar') => void;
   setBookingStep: (step: number) => void;
 }
@@ -35,6 +36,9 @@ export function StagePage({
   bookingStep,
   initialBookingShow,
   confirmExitNavigation,
+  runSpotlightTransition = (navigate) => {
+    navigate();
+  },
   setCurrentView,
   setBookingStep,
 }: StagePageProps) {
@@ -137,6 +141,15 @@ export function StagePage({
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (bookingStep !== 3 || selectedSeatIds.length === 0) return;
+    setNextStepHint(null);
+    if (nextStepHintTimeoutRef.current) {
+      window.clearTimeout(nextStepHintTimeoutRef.current);
+      nextStepHintTimeoutRef.current = null;
+    }
+  }, [bookingStep, selectedSeatIds.length]);
 
   const canAdvanceFromStep =
     bookingStep === 1
@@ -333,7 +346,41 @@ export function StagePage({
       const destination = view === 'seating' ? '/#seating' : '/#calendar';
       if (!confirmExitNavigation(destination)) return;
     }
-    setCurrentView(view);
+
+    const applyView = () => {
+      setCurrentView(view);
+      if (typeof window === 'undefined') return;
+      if (view === 'seating') {
+        window.history.replaceState(null, '', '/#seating');
+        queueMicrotask(() => {
+          requestAnimationFrame(() => {
+            document.getElementById('booking-flow')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
+          });
+        });
+      } else if (view === 'calendar') {
+        window.history.replaceState(null, '', '/#calendar');
+        queueMicrotask(() => {
+          requestAnimationFrame(() => {
+            document.getElementById('booking-flow')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
+          });
+        });
+      } else if (view === 'booking') {
+        window.history.replaceState(null, '', '/#booking-flow');
+      }
+    };
+
+    if (view === currentView) {
+      applyView();
+      return;
+    }
+
+    runSpotlightTransition(applyView);
   };
 
   return (
@@ -456,9 +503,16 @@ export function StagePage({
 
         {currentView === 'booking' && (
           <div className="booking-view booking-view-no-scroll">
-            <Suspense fallback={null}>
-              <BookingProgress currentStep={bookingStep} steps={bookingProgressSteps} />
-            </Suspense>
+            <div className="booking-flow-header">
+              <Suspense fallback={null}>
+                <BookingProgress currentStep={bookingStep} steps={bookingProgressSteps} />
+              </Suspense>
+              {bookingStep < bookingSteps.length && nextStepHint && (
+                <p className="booking-next-hint-banner" role="status" aria-live="polite">
+                  {nextStepHint}
+                </p>
+              )}
+            </div>
             <div ref={bookingStepPanelRef} className="booking-step-panel booking-step-panel-scroll">
               {bookingStep === 1 && (
                 <div className="booking-step-content booking-step-content-seat">
@@ -562,7 +616,7 @@ export function StagePage({
                           </select>
                         </label>
                         <button
-                          className="seating-suggest-btn booking-seat-sidebar-btn booking-seat-sidebar-suggest"
+                          className="seating-suggest-btn show-card-btn booking-seat-sidebar-btn"
                           type="button"
                           onClick={() => setSuggestRequestKey((prev) => prev + 1)}
                         >
@@ -576,13 +630,15 @@ export function StagePage({
                           Reset
                         </button>
                       </div>
-                      <div className="booking-seat-sidebar-title">Selected Seats</div>
-                      <div className={`booking-seat-sidebar-list ${selectedSeatIds.length > 0 ? 'booking-seat-sidebar-list-selected' : ''}`}>
-                        {selectedSeatIds.length > 0 ? selectedSeatIds.join(', ') : 'None selected'}
-                      </div>
-                      <div className="booking-seat-sidebar-total">
-                        <span>Total</span>
-                        <strong>${selectedSeatTotal.toFixed(2)}</strong>
+                      <div className="booking-seat-sidebar-output">
+                        <div className="booking-seat-sidebar-title">Selected Seats</div>
+                        <div className={`booking-seat-sidebar-list ${selectedSeatIds.length > 0 ? 'booking-seat-sidebar-list-selected' : ''}`}>
+                          {selectedSeatIds.length > 0 ? selectedSeatIds.join(', ') : 'None selected'}
+                        </div>
+                        <div className="booking-seat-sidebar-total">
+                          <span>Total</span>
+                          <strong>${selectedSeatTotal.toFixed(2)}</strong>
+                        </div>
                       </div>
                     </aside>
                   </div>
@@ -686,11 +742,6 @@ export function StagePage({
                 >
                   Next Step
                 </button>
-                {nextStepHint && (
-                  <p className="booking-next-hint-popover" role="status" aria-live="polite">
-                    {nextStepHint}
-                  </p>
-                )}
               </div>
             )}
             <p className="booking-exit-hint booking-exit-hint-footer" aria-live="polite">
