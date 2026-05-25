@@ -1,11 +1,18 @@
 import { Show } from './types';
+import { buildPosterSrcSet, posterSrc, POSTER_SIZES } from '../lib/show-posters';
+
+function showPoster(slug: string): Pick<Show, 'image' | 'imageSrcSet' | 'imageSizes'> {
+  return {
+    image: posterSrc(slug, 320),
+    imageSrcSet: buildPosterSrcSet(slug),
+    imageSizes: POSTER_SIZES,
+  };
+}
 
 export const SHOWS: Show[] = [
   {
     title: 'The Design System',
-    image: '/images/shows/design-system-320.webp',
-    imageSrcSet: '/images/shows/design-system-320.webp 320w, /images/shows/design-system-480.webp 480w, /images/shows/design-system-680.webp 680w, /images/shows/design-system-768.webp 768w, /images/shows/design-system-1200.webp 1200w',
-    imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
+    ...showPoster('design-system'),
     date: '2026',
     scope: 'User Experience Architecture',
     stack: 'React · TypeScript · Figma',
@@ -14,9 +21,7 @@ export const SHOWS: Show[] = [
   },
   {
     title: 'Salesforce',
-    image: '/images/shows/salesforce-320.webp',
-    imageSrcSet: '/images/shows/salesforce-320.webp 320w, /images/shows/salesforce-480.webp 480w, /images/shows/salesforce-680.webp 680w, /images/shows/salesforce-768.webp 768w, /images/shows/salesforce-1200.webp 1200w',
-    imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
+    ...showPoster('salesforce'),
     date: '2022 — 2026',
     scope: 'Digital Campus at Scale',
     stack: 'Javascript · GraphQL · Java',
@@ -25,9 +30,7 @@ export const SHOWS: Show[] = [
   },
   {
     title: 'Google',
-    image: '/images/shows/google-320.webp',
-    imageSrcSet: '/images/shows/google-320.webp 320w, /images/shows/google-480.webp 480w, /images/shows/google-680.webp 680w, /images/shows/google-768.webp 768w, /images/shows/google-1200.webp 1200w',
-    imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
+    ...showPoster('google'),
     date: '2021 — 2022',
     scope: 'Lead Management Engine',
     stack: 'Javascript · LWC · Java',
@@ -36,10 +39,8 @@ export const SHOWS: Show[] = [
   },
   {
     title: 'BFA Theater',
-    image: '/images/shows/bfa-theater-320.webp',
-    imageSrcSet: '/images/shows/bfa-theater-320.webp 320w, /images/shows/bfa-theater-480.webp 480w, /images/shows/bfa-theater-680.webp 680w, /images/shows/bfa-theater-768.webp 768w, /images/shows/bfa-theater-1200.webp 1200w',
-    imageSizes: '(max-width: 768px) 92vw, (max-width: 1280px) 46vw, 292px',
-    date: '2004 — 2026',
+    ...showPoster('bfa-theater'),
+    date: '2003 — 2007',
     scope: 'Collaborative Production',
     stack: 'Narrative & User Psychology',
     impact: 'Foundational Empathy',

@@ -21,7 +21,10 @@
   --seat-vip: #d4af37;
   --seat-vip-symbol-color: #111827;
   --seat-accessible: #1d4ed8;
-  --stage-hero-gold: color-mix(in oklab, var(--spotlight) 74%, #f4d58a 26%);
+  --stage-hero-gold: var(--accent-gold);
+  --stage-hero-subtitle-color: color-mix(in oklab, var(--muted-foreground) 68%, var(--spotlight) 32%);
+  --stage-hero-description-color: color-mix(in oklab, var(--muted-foreground) 58%, var(--spotlight) 42%);
+  --show-card-title-hover-color: var(--accent-gold);
 
   /* Base Tokens */
   --background: #ffffff;
@@ -267,7 +270,19 @@
   --btn-disabled-bg: color-mix(in oklab, var(--card) 82%, var(--foreground) 18%);
   --btn-disabled-border: color-mix(in oklab, var(--foreground) 30%, transparent);
   --btn-disabled-fg: color-mix(in oklab, var(--foreground) 88%, transparent);
-  --stage-hero-gold: color-mix(in oklab, #f4d981 88%, var(--spotlight) 12%);
+  --stage-hero-gold: var(--accent-gold);
+  --show-card-title-hover-color: var(--accent-gold);
+}
+
+.dark.theme-stage .stage-page,
+.theme-stage.dark .stage-page,
+.dark .theme-stage .stage-page {
+  --portfolio-card-bg: #111424;
+  --portfolio-card-border: #1e233d;
+  --portfolio-body-color: #94a3b8;
+  --portfolio-subhead-color: #f1f5f9;
+  --stage-hero-subtitle-color: color-mix(in oklab, var(--marquee-surface) 82%, var(--spotlight) 18%);
+  --stage-hero-description-color: color-mix(in oklab, var(--marquee-surface) 74%, var(--spotlight) 26%);
 }
 
 /* Increase selected-day clarity in calendar for Stage dark mode. */
@@ -482,6 +497,11 @@ html.theme-stage:not(.dark) .show-card-price {
 .theme-stage.dark .show-card-title,
 .dark .theme-stage .show-card-title {
   color: color-mix(in oklab, #ffffff 94%, var(--foreground) 6%) !important;
+}
+
+html.theme-stage .group:hover .show-card-title,
+html.theme-stage:not(.dark) .group:hover .show-card-title {
+  color: var(--show-card-title-hover-color) !important;
 }
 
 .dark.theme-stage .show-card-meta,

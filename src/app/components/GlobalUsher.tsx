@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState, useRef, useId } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import { Search, Theater, MapPin, Grid3X3, Calendar, User, CreditCard, Settings, X } from 'lucide-react';
 
 interface Action {
@@ -166,29 +165,15 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
   if (!isOpen) return null;
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="usher-overlay-wrap">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="usher-backdrop"
-            onClick={onClose}
-          />
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -20 }}
-            transition={{ type: 'spring', duration: 0.4 }}
-            className="usher-panel"
-            ref={panelRef}
-            style={{
-              boxShadow: '0 0 40px rgba(212, 175, 55, 0.3), 0 20px 50px rgba(0, 0, 0, 0.5)',
-            }}
-            onClick={(e) => e.stopPropagation()}
+    <div className="usher-overlay-wrap usher-overlay-wrap--open">
+      <div className="usher-backdrop usher-backdrop--animate" onClick={onClose} aria-hidden />
+      <div
+        className="usher-panel usher-panel--animate"
+        ref={panelRef}
+        style={{
+          boxShadow: '0 0 40px rgba(212, 175, 55, 0.3), 0 20px 50px rgba(0, 0, 0, 0.5)',
+        }}
+        onClick={(e) => e.stopPropagation()}
             onKeyDownCapture={(e) => {
               if (
                 e.key === 'ArrowDown' ||
@@ -339,9 +324,7 @@ export function GlobalUsher({ isOpen, onClose, onSelect }: GlobalUsherProps) {
                 <span className="usher-footer-hint">Close</span>
               </div>
             </div>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
+      </div>
+    </div>
   );
 }

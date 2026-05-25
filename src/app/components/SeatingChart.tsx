@@ -873,7 +873,8 @@ try {
 
             <div className="seating-grid-legend-column">
       <p id="seating-grid-help" className="sr-only">
-        Seating chart keyboard controls: use arrow keys to move between seats, and press Enter or Space to select a seat.
+        Seating chart keyboard controls: arrow keys move through every seat including unavailable seats; Enter or Space
+        selects selectable seats only.
       </p>
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {seatLiveMessage}
@@ -901,6 +902,7 @@ try {
                   return (
                     <div key={seat.id} className="seating-seat-wrap">
                       <button
+                        type="button"
                         data-seat-id={seat.id}
                         onMouseDown={() => {
                           setIsDragSelecting(true);
@@ -936,7 +938,6 @@ try {
                           // Keyboard-triggered click (Enter/Space) has detail=0.
                           if (event.detail === 0) handleSeatClick(seat);
                         }}
-                        disabled={isUnavailable && !isToolsOpen}
                         className={`seating-seat-btn ${seatColors[displayStatus]} ${isSuggested ? 'seating-seat-suggested' : ''} ${focusedSeatId === seat.id ? 'seating-seat-focused' : ''}`}
                         aria-label={`${getSeatLocationLabel(seat)}, ${displayStatus}, $${seat.price}`}
                         role="gridcell"

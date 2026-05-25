@@ -384,8 +384,12 @@ export function StagePage({
   };
 
   return (
-    <main className={`app-main ${isBookingNoScrollMode ? 'app-main-booking' : ''}`}>
-  {!isComponentFocusMode && (
+    <main className={`app-main stage-page ${isBookingNoScrollMode ? 'app-main-booking' : ''}`}>
+      <div
+        className={`stage-ambient-layer ${isComponentFocusMode ? 'stage-ambient-layer--occluded' : ''}`}
+        aria-hidden={isComponentFocusMode}
+        {...(isComponentFocusMode ? { inert: true } : {})}
+      >
     <section id="stage" className="hero-section">
       <div
         ref={stagePinchTargetRef}
@@ -407,9 +411,7 @@ export function StagePage({
         <p className="hero-description">
           <span>
             <span>
-              A design system for complex state-driven interactions. Powered by 
-              a command-driven &quot;Global Usher&quot; that bridges accessible 
-              spatial navigation with a seamless booking flow.
+            An immersive, state-driven design system combining keyboard-first interactions, accessible spatial navigation, and a narrative booking journey.
             </span>
           </span>
         </p>
@@ -421,8 +423,6 @@ export function StagePage({
         </div>
       </div>
     </section>
-  )}
-      {!isComponentFocusMode && (
       <section id="now-playing" className="section-stack">
         <div className="section-header-row">
           <h3 className="section-title">
@@ -431,11 +431,11 @@ export function StagePage({
         </div>
 
         <div className="shows-grid">
-          {shows.map((show) => (
+          {shows.map((show, index) => (
             <ShowCard
               key={show.title}
               {...show}
-              priority
+              priority={index === 0}
               scriptHref={
                 show.title === 'The Design System'
                   ? '/script#technical-documentation'
@@ -450,7 +450,7 @@ export function StagePage({
           ))}
         </div>
       </section>
-      )}
+      </div>
 
       <section
         id="booking-flow"
@@ -770,67 +770,90 @@ export function StagePage({
       </section>
 
       {!isComponentFocusMode && (
-      <section className="feature-banner">
-        <div className="feature-banner-inner">
+      <section className="component-panel stage-features-section">
+        <div className="feature-banner-intro">
           <TheaterIcon className="icon-xl" />
-          <h3 className="section-title">
-            Theater Design System Features
-          </h3>
-          <div className="feature-grid">
-            <div className="feature-item">
-              <h4 className="spotlight-text">Global Usher (⌘K)</h4>
-              <p className="feature-copy">
-                An atmospheric, keyboard-first command palette that utilizes spotlight transitions and theater-themed state
-                management to navigate complex inventory.
-              </p>
+        </div>
+        <h3 className="section-title">Theater Design System Features</h3>
+        <div className="stage-features-grid">
+          <div className="stage-features-band">
+            <p className="stage-features-group-label">Core Experience</p>
+            <div className="stage-features-band-grid">
+              <article className="feature-item portfolio-card stage-feature-hero-card">
+                <h4 className="spotlight-text feature-card-title">Global Usher (⌘K)</h4>
+                <p className="stage-feature-card-meta">Command Palette · State Management</p>
+                <p className="feature-copy">
+                  An atmospheric, keyboard-first command palette that utilizes spotlight transitions and theater-themed state
+                  management to navigate complex inventory.
+                </p>
+              </article>
+              <article className="feature-item portfolio-card stage-feature-hero-card">
+                <h4 className="spotlight-text feature-card-title">The Interactive House</h4>
+                <p className="stage-feature-card-meta">Spatial Engine · Real-Time Sync</p>
+                <p className="feature-copy">
+                  A spatial seating engine architected to support real-time state synchronization for VIP, accessible, and
+                  standard inventory, engineered for high-integrity UX.
+                </p>
+              </article>
+              <article className="feature-item portfolio-card">
+                <h4 className="spotlight-text feature-card-title">The 5-Act Checkout</h4>
+                <p className="stage-feature-card-meta">Guided Transactions · Narrative Commerce</p>
+                <p className="feature-copy">
+                  A theatric booking journey that utilizes visual progress indicators to transform a standard transaction into
+                  a guided performance.
+                </p>
+              </article>
+              <article className="feature-item portfolio-card">
+                <h4 className="spotlight-text feature-card-title">Performance Calendar</h4>
+                <p className="stage-feature-card-meta">Temporal Scheduling · Availability Orchestration</p>
+                <p className="feature-copy">
+                A precision-built booking interface that synchronizes matinee and evening performance 
+                availability through concurrency-aware scheduling.
+                </p>
+              </article>
             </div>
-            <div className="feature-item">
-              <h4 className="spotlight-text">The Interactive House</h4>
-              <p className="feature-copy">
-                A spatial seating engine architected to support real-time state synchronization for VIP, accessible, and
-                standard inventory, engineered for high-integrity UX.
-              </p>
+          </div>
+
+          <div className="stage-features-band">
+            <p className="stage-features-group-label">Accessibility Engine</p>
+            <div className="stage-features-band-grid">
+              <article className="feature-item portfolio-card">
+                <h4 className="spotlight-text feature-card-title">The Blackout</h4>
+                <p className="stage-feature-card-meta">Dark Mode</p>
+                <p className="feature-copy">
+                  A low-glare optimization engine calibrated for discreet device usage in light-sensitive environments,
+                  reducing visual noise without sacrificing clarity.
+                </p>
+              </article>
+              <article className="feature-item portfolio-card">
+                <h4 className="spotlight-text feature-card-title">Static Stage</h4>
+                <p className="stage-feature-card-meta">Motion Pause</p>
+                <p className="feature-copy">
+                  A global override that silences ambient animations and background transitions, providing a static environment
+                  for viewers with motion sensitivity.
+                </p>
+              </article>
             </div>
-            <div className="feature-item">
-              <h4 className="spotlight-text">The 5-Act Checkout</h4>
-              <p className="feature-copy">
-                A narrative booking journey that utilizes visual progress indicators to transform a standard transaction into
-                a guided performance.
-              </p>
-            </div>
-            <div className="feature-item">
-              <h4 className="spotlight-text">Performance Calendar</h4>
-              <p className="feature-copy">
-                A custom temporal interface engineered for precision concurrency management between matinee and evening show
-                availability.
-              </p>
-            </div>
-            <div className="feature-item">
-              <h4 className="spotlight-text">Dark Mode: &quot;The Blackout&quot;</h4>
-              <p className="feature-copy">
-                A low-glare optimization engine calibrated for discreet device usage in light-sensitive environments,
-                reducing visual noise without sacrificing clarity.
-              </p>
-            </div>
-            <div className="feature-item">
-              <h4 className="spotlight-text">Motion Pause: &quot;Static Stage&quot;</h4>
-              <p className="feature-copy">
-                A global override that silences ambient animations and background transitions, providing a static environment
-                for viewers with motion sensitivity.
-              </p>
-            </div>
-            <div className="feature-item">
-              <h4 className="spotlight-text">Atmospheric Presets</h4>
-              <p className="feature-copy">
-                Dynamic environment toggles that transition the UI between high-visibility utility and immersive
-                &quot;Misty&quot; or &quot;Midnight&quot; states.
-              </p>
-            </div>
-            <div className="feature-item">
-              <h4 className="spotlight-text">Production Show Cards</h4>
-              <p className="feature-copy">
-                Modular data primitives designed to harmonize high-density metadata with a premium aesthetic finish.
-              </p>
+          </div>
+
+          <div className="stage-features-band">
+            <p className="stage-features-group-label">System Primitives</p>
+            <div className="stage-features-band-grid">
+              <article className="feature-item portfolio-card">
+                <h4 className="spotlight-text feature-card-title">Atmospheric Presets</h4>
+                <p className="stage-feature-card-meta">Adaptive Theming</p>
+                <p className="feature-copy">
+                  Dynamic environment toggles that shift the experience between high-visibility utility and immersive
+                  &quot;Misty&quot; or &quot;Midnight&quot; states.
+                </p>
+              </article>
+              <article className="feature-item portfolio-card">
+                <h4 className="spotlight-text feature-card-title">Production Show Cards</h4>
+                <p className="stage-feature-card-meta">Modular Presentation</p>
+                <p className="feature-copy">
+                Structured content modules that balance high-density metadata with a refined, premium visual system.
+                </p>
+              </article>
             </div>
           </div>
         </div>

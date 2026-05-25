@@ -42,6 +42,8 @@
   --segment-active-bg: var(--selection-accent);
   --segment-active-fg: var(--terminal-bg);
   --spotlight: var(--glitch-cyan);
+  --accent-gold: var(--glitch-cyan);
+  --narrative-section-gold: var(--glitch-cyan);
   --accent: var(--amber-warning);
   --border: #9ca3af;
   --ring: var(--matrix-green);
@@ -125,6 +127,8 @@
   --segment-active-bg: var(--selection-accent);
   --segment-active-fg: var(--terminal-bg);
   --spotlight: var(--glitch-cyan);
+  --accent-gold: var(--glitch-cyan);
+  --narrative-section-gold: var(--glitch-cyan);
   --border: #30363d;
   --seating-selected-ring: color-mix(in oklab, var(--seat-selected) 74%, transparent);
   --seating-selected-glow: color-mix(in oklab, var(--seat-selected) 66%, transparent);
@@ -182,6 +186,11 @@
 
 .theme-terminal .theater-nav-link {
   color: var(--foreground);
+}
+
+.theme-terminal .spotlight-text,
+.theme-terminal .hero-shortcut .spotlight-text {
+  color: var(--glitch-cyan);
 }
 
 .theme-terminal .theater-icon-btn,

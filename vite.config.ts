@@ -1,13 +1,13 @@
 import { defineConfig } from 'vite'
-import type { OutputBundle } from 'rollup'
 import type { Plugin } from 'vite'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import { criticalPathHtml } from './vite-critical-path'
 
 /**
- * Turns blocking `<link rel="stylesheet" href="/assets/*.css">` into preload + onload
- * so the initial HTML parse is not blocked (addresses Lighthouse "render-blocking requests").
+ * Loads the main stylesheet without blocking first paint. Requires matching
+ * critical rules in index.html (shell, footer, LCP poster slot, calendar grid).
  */
 function deferMainCss(): Plugin {
   return {
@@ -37,33 +37,6 @@ function figmaAssetResolver() {
   }
 }
 
-/**
- * Emits <link rel="modulepreload"> for lazy chunks still split from the entry bundle (e.g. SeatingChart).
- */
-function modulepreloadLazyChunks(): Plugin {
-  return {
-    name: 'modulepreload-lazy-chunks',
-    transformIndexHtml: {
-      order: 'post',
-      handler(html, ctx) {
-        const bundle = ctx.bundle as OutputBundle | undefined
-        if (!bundle) return html
-
-        const hrefs: string[] = []
-        for (const fileName of Object.keys(bundle)) {
-          if (!fileName.endsWith('.js')) continue
-          if (fileName.includes('SeatingChart-')) {
-            hrefs.push(`      <link rel="modulepreload" crossorigin href="/${fileName}" />`)
-          }
-        }
-        if (hrefs.length === 0) return html
-
-        return html.replace(/<\/head>/i, `${hrefs.join('\n')}\n    </head>`)
-      },
-    },
-  }
-}
-
 export default defineConfig({
   build: {
     esbuild: {
@@ -73,7 +46,7 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('node_modules/lucide-react')) {
-            return 'lucide'
+            return 'lucide';
           }
         },
       },
@@ -81,7 +54,7 @@ export default defineConfig({
   },
   plugins: [
     deferMainCss(),
-    modulepreloadLazyChunks(),
+    criticalPathHtml(),
     figmaAssetResolver(),
     // The React and Tailwind plugins are both required for Make, even if
     // Tailwind is not being actively used – do not remove them

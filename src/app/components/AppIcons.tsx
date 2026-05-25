@@ -2,9 +2,20 @@ import React from 'react';
 
 type IconProps = React.SVGProps<SVGSVGElement>;
 
-function BaseIcon({ children, ...props }: IconProps) {
+function BaseIcon({ children, width = 24, height = 24, ...props }: IconProps) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>
+    <svg
+      viewBox="0 0 24 24"
+      width={width}
+      height={height}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
       {children}
     </svg>
   );

@@ -64,9 +64,11 @@ export function ShowCard({
             sizes={imageSizes}
             alt={title}
             className="show-card-image"
+            width={320}
+            height={480}
             loading={priority ? 'eager' : 'lazy'}
             decoding="async"
-            fetchPriority={priority ? 'high' : undefined}
+            fetchPriority={priority ? 'high' : 'auto'}
           />
         </picture>
 

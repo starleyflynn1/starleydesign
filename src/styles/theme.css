@@ -78,6 +78,11 @@
   --text-muted-aa: color-mix(in oklab, var(--foreground) 92%, transparent);
   --text-subtle-aa: color-mix(in oklab, var(--foreground) 82%, transparent);
   --text-accent-aa: color-mix(in oklab, var(--foreground) 74%, var(--spotlight) 26%);
+  /* Shared accent for show-card title hover and matching section headings (e.g. Director). */
+  /* Warm theater gold — shared by .spotlight-text, Director headings, nav hovers, etc. */
+  --accent-gold: color-mix(in oklab, var(--spotlight) 64%, #e8c97a 36%);
+  --narrative-section-gold: var(--accent-gold);
+  --show-card-title-hover-color: var(--accent-gold);
   --stepper-track-bg: color-mix(in oklab, var(--foreground) 30%, transparent);
   --stepper-fill-bg: var(--spotlight);
   --stepper-pending-bg: color-mix(in oklab, var(--card) 92%, var(--foreground) 8%);
@@ -106,6 +111,10 @@
   --seat-taken: #7185a1;
   --seat-vip: #dfc256;
   --seat-accessible: #78aee8;
+  /* Slightly brighter warm gold on deep surfaces (Director, Backstage, Script). */
+  --accent-gold: color-mix(in oklab, var(--spotlight) 50%, #ebc06a 50%);
+  --narrative-section-gold: var(--accent-gold);
+  --show-card-title-hover-color: var(--accent-gold);
 }
 
 @layer base {

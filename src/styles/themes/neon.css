@@ -232,7 +232,7 @@
 }
 
 /* --- Buttons --- */
-.theme-neon :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn)) {
+.theme-neon :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-day-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn)) {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 500;
   text-transform: uppercase;
@@ -247,7 +247,7 @@
   overflow: hidden;
 }
 
-.theme-neon :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn):hover) {
+.theme-neon :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-day-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn):hover) {
   border-color: var(--primary);
   box-shadow: 0 0 20px rgba(255, 0, 127, 0.3);
   transform: translateY(-2px);
@@ -352,6 +352,39 @@
 .dark.theme-neon .script-download-btn:focus-visible {
   outline: 2px solid color-mix(in oklab, #ffffff 78%, var(--secondary) 22%);
   outline-offset: 2px;
+}
+
+/* --- Calendar isolation: prevent neon global button chrome on day grid --- */
+.theme-neon .calendar-nav-btn,
+.theme-neon .calendar-day-btn,
+.theme-neon .calendar-time-btn {
+  text-transform: none;
+  letter-spacing: normal;
+  box-shadow: none;
+  transform: none;
+  filter: none;
+  backdrop-filter: none;
+}
+
+.theme-neon .calendar-root .calendar-day-btn,
+.theme-neon .calendar-root .calendar-day-btn:hover,
+.theme-neon .calendar-root .calendar-day-btn:focus-visible {
+  padding: 0 !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  font-family: inherit !important;
+  transform: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  overflow: hidden !important;
+}
+
+.theme-neon .calendar-root .calendar-day-btn.calendar-day-available,
+.theme-neon .calendar-root .calendar-day-btn.calendar-day-unavailable {
+  border-width: 1px !important;
+  border-style: solid !important;
 }
 
 /* Calendar selected state clarity in neon (light + dark). */

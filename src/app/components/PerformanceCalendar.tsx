@@ -25,20 +25,43 @@ export function PerformanceCalendar({
   const [selectedDate, setSelectedDate] = useState<Date | null>(initialSelectedDate ?? null);
   const [selectedTimeKey, setSelectedTimeKey] = useState<string | null>(null);
 
-  const firstAvailableDate = useMemo(() => {
-    if (performances.length === 0) return null;
-    return [...performances]
-      .map((performance) => performance.date)
-      .sort((a, b) => a.getTime() - b.getTime())[0];
+  const isSameCalendarDay = (a: Date, b: Date) =>
+    a.getDate() === b.getDate() &&
+    a.getMonth() === b.getMonth() &&
+    a.getFullYear() === b.getFullYear();
+
+  const startOfDay = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+  const getPerformancesForDate = (date: Date) =>
+    performances.find((p) => isSameCalendarDay(p.date, date));
+
+  const hasBookableTickets = (date: Date) => {
+    const performance = getPerformancesForDate(date);
+    return performance?.times.some((slot) => slot.available > 0) ?? false;
+  };
+
+  const firstBookableDate = useMemo(() => {
+    const sorted = [...performances].sort((a, b) => a.date.getTime() - b.date.getTime());
+    return sorted.find((performance) => performance.times.some((slot) => slot.available > 0))?.date ?? null;
   }, [performances]);
 
   useEffect(() => {
-    const nextDate = initialSelectedDate ?? firstAvailableDate;
-    if (!nextDate) return;
+    const candidate = initialSelectedDate ?? firstBookableDate;
+    if (!candidate) {
+      setSelectedDate(null);
+      setSelectedTimeKey(null);
+      return;
+    }
+    const nextDate = hasBookableTickets(candidate) ? candidate : firstBookableDate;
+    if (!nextDate) {
+      setSelectedDate(null);
+      setSelectedTimeKey(null);
+      return;
+    }
     setCurrentMonth(new Date(nextDate));
     setSelectedDate(new Date(nextDate));
     setSelectedTimeKey(null);
-  }, [firstAvailableDate, initialSelectedDate]);
+  }, [firstBookableDate, initialSelectedDate, performances]);
 
   const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
@@ -51,61 +74,43 @@ export function PerformanceCalendar({
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
   };
 
-  const hasPerformance = (day: number) => {
-    return performances.some(
-      (p) =>
-        p.date.getDate() === day &&
-        p.date.getMonth() === currentMonth.getMonth() &&
-        p.date.getFullYear() === currentMonth.getFullYear()
-    );
-  };
-
-  const getPerformancesForDate = (date: Date) => {
-    return performances.find(
-      (p) =>
-        p.date.getDate() === date.getDate() &&
-        p.date.getMonth() === date.getMonth() &&
-        p.date.getFullYear() === date.getFullYear()
-    );
-  };
-
   const days: React.ReactNode[] = [];
   for (let i = 0; i < firstDayOfMonth; i++) {
     days.push(<div key={`empty-${i}`} className="calendar-empty-day"></div>);
   }
 
+  const todayStart = startOfDay(new Date());
+
   for (let day = 1; day <= daysInMonth; day++) {
     const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    const isToday =
-      date.getDate() === new Date().getDate() &&
-      date.getMonth() === new Date().getMonth() &&
-      date.getFullYear() === new Date().getFullYear();
-    const isPast = date < new Date() && !isToday;
-    const hasShow = hasPerformance(day);
-    const isSelected = selectedDate?.getDate() === day && selectedDate?.getMonth() === currentMonth.getMonth();
+    const dateStart = startOfDay(date);
+    const isToday = isSameCalendarDay(date, todayStart);
+    const isPast = dateStart < todayStart;
+    const isBookable = !isPast && hasBookableTickets(date);
+    const isSelected = Boolean(selectedDate && isSameCalendarDay(date, selectedDate) && isBookable);
 
     days.push(
       <button
         key={day}
-        onClick={() => hasShow && !isPast && setSelectedDate(date)}
-        disabled={isPast || !hasShow}
+        type="button"
+        onClick={() => {
+          if (!isBookable) return;
+          setSelectedDate(date);
+          setSelectedTimeKey(null);
+        }}
+        disabled={!isBookable}
+        aria-disabled={!isBookable}
+        aria-pressed={isSelected}
         className={`calendar-day-btn ${
-          isPast
+          isPast || !isBookable
             ? 'calendar-day-unavailable'
             : isSelected
-            ? 'calendar-day-selected'
-            : hasShow
-            ? 'calendar-day-available'
-            : 'calendar-day-unavailable'
-        } ${isToday && !isSelected ? 'calendar-day-today' : ''}`}
-        onMouseDown={() => {
-          if (hasShow && !isPast) setSelectedTimeKey(null);
-        }}
+              ? 'calendar-day-selected'
+              : 'calendar-day-available'
+        } ${isToday && !isSelected && isBookable ? 'calendar-day-today' : ''}`}
       >
         <span className="calendar-day-number">{day}</span>
-        {hasShow && !isPast && (
-          <div className="calendar-dot"></div>
-        )}
+        {isBookable && <div className="calendar-dot" aria-hidden />}
       </button>
     );
   }
@@ -125,7 +130,8 @@ export function PerformanceCalendar({
     'December',
   ];
 
-  const selectedPerformance = selectedDate ? getPerformancesForDate(selectedDate) : null;
+  const selectedPerformance =
+    selectedDate && hasBookableTickets(selectedDate) ? getPerformancesForDate(selectedDate) : null;
   const defaultHint = "Navigation: Entering Backstage for 'Calendar & Date Schema' technical specs.";
   const timeSelectionHint = interactionHint ?? defaultHint;
 

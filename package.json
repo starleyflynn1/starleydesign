@@ -7,6 +7,7 @@
     "build": "vite build",
     "dev": "vite",
     "images:show-680": "node scripts/generate-show-680-variants.mjs",
+    "images:director": "node scripts/generate-director-portrait.mjs",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "predeploy:ftp": "npm run build",

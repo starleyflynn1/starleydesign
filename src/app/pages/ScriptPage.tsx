@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import React, { Suspense, lazy, useState } from 'react';
 import { Check, Copy, Download, FileText } from 'lucide-react';
+
+const ScriptResumeModal = lazy(() =>
+  import('../components/ScriptResumeModal').then((module) => ({ default: module.ScriptResumeModal }))
+);
 
 interface ScriptPageProps {
   resumeUrl: string;
@@ -117,59 +120,63 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
   return (
     <>
       <main className="app-main backstage-page">
-        <section id="technical-documentation" className="component-panel section-stack script-tech-section">
-          <div className="script-tech-header">
+        <section id="technical-documentation" className="component-panel section-stack script-tech-section portfolio-section portfolio-deep-dive">
+          <div className="script-tech-header portfolio-section-header">
             <h3 className="section-title">The Designed Stage</h3>
             <p className="hero-description">
-              Visual blueprints mapping the sophisticated interaction systems that bring The Designed Stage to life,
-              bridging technical complexity with intuitive UX.
+             The architectural blueprints behind of the interaction systems of The Designed Stage.
               {' '}
               <a href="/backstage" className="link-button">
                <strong>Step Backstage</strong> 
               </a>
-              {' '}to explore the underlying <strong>schemas</strong>, environmental persistence, and <strong>accessibility guardrails </strong> of the
+              {' '}to explore the underlying schemas, environmental persistence, and accessibility guardrails of the
               production.
             </p>
           </div>
 
-          <div className="script-tech-grid">
-            <article className="script-tech-card">
+          <div className="portfolio-grid portfolio-grid-split">
+            <article className="script-tech-card portfolio-card">
               <h4 className="spotlight-text">Planned System Architecture</h4>
-              <p className="script-tech-copy">
-                By moving away from "improvising" components and toward a Stage Manager&apos;s Script, we ensure the
-                entire application reads from a <strong>single source of truth</strong>. This centralized orchestration model protects
+              <p className="feature-copy">
+                By moving away from improvising components and toward a Stage Manager&apos;s Script, we ensure the
+                entire application reads from a single source of truth. This centralized orchestration model protects
                 the patron&apos;s journey through four key technical acts:
               </p>
-              <p className="script-tech-copy">
+              <p className="feature-copy">
                 <strong>The Orchestration Layer</strong>
-                <br />
                 This is the master script that handles three critical cues: <br />
-                <strong>State Consistency</strong>: No seat is spotlighted as "Selected" until the backend provides the cue. <br />
-                <strong>Side Effect Management</strong>: Coordinating the complex "backstage" handshakes between hold requests and{' '}
-                payment gateways. <br />
-                <strong>Conflict Resolution</strong>: Acting as the arbiter if two patrons attempt to claim the same seat simultaneously.
+                <br />
+                <em>State Consistency:</em> No seat is spotlighted as selected until the backend provides the cue. <br />
+                <br />
+                <em>Side Effect Management:</em> Coordinating the complex backstage handshakes between hold requests and{' '}
+                payment gateways. <br /> 
+                <br />
+                <em>Conflict Resolution:</em> Acting as the arbiter if two patrons attempt to claim the same seat simultaneously.
               </p>
-              <p className="script-tech-copy">
+              <p className="feature-copy">
                 <strong>The Box Office Lease (Temporary Holds)</strong>
                 <br />
-                Inventory is protected by treating seat selection as a Lease Pattern. <br />
-                <strong>Optimistic UI</strong>: To keep the performance fluid, the store updates the seat to "Pending" the moment a
+                Inventory is protected by treating seat selection as a lease pattern. <br />
+                <br />
+                <em>Optimistic UI:</em> To keep the performance fluid, the store updates the seat to "Pending" the moment a
                 patron clicks. <br />
-                <strong>Countdown to Curtains</strong>: The store manages a high-integrity <strong>TTL</strong> (<strong>Time-to-Live</strong>) buffer. It syncs a
+                <br />
+                <em>Countdown to Curtains:</em> The store manages a high-integrity TTL (Time-to-Live) buffer. It syncs a
                 10-minute timer with the server, broadcasts a "Warning" state as the hold nears expiration, and
                 gracefully releases the inventory if the patron misses their cue.
               </p>
-              <p className="script-tech-copy">
+              <p className="feature-copy">
                 <strong>Ensemble Synchronization (Real-Time)</strong>
                 <br />
-                A live performance requires everyone to see the same house. Utilizing <strong>WebSockets</strong> or <strong>SSE</strong>, the store
+                A live performance requires everyone to see the same house. Utilizing WebSockets or SSE, the store
                 ensures inventory is a live reflection of reality. When a seat is claimed, every active session
                 receives an "Inventory Update" to recalibrate. This prevents the "broken fourth wall" of a patron reaching checkout only to find their seat was taken
                 minutes ago.
               </p>
-              <p className="script-tech-copy">
+              <p className="feature-copy">
                 <strong>The Scripted Journey (State Machine)</strong>
-                The booking flow is a narrative in five acts. By implementing a <strong>Finite State Machine</strong> (<strong>FSM</strong>), we ensure
+                <br />
+                The booking flow is a narrative in five acts. By implementing a Finite State Machine (FSM), we ensure
                 the patron cannot skip their marks-preventing "illegal transitions" like moving to Payment (Act 4)
                 without a validated Lease (Act 2). This rigid logic ensures every journey ends in a successful
                 "Pass to the Show."
@@ -185,35 +192,35 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
               </div>
             </article>
 
-            <article className="script-tech-card script-tech-card-code">
+            <article className="script-tech-card portfolio-card script-tech-card-code">
               <h4 className="spotlight-text">Intent-Based Seating Algorithm</h4>
-              <p className="script-tech-copy">
-                To keep the &quot;Paradox of Choice&quot; at bay for an audience member, this runtime algorithm acts as the digital
+              <p className="feature-copy">
+                To keep the paradox of choice at bay for an audience member, this runtime algorithm acts as the digital
                 usher that guides the patron to their best possible viewing experience. The evaluation prioritizes{' '}
-                <strong>contiguous seat groups</strong> row-by-row to surface a single, high-fidelity recommendation that honors the
+                contiguous seat groups row-by-row to surface a single, high-fidelity recommendation that honors the
                 patron&apos;s intent.
               </p>
-              <p className="script-tech-copy">
+              <p className="feature-copy">
                 <strong>Finding the Golden Sightline</strong>
                 <br />
-                Each candidate group is scored against the &quot;Sweet Spot&quot; of the house—the intersection of the horizontal
+                Each candidate group is scored against the sweet spot of the house—the intersection of the horizontal
                 centerline and an optimal row depth (roughly 35% from the stage). The closer the ensemble matches this
-                coordinate, the higher the <strong>Sightline Score</strong>.
+                coordinate, the higher the sightline score.
               </p>
-              <p className="script-tech-copy">
+              <p className="feature-copy">
                 <strong>Ensemble Blocking &amp; Aisle Cues</strong>
                 <br />
                 Only fully contiguous windows are cast. Groups that cross a configured aisle break receive a heavy
                 blocking penalty, as the algorithm prioritizes keeping the party together in a single, uninterrupted row.
               </p>
-              <p className="script-tech-copy">
+              <p className="feature-copy">
                 <strong>Managing the House Balance</strong>
                 <br />
-                The algorithm applies <strong>Dead-Seat Prevention</strong> to ensure the inventory remains marketable. Any selection
+                The algorithm applies Dead-Seat Prevention to ensure the inventory remains marketable. Any selection
                 that would strand an isolated single seat—the theatrical equivalent of a missed cue—is de-prioritized to
                 preserve long-term sell-through health.
               </p>
-              <p className="script-tech-copy">
+              <p className="feature-copy">
                 <strong>Auto-Selection</strong>
                 <br />
                 The highest-scoring group is spotlighted as the primary suggestion. This ensures a fast-paced Opening Night
@@ -233,16 +240,16 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
               <pre className="script-tech-code" tabIndex={0}><code>{intentBasedSeatingAlgorithmSnippet}</code></pre>
             </article>
 
-            <article className="script-tech-card script-tech-card-code">
+            <article className="script-tech-card portfolio-card script-tech-card-code">
               <h4 className="spotlight-text">High-Density State Orchestration</h4>
-              <p className="script-tech-copy">
+              <p className="feature-copy">
                 To manage hundreds of interactive seats without the overhead of 500+ individual state observers, the house
-                is rendered as a <strong>single memoized projection</strong>.
+                is rendered as a single memoized projection.
               </p>
-              <p className="script-tech-copy">
-                By using a <strong>Sparse Override Map</strong> for status changes and a <strong>Roving Tabindex</strong> for accessibility, the
+              <p className="feature-copy">
+                By using a Sparse Override Map for status changes and a Roving Tabindex for accessibility, the
                 system maintains constant-time lookup for user interactions. This &quot;Backstage&quot; logic ensures that even as the
-                house grows to thousands of seats, the UI remains fluid, achieving a <strong>95+ Lighthouse performance score</strong>{' '}
+                house grows to thousands of seats, the UI remains fluid, achieving a 95+ Lighthouse performance score{' '}
                 by minimizing React re-renders and DOM thrashing.
               </p>
               <div className="script-tech-code-row">
@@ -259,11 +266,11 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
               <pre className="script-tech-code" tabIndex={0}><code>{highDensityStateOrchestrationSnippet}</code></pre>
             </article>
 
-            <article className="script-tech-card script-tech-card-code">
+            <article className="script-tech-card portfolio-card script-tech-card-code">
               <h4 className="spotlight-text">Interactive Debug Snapshot</h4>
-              <p className="script-tech-copy">
-                Built-in developer diagnostics provide real-time visibility into <strong>seat logic</strong> and <strong>ticket constraints</strong>.
-                This transparency bridges the gap between design and engineering, facilitating seamless <strong>quality assurance</strong>, clear demo
+              <p className="feature-copy">
+                Built-in developer diagnostics provide real-time visibility into seat logic and ticket constraints.
+                This transparency bridges the gap between design and engineering, facilitating seamless quality assurance, clear demo
                 narration, and deep-dive architecture walkthroughs.
               </p>
               <div className="script-tech-code-row">
@@ -282,8 +289,8 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
           </div>
         </section>
 
-        <section id="education-cloud-design-doc" className="component-panel section-stack script-tech-section">
-          <div className="script-tech-header">
+        <section id="education-cloud-design-doc" className="component-panel section-stack script-tech-section portfolio-section portfolio-deep-dive">
+          <div className="script-tech-header portfolio-section-header">
             <h3 className="section-title">Salesforce Education Cloud</h3>
             <p className="hero-description">
               Product and UX reference notes focused on course registration, degree planning, and program comparison
@@ -291,10 +298,10 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
             </p>
           </div>
 
-          <div className="script-tech-grid">
-            <article className="script-tech-card">
+          <div className="portfolio-grid portfolio-grid-split">
+            <article className="script-tech-card portfolio-card">
               <h4 className="spotlight-text">Intelligent Degree Planner</h4>
-              <p className="script-tech-copy">
+              <p className="feature-copy">
                 The drag-and-drop term planner automates requirement validation. By mapping planned courses against
                 remaining credits in real-time, it removes the guesswork from prerequisite sequencing and keeps
                 students on the fastest track to completion.
@@ -305,7 +312,7 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Open Learner Portal Documentation
+                Learner Portal Documentation
               </a>
               <a
                 href="https://res.cloudinary.com/hy4kyit2a/f_auto,fl_lossy,q_70/learn/modules/student-success-with-education-cloud/explore-the-learner-portal/images/fac4363dfd265f015157b81309b9a1a3_kix.59jefz262pux.png"
@@ -326,9 +333,9 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
               </a>
             </article>
 
-            <article className="script-tech-card">
+            <article className="script-tech-card portfolio-card">
               <h4 className="spotlight-text">Intelligent Program Comparison Engine</h4>
-              <p className="script-tech-copy">
+              <p className="feature-copy">
                 The platform's degree comparison tool surfaces critical differences in program duration and credit
                 hours. This side-by-side analysis automates 'what-if' scenarios, allowing advisors and learners to
                 instantly see requirement gaps and make informed transfer decisions.
@@ -339,7 +346,7 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Open Program Comparison Documentation
+                Program Comparison Documentation
               </a>
               <a
                 href="https://res.cloudinary.com/hy4kyit2a/f_auto,fl_lossy,q_70/learn/modules/student-success-with-education-cloud/explore-the-learner-portal/images/57744418e2bda8603c198b4f0a2aa55e_kix.6nom3yc8kfna.png"
@@ -360,9 +367,9 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
               </a>
             </article>
 
-            <article className="script-tech-card">
+            <article className="script-tech-card portfolio-card">
               <h4 className="spotlight-text">Course Search and Registration</h4>
-              <p className="script-tech-copy">
+              <p className="feature-copy">
                 Education Cloud streamlines registration by consolidating search, seat availability, and cart
                 management into a single view. This eliminates context switching, allowing learners to verify
                 eligibility and enroll in one seamless flow.
@@ -373,7 +380,7 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Open Course Registration Reference
+                Course Registration Reference
               </a>
               <a
                 href="https://sf-zdocs-cdn-prod.zoominsoftware.com/tdta-education_cloud-260-0-0-production-enus/e66d9fbf-c55a-4f61-88e7-f7e98b63ac3e/education_cloud/images/course_search_and_registration.png"
@@ -394,9 +401,9 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
               </a>
             </article>
 
-            <article className="script-tech-card">
+            <article className="script-tech-card portfolio-card">
               <h4 className="spotlight-text">Education Cloud Architecture</h4>
-              <p className="script-tech-copy">
+              <p className="feature-copy">
                 The platform unifies the student experience by centering all data around the learner lifecycle. By
                 combining specialized apps for academic success with powerful automation, Education Cloud eliminates
                 silos from recruitment through to alumni relations.
@@ -407,7 +414,7 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Open Education Cloud Tools and Benefits
+                Education Cloud Tools and Benefits
               </a>
               <a
                 href="https://res.cloudinary.com/hy4kyit2a/f_auto,fl_lossy,q_70/learn/modules/education-cloud-basics/education-cloud-tools-and-benefits/images/aa92349165c809c196b7ca79e668f4bd_kix.alariidpt8ma.png"
@@ -430,8 +437,8 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
           </div>
         </section>
 
-        <section id="google-engineering-process" className="component-panel section-stack script-tech-section script-tech-section-google">
-          <div className="script-tech-header">
+        <section id="google-engineering-process" className="component-panel section-stack script-tech-section portfolio-section portfolio-deep-dive">
+          <div className="script-tech-header portfolio-section-header">
             <h3 className="section-title">Google</h3>
             <p className="hero-description">
               The delivery framework used for proprietary platform work, from product alignment through rollout,
@@ -439,72 +446,72 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
             </p>
           </div>
 
-          <div className="script-tech-grid">
-            <article className="script-tech-card">
+          <div className="portfolio-grid portfolio-grid-stack">
+            <article className="script-tech-card portfolio-card">
               <h4 className="spotlight-text">Requirement Discovery and Product Alignment</h4>
-              <p className="script-tech-copy">
+              <p className="feature-copy">
                 Work starts with a clearly defined problem statement and shared success metrics. I partner with PMs, UX, and
-                domain stakeholders to align on user outcomes, edge cases, and <strong>non-functional constraints</strong> so
-                implementation scope and <strong>Definition of Done</strong> remain explicit from day one.
+                domain stakeholders to align on user outcomes, edge cases, and non-functional constraints so
+                implementation scope and Definition of Done remain explicit from day one.
               </p>
             </article>
 
-            <article className="script-tech-card">
+            <article className="script-tech-card portfolio-card">
               <h4 className="spotlight-text">Design Phase and Technical Review</h4>
-              <p className="script-tech-copy">
-                Before production code, I draft a technical design that maps <strong>service boundaries</strong>, <strong>data contracts</strong>, and
+              <p className="feature-copy">
+                Before production code, I draft a technical design that maps service boundaries, data contracts, and
                 risk trade-offs such as latency, consistency, and operational complexity. The design is reviewed with
                 engineering peers to validate reuse opportunities and reduce architectural drift.
               </p>
             </article>
 
-            <article className="script-tech-card">
+            <article className="script-tech-card portfolio-card">
               <h4 className="spotlight-text">Iterative Implementation</h4>
-              <p className="script-tech-copy">
-                Execution is milestone-driven with small, atomic <strong>PRs</strong> that keep review quality high and blast radius
+              <p className="feature-copy">
+                Execution is milestone-driven with small, atomic PRs that keep review quality high and blast radius
                 low. This workflow improves collaboration across engineers and speeds decisions around code quality,
                 security posture, and long-term maintainability.
               </p>
             </article>
 
-            <article className="script-tech-card">
+            <article className="script-tech-card portfolio-card">
               <h4 className="spotlight-text">Layered Test Cycle</h4>
-              <p className="script-tech-copy">
-                Validation follows a layered strategy: <strong>unit tests</strong> for core logic, <strong>integration tests</strong> for service
-                boundaries, and <strong>end-to-end</strong> checks for real user journeys. Pre-release confidence is reinforced in{' '}
-                <strong>staging</strong> and <strong>canary</strong> environments using production-like configuration patterns.
+              <p className="feature-copy">
+                Validation follows a layered strategy: unit tests for core logic, integration tests for service
+                boundaries, and end-to-end checks for real user journeys. Pre-release confidence is reinforced in{' '}
+                staging and canary environments using production-like configuration patterns.
               </p>
             </article>
 
-            <article className="script-tech-card">
+            <article className="script-tech-card portfolio-card">
               <h4 className="spotlight-text">Deployment and Controlled Rollout</h4>
-              <p className="script-tech-copy">
+              <p className="feature-copy">
                 Launches are progressive, not binary. Feature flags and phased rollout gates enable real-time
-                monitoring at low exposure levels first, with fast disable paths when <strong>telemetry</strong> signals regressions in
+                monitoring at low exposure levels first, with fast disable paths when telemetry signals regressions in
                 latency, reliability, or error rates.
               </p>
             </article>
 
-            <article className="script-tech-card">
+            <article className="script-tech-card portfolio-card">
               <h4 className="spotlight-text">Observability and Post-Launch Learning</h4>
-              <p className="script-tech-copy">
-                After release, ownership shifts to operational visibility and continuous improvement. <strong>Dashboards</strong>,
-                <strong> alerting</strong>, and <strong>incident review loops</strong> feed directly into backlog refinement so each cycle improves system
+              <p className="feature-copy">
+                After release, ownership shifts to operational visibility and continuous improvement. Dashboards,
+                alerting, and incident review loops feed directly into backlog refinement so each cycle improves system
                 resilience, developer velocity, and user trust.
               </p>
             </article>
           </div>
         </section>
 
-        <section className="component-panel section-stack">
+        <section className="component-panel section-stack portfolio-section">
           <h3 className="section-title">Resume</h3>
           <p className="hero-description">
-            Open a cinematic preview of my resume or download the PDF directly.
+            Access the theatrical preview of my professional journey or download the PDF directly.
           </p>
           <div className="script-actions">
             <button className="script-open-btn" onClick={() => setIsResumeOpen(true)}>
               <FileText className="w-4 h-4" />
-              Open Resume
+              View Resume
             </button>
             <a className="script-download-btn" href={resumeUrl} download>
               <Download className="w-4 h-4" />
@@ -514,54 +521,15 @@ export function ScriptPage({ resumeUrl }: ScriptPageProps) {
         </section>
       </main>
 
-      <AnimatePresence>
-        {isResumeOpen && (
-          <div className="script-modal-wrap">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="script-modal-backdrop"
-              onClick={() => setIsResumeOpen(false)}
-            />
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: -20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -20 }}
-              transition={{ type: 'spring', duration: 0.4 }}
-              className="script-modal-panel"
-              onClick={(e) => e.stopPropagation()}
-              role="dialog"
-              aria-modal="true"
-              aria-label="Resume preview"
-            >
-              <div className="script-modal-header">
-                <h3 className="section-title script-modal-title">Resume Preview</h3>
-                <button
-                  onClick={() => setIsResumeOpen(false)}
-                  className="script-modal-close-btn"
-                  aria-label="Close resume preview"
-                >
-                  <span aria-hidden="true" className="script-modal-close-glyph">×</span>
-                </button>
-              </div>
-
-              <div className="script-modal-content">
-                <iframe title="Resume PDF" src={resumeUrl} className="script-resume-frame" />
-              </div>
-
-              <div className="script-modal-footer">
-                <a className="script-download-btn" href={resumeUrl} download>
-                  <Download className="w-4 h-4" />
-                  Download PDF
-                </a>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      {isResumeOpen && (
+        <Suspense fallback={null}>
+          <ScriptResumeModal
+            resumeUrl={resumeUrl}
+            isOpen={isResumeOpen}
+            onClose={() => setIsResumeOpen(false)}
+          />
+        </Suspense>
+      )}
 
       {copyToastMessage && (
         <div className="script-copy-toast" role="status" aria-live="polite">

@@ -1,7 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { CloseIcon, MenuIcon, MoonIcon, PauseIcon, PlayIcon, SearchIcon, SunIcon, TheaterIcon } from './AppIcons';
 import { useTheme } from '../contexts/ThemeContext';
-import { StylePicker } from './StylePicker';
+
+const StylePicker = lazy(() =>
+  import('./StylePicker').then((module) => ({ default: module.StylePicker }))
+);
 
 interface TheaterHeaderProps {
   onSearchClick: () => void;
@@ -154,7 +157,9 @@ export function TheaterHeader({ onSearchClick, onNavigate }: TheaterHeaderProps)
                 <SearchIcon className="w-5 h-5" />
               </button>
 
-              <StylePicker />
+              <Suspense fallback={null}>
+                <StylePicker />
+              </Suspense>
 
               <button
                 onClick={() => {
@@ -218,17 +223,19 @@ export function TheaterHeader({ onSearchClick, onNavigate }: TheaterHeaderProps)
             ref={mobileMenuRef}
           >
             <div className="theater-nav-mobile-controls">
-              <StylePicker
-                onOpenChange={setIsMobileStylePickerOpen}
-                onThemeSelected={() => {
-                  setIsMobileStylePickerOpen(false);
-                  closeMobileMenu();
-                }}
-                onEscape={() => {
-                  setIsMobileStylePickerOpen(false);
-                  closeMobileMenu();
-                }}
-              />
+              <Suspense fallback={null}>
+                <StylePicker
+                  onOpenChange={setIsMobileStylePickerOpen}
+                  onThemeSelected={() => {
+                    setIsMobileStylePickerOpen(false);
+                    closeMobileMenu();
+                  }}
+                  onEscape={() => {
+                    setIsMobileStylePickerOpen(false);
+                    closeMobileMenu();
+                  }}
+                />
+              </Suspense>
               <button
                 onClick={toggleMode}
                 className="theater-icon-btn"

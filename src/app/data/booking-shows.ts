@@ -1,6 +1,6 @@
 import { Show } from './types';
 
-export const BOOKING_SHOWS_CATEGORY = 'shows-theater';
+export { BOOKING_SHOWS_CATEGORY } from './booking-constants';
 
 export const BOOKING_SHOWS: Show[] = [
   {

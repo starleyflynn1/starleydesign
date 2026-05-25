@@ -194,6 +194,12 @@
   color: var(--foreground);
 }
 
+.theme-coastal:not(.dark) {
+  --accent-gold: color-mix(in oklab, var(--sea-glass) 72%, #0d5c56 28%);
+  --narrative-section-gold: var(--foreground);
+  --show-card-title-hover-color: var(--sea-glass);
+}
+
 .theme-coastal .theater-icon-btn,
 .theme-coastal .theater-mobile-search-btn,
 .theme-coastal .theater-mobile-menu-btn,

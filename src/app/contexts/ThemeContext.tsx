@@ -149,6 +149,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return 'default';
   }, []);
 
+  /** Inline tokens from index.html critical paint must be cleared or they beat .theme-* CSS vars. */
+  const clearCriticalPaintOverrides = useCallback((root: HTMLElement) => {
+    root.style.removeProperty('--background');
+    root.style.removeProperty('--foreground');
+    root.style.removeProperty('--card');
+    root.style.removeProperty('--border');
+  }, []);
+
   const applyRootTheme = useCallback((theme: ThemeName, currentMode: Mode) => {
     const root = document.documentElement;
     Object.keys(themeConfigs).forEach((themeName) => {
@@ -160,7 +168,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } else {
       root.classList.remove('dark');
     }
-  }, []);
+    root.style.colorScheme = currentMode;
+    clearCriticalPaintOverrides(root);
+  }, [clearCriticalPaintOverrides]);
 
   const resolveVariableRgb = useCallback((variableName: string): [number, number, number] | null => {
     const resolved = window.getComputedStyle(document.documentElement).getPropertyValue(variableName);
@@ -437,7 +447,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [currentTheme, mode, reduceMotionEnabled, applyRootTheme, applySemanticContrastGuardrails, ensureThemeStylesLoaded]);
 
   const setTheme = (theme: ThemeName) => {
-    runThemeTransition(theme, themeConfigs[theme].defaultMode);
+    runThemeTransition(theme, mode);
   };
 
   const setMode = (newMode: Mode) => {

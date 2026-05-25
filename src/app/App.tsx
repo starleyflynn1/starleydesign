@@ -1,17 +1,16 @@
 import React from 'react';
 import { flushSync, createPortal } from 'react-dom';
-import { Suspense, lazy, useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } from 'react';
+import { Suspense, lazy, useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { TheaterHeader } from './components/TheaterHeader';
 import { TheaterIcon } from './components/AppIcons';
-import { StagePage } from './pages/StagePage';
-import { SHOWS } from './data/shows';
-import { BOOKING_SHOWS, BOOKING_SHOWS_CATEGORY } from './data/booking-shows';
-import { BOOKING_STEPS } from './data/booking-steps';
-import { buildUpcomingPerformances } from './lib/performances';
-import { resolveUsherDestination } from './lib/usher-routing';
-import { Performance } from './data/types';
+import { BOOKING_SHOWS_CATEGORY, BOOKING_STEP_COUNT } from './data/booking-constants';
+import { readHomeViewFromLocation } from './lib/home-view';
+import { BOOKING_SHOW_TITLES, resolveUsherDestination } from './lib/usher-routing';
 
+const HomeStageHost = lazy(() =>
+  import('./HomeStageHost').then((module) => ({ default: module.HomeStageHost }))
+);
 const ScriptPage = lazy(() => import('./pages/ScriptPage').then((module) => ({ default: module.ScriptPage })));
 const DirectorPage = lazy(() => import('./pages/DirectorPage').then((module) => ({ default: module.DirectorPage })));
 const BackstagePage = lazy(() => import('./pages/BackstagePage').then((module) => ({ default: module.BackstagePage })));
@@ -20,13 +19,12 @@ const GlobalUsher = lazy(() =>
 );
 export default function App() {
   const [isUsherOpen, setIsUsherOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<'home' | 'booking' | 'seating' | 'calendar'>('seating');
+  const [currentView, setCurrentView] = useState(readHomeViewFromLocation);
   const [bookingStep, setBookingStep] = useState(1);
   const [bookingShowOverride, setBookingShowOverride] = useState<string | undefined>(undefined);
   const [isExitBookingDialogOpen, setIsExitBookingDialogOpen] = useState(false);
   const [pendingExitHref, setPendingExitHref] = useState<string | null>(null);
   const [exitDialogAnchorTop, setExitDialogAnchorTop] = useState<number | null>(null);
-  const [performances, setPerformances] = useState<Performance[]>([]);
   const isPageTransitioningRef = useRef(false);
   /** Snapshot scroll when exit confirmation opens — restore in layout effect to avoid jump from scroll lock. */
   const exitDialogScrollYRef = useRef(0);
@@ -70,6 +68,7 @@ export default function App() {
 
     // Default entry section for the main page.
     window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#stage`);
+    setCurrentView('home');
   }, []);
 
   useEffect(() => {
@@ -77,24 +76,7 @@ export default function App() {
     if (window.location.pathname !== '/') return;
 
     const syncViewWithHash = () => {
-      const hash = window.location.hash;
-      if (hash === '#stage') {
-        setCurrentView('home');
-        return;
-      }
-      if (hash === '#seating-chart' || hash === '#seating') {
-        setCurrentView('seating');
-        return;
-      }
-      if (hash === '#booking-flow' || hash === '#booking') {
-        setCurrentView('booking');
-        return;
-      }
-      if (hash === '#calendar') {
-        setCurrentView('calendar');
-        return;
-      }
-      setCurrentView('seating');
+      setCurrentView(readHomeViewFromLocation());
     };
 
     syncViewWithHash();
@@ -103,32 +85,21 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      setPerformances(buildUpcomingPerformances());
-      return;
-    }
-    let cancelled = false;
-    const run = () => {
-      if (cancelled) return;
-      setPerformances(buildUpcomingPerformances());
+    if (currentPage !== 'home' || typeof window === 'undefined') return;
+    const prefetchHome = () => {
+      void import('./HomeStageHost');
     };
-
-    if ('requestIdleCallback' in window) {
-      const idleId = (window as Window & { requestIdleCallback: (cb: IdleRequestCallback) => number })
-        .requestIdleCallback(() => run());
-      return () => {
-        cancelled = true;
-        (window as Window & { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback?.(idleId);
-      };
-    }
-
-    const timeoutId = globalThis.setTimeout(run, 0);
-    return () => {
-      cancelled = true;
-      globalThis.clearTimeout(timeoutId);
+    const w = window as Window & {
+      requestIdleCallback?: (cb: IdleRequestCallback, opts?: IdleRequestOptions) => number;
+      cancelIdleCallback?: (id: number) => void;
     };
-  }, []);
-  const bookingShowTitles = useMemo(() => new Set(BOOKING_SHOWS.map((show) => show.title)), []);
+    if (typeof w.requestIdleCallback === 'function') {
+      const idleId = w.requestIdleCallback(prefetchHome, { timeout: 2500 });
+      return () => w.cancelIdleCallback?.(idleId);
+    }
+    const timeoutId = globalThis.setTimeout(prefetchHome, 1200);
+    return () => globalThis.clearTimeout(timeoutId);
+  }, [currentPage]);
   const isBookingFlowActive = currentPage === 'home' && currentView === 'booking';
   const hideFooterForBooking = currentPage === 'home' && currentView === 'booking';
   const runUsherSpotlightTransition = useCallback((navigate: () => void) => {
@@ -252,14 +223,19 @@ export default function App() {
         execute();
         return;
       }
+      const isBookingExitToStage = isBookingFlowActive && (!href || href === '/#stage');
+      if (isBookingExitToStage) {
+        execute();
+        return;
+      }
       runUsherSpotlightTransition(execute);
     },
-    [runUsherSpotlightTransition]
+    [isBookingFlowActive, runUsherSpotlightTransition]
   );
   const confirmExitBooking = useCallback(
     (href: string) => {
       if (!isBookingFlowActive) return true;
-      if (bookingStep >= BOOKING_STEPS.length) return true;
+      if (bookingStep >= BOOKING_STEP_COUNT) return true;
       if (href.includes('#booking-flow') || href.includes('#booking')) {
         return true;
       }
@@ -542,7 +518,7 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <div className="app-root">
+      <div className={`app-root ${hideFooterForBooking ? '' : 'app-root--has-footer'}`}>
         <TheaterHeader onSearchClick={() => setIsUsherOpen(true)} onNavigate={confirmExitBooking} />
 
       <Suspense fallback={null}>
@@ -551,7 +527,7 @@ export default function App() {
             isOpen={isUsherOpen}
             onClose={() => setIsUsherOpen(false)}
             onSelect={(action) => {
-              if (bookingShowTitles.has(action.title)) {
+              if (BOOKING_SHOW_TITLES.has(action.title)) {
                 runUsherSpotlightTransition(() => {
                   if (typeof window !== 'undefined') {
                     const bookingUrl = `/?bookingCategory=${encodeURIComponent(
@@ -679,22 +655,20 @@ export default function App() {
         )}
 
       {currentPage === 'home' && (
-        <StagePage
-          shows={SHOWS}
-          bookingShows={BOOKING_SHOWS}
-          bookingSteps={BOOKING_STEPS}
-          performances={performances}
-          currentView={currentView}
-          bookingStep={bookingStep}
-          initialBookingShow={
-            bookingShowOverride ??
-            (bookingCategoryFromQuery === BOOKING_SHOWS_CATEGORY ? bookingShowFromQuery : undefined)
-          }
-          confirmExitNavigation={confirmExitBooking}
-          runSpotlightTransition={runUsherSpotlightTransition}
-          setCurrentView={setCurrentView}
-          setBookingStep={setBookingStep}
-        />
+        <Suspense fallback={null}>
+          <HomeStageHost
+            currentView={currentView}
+            bookingStep={bookingStep}
+            initialBookingShow={
+              bookingShowOverride ??
+              (bookingCategoryFromQuery === BOOKING_SHOWS_CATEGORY ? bookingShowFromQuery : undefined)
+            }
+            confirmExitNavigation={confirmExitBooking}
+            runSpotlightTransition={runUsherSpotlightTransition}
+            setCurrentView={setCurrentView}
+            setBookingStep={setBookingStep}
+          />
+        </Suspense>
       )}
 
       <Suspense fallback={null}>
@@ -703,31 +677,32 @@ export default function App() {
         {currentPage === 'backstage' && <BackstagePage />}
       </Suspense>
 
-      {!hideFooterForBooking && (
-        <footer className="app-footer">
-          <div className="app-footer-inner">
-            <div className="app-footer-row">
-              <div className="footer-brand">
-                <TheaterIcon className="icon-md-velvet" />
-                <p className="footer-copy">
-                  <span className="footer-copy-lead">© 2026 Starley Flynn</span>
-                </p>
-              </div>
-              <div className="footer-links">
-                <a href="/#stage" className="footer-link">
-                  Stage
-                </a>
-                <a href="/script" className="footer-link">
-                  Script
-                </a>
-                <a href="/backstage" className="footer-link">
-                  Backstage
-                </a>
-              </div>
+      <footer
+        className={`app-footer ${hideFooterForBooking ? 'app-footer--collapsed' : ''}`}
+        aria-hidden={hideFooterForBooking}
+      >
+        <div className="app-footer-inner">
+          <div className="app-footer-row">
+            <div className="footer-brand">
+              <TheaterIcon className="icon-md-velvet" />
+              <p className="footer-copy">
+                <span className="footer-copy-lead">© 2026 Starley Flynn</span>
+              </p>
+            </div>
+            <div className="footer-links">
+              <a href="/#stage" className="footer-link" tabIndex={hideFooterForBooking ? -1 : undefined}>
+                Stage
+              </a>
+              <a href="/script" className="footer-link" tabIndex={hideFooterForBooking ? -1 : undefined}>
+                Script
+              </a>
+              <a href="/backstage" className="footer-link" tabIndex={hideFooterForBooking ? -1 : undefined}>
+                Backstage
+              </a>
             </div>
           </div>
-        </footer>
-      )}
+        </div>
+      </footer>
     </div>
     </ThemeProvider>
   );

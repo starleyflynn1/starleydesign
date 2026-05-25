@@ -98,7 +98,7 @@
 }
 
 /* --- The Archive Button --- */
-.theme-archive :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn)) {
+.theme-archive :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-day-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn)) {
   font-family: 'Playfair Display', serif;
   text-transform: uppercase;
   border: 4px double var(--stage-base);
@@ -108,7 +108,7 @@
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.theme-archive :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn):hover) {
+.theme-archive :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-day-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn):hover) {
   background: var(--stage-base);
   color: var(--marquee-surface);
   transform: translateY(-2px);
@@ -228,6 +228,36 @@
 .theme-archive .segment-btn.segment-btn-active,
 .dark.theme-archive .segment-btn.segment-btn-active {
   border: 3px double color-mix(in oklab, var(--velvet) 80%, var(--stage-base) 20%) !important;
+}
+
+/* --- Calendar isolation: prevent archive global button chrome on day grid --- */
+.theme-archive .calendar-nav-btn,
+.theme-archive .calendar-day-btn,
+.theme-archive .calendar-time-btn {
+  text-transform: none;
+  letter-spacing: normal;
+  box-shadow: none;
+  transform: none;
+  filter: none;
+}
+
+.theme-archive .calendar-root .calendar-day-btn,
+.theme-archive .calendar-root .calendar-day-btn:hover,
+.theme-archive .calendar-root .calendar-day-btn:focus-visible {
+  padding: 0 !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  font-family: inherit !important;
+  transform: none !important;
+  filter: none !important;
+}
+
+.theme-archive .calendar-root .calendar-day-btn.calendar-day-available,
+.theme-archive .calendar-root .calendar-day-btn.calendar-day-unavailable {
+  border-width: 1px !important;
+  border-style: solid !important;
 }
 
 /* Match calendar selected state to the same velvet maroon as active mode buttons. */
