@@ -350,6 +350,22 @@
   box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
 }
 
+.theme-coastal .line-prompter-root {
+  --lp-control-border-width: 2px;
+  --lp-control-border: 2px solid var(--lp-control-border-color);
+}
+
+.theme-coastal .line-prompter-root :is(
+  .upload-card,
+  .picker-card,
+  .settings-card,
+  .preview-details,
+  .missed-lines-report,
+  .prompter-stage
+) {
+  backdrop-filter: blur(12px);
+}
+
 /* --- Calendar isolation: prevent coastal global button pills --- */
 .theme-coastal .calendar-nav-btn,
 .theme-coastal .calendar-day-btn,

@@ -12,18 +12,21 @@ const BookingProgress = lazy(() =>
 const PerformanceCalendar = lazy(() =>
   import('../components/PerformanceCalendar').then((module) => ({ default: module.PerformanceCalendar }))
 );
+const LinePrompter = lazy(() =>
+  import('../components/LinePrompter').then((module) => ({ default: module.LinePrompter }))
+);
 
 interface StagePageProps {
   shows: Show[];
   bookingShows: Show[];
   bookingSteps: BookingStep[];
   performances: Performance[];
-  currentView: 'home' | 'booking' | 'seating' | 'calendar';
+  currentView: 'home' | 'booking' | 'seating' | 'calendar' | 'prompter';
   bookingStep: number;
   initialBookingShow?: string;
   confirmExitNavigation?: (href: string) => boolean;
   runSpotlightTransition?: (navigate: () => void) => void;
-  setCurrentView: (view: 'home' | 'booking' | 'seating' | 'calendar') => void;
+  setCurrentView: (view: 'home' | 'booking' | 'seating' | 'calendar' | 'prompter') => void;
   setBookingStep: (step: number) => void;
 }
 
@@ -337,13 +340,18 @@ export function StagePage({
     };
   }, [isMobileViewport]);
   const handleComponentTabChange = (
-    view: 'booking' | 'seating' | 'calendar', 
-    e?: React.MouseEvent // Add the event parameter
+    view: 'booking' | 'seating' | 'calendar' | 'prompter',
+    e?: React.MouseEvent
   ) => {
-    if (e) e.preventDefault(); // Stop the scroll-to-top behavior
-  
+    if (e) e.preventDefault();
+
     if (currentView === 'booking' && view !== 'booking' && confirmExitNavigation) {
-      const destination = view === 'seating' ? '/#seating' : '/#calendar';
+      const destination =
+        view === 'seating'
+          ? '/#seating'
+          : view === 'calendar'
+            ? '/#calendar'
+            : '/#line-prompter';
       if (!confirmExitNavigation(destination)) return;
     }
 
@@ -362,6 +370,16 @@ export function StagePage({
         });
       } else if (view === 'calendar') {
         window.history.replaceState(null, '', '/#calendar');
+        queueMicrotask(() => {
+          requestAnimationFrame(() => {
+            document.getElementById('booking-flow')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
+          });
+        });
+      } else if (view === 'prompter') {
+        window.history.replaceState(null, '', '/#line-prompter');
         queueMicrotask(() => {
           requestAnimationFrame(() => {
             document.getElementById('booking-flow')?.scrollIntoView({
@@ -411,8 +429,7 @@ export function StagePage({
         <p className="hero-description">
           <span>
             <span>
-            An immersive, state-driven design system combining keyboard-first interactions, accessible spatial navigation, and a narrative booking journey.
-            </span>
+            An immersive digital stage for human connection, where intuitive spatial interaction, accessibility, and narrative-led user journeys shape the experience.            </span>
           </span>
         </p>
 
@@ -485,8 +502,22 @@ export function StagePage({
             >
               Calendar
             </button>
+            <button
+              onClick={() => handleComponentTabChange('prompter')}
+              className={`segment-btn ${
+                currentView === 'prompter' ? 'segment-btn-active' : ''
+              }`}
+            >
+              Line Prompter
+            </button>
           </div>
         </div>
+
+        {currentView === 'prompter' && (
+          <Suspense fallback={null}>
+            <LinePrompter />
+          </Suspense>
+        )}
 
         {currentView === 'calendar' && (
           <Suspense fallback={null}>
@@ -786,6 +817,10 @@ export function StagePage({
                   An atmospheric, keyboard-first command palette that utilizes spotlight transitions and theater-themed state
                   management to navigate complex inventory.
                 </p>
+                <p className="stage-feature-card-meta">Problem Solved</p>
+                <p className="feature-copy">Traditional nested navigation forces theater administrators and power users to constantly context-switch, slowing workflows and increasing cognitive load during high-pressure booking periods.</p>
+                <p className="stage-feature-card-meta">User Impact</p>
+                <p className="feature-copy">Condenses complex workflows into a single, universal interaction layer. Spotlight-driven discovery reduces visual clutter, minimizes menu traversal, and accelerates task completion for frequent users.</p>
               </article>
               <article className="feature-item portfolio-card stage-feature-hero-card">
                 <h4 className="spotlight-text feature-card-title">The Interactive House</h4>
@@ -794,21 +829,39 @@ export function StagePage({
                   A spatial seating engine architected to support real-time state synchronization for VIP, accessible, and
                   standard inventory, engineered for high-integrity UX.
                 </p>
-              </article>
-              <article className="feature-item portfolio-card">
+                <p className="stage-feature-card-meta">Problem Solved</p>
+                <p className="feature-copy">Static or poorly synchronized seating maps create booking conflicts, unclear availability states, and uncertainty around accessibility accommodations such as wheelchair spaces and companion seating.</p>
+                <p className="stage-feature-card-meta">User Impact</p>
+                <p className="feature-copy">Creates confidence before purchase through live seat-state visibility and clear spatial context. Patrons can independently evaluate availability, accessibility needs, and seating relationships without guesswork.</p>
+                </article>
+                <article className="feature-item portfolio-card">
                 <h4 className="spotlight-text feature-card-title">The 5-Act Checkout</h4>
                 <p className="stage-feature-card-meta">Guided Transactions · Narrative Commerce</p>
                 <p className="feature-copy">
                   A theatric booking journey that utilizes visual progress indicators to transform a standard transaction into
                   a guided performance.
                 </p>
+                <p className="stage-feature-card-meta">Problem Solved</p>
+                <p className="feature-copy">Traditional multi-step checkouts often feel fragmented, increasing abandonment when users lose context or become uncertain about progress.</p>
+                <p className="stage-feature-card-meta">User Impact</p>
+                <p className="feature-copy">Introduces a structured, low-friction purchase flow that reduces anxiety through predictable stages, clear progress indicators, and narrative continuity across the transaction.</p>
               </article>
               <article className="feature-item portfolio-card">
-                <h4 className="spotlight-text feature-card-title">Performance Calendar</h4>
-                <p className="stage-feature-card-meta">Temporal Scheduling · Availability Orchestration</p>
+                <h4 className="spotlight-text feature-card-title">Line Prompter</h4>
+                <p className="stage-feature-card-meta">Web Speech API · TTS/STT</p>
                 <p className="feature-copy">
-                A precision-built booking interface that synchronizes matinee and evening performance 
-                availability through concurrency-aware scheduling.
+                  A browser-based rehearsal companion that parses uploaded scripts, speaks partner lines aloud, listens
+                  for yours through the microphone, and advances the scene when your delivery matches—or use voice
+                  commands (&quot;line,&quot; &quot;next,&quot; &quot;back&quot;) to prompt, skip, or rewind.
+                </p>
+                <p className="stage-feature-card-meta">Problem Solved</p>
+                <p className="feature-copy">
+                  Solo rehearsal often means reading silently or skipping over partner lines, which eliminates the critical skill of listening to cues and makes memorization a non-interactive chore.
+                </p>
+                <p className="stage-feature-card-meta">User Impact</p>
+                <p className="feature-copy">
+                  Actors can run scenes hands-free with spoken cues, adaptive line recognition, and on-demand prompts—all
+                  in the browser with no uploads, so practice stays private and immediately accessible.
                 </p>
               </article>
             </div>
@@ -824,6 +877,10 @@ export function StagePage({
                   A low-glare optimization engine calibrated for discreet device usage in light-sensitive environments,
                   reducing visual noise without sacrificing clarity.
                 </p>
+                <p className="stage-feature-card-meta">Problem Solved</p>
+                <p className="feature-copy">Bright screen glare is highly disruptive in live theater environments and causes significant eye strain for users with light sensitivity or low-vision conditions.</p>
+                <p className="stage-feature-card-meta">User Impact</p>
+                <p className="feature-copy">Maximizes visual comfort and situational inclusivity. By strictly regulating contrast and luminance, it allows users to discreetly check details in a dark auditorium without breaking immersion or causing digital eye strain.</p>
               </article>
               <article className="feature-item portfolio-card">
                 <h4 className="spotlight-text feature-card-title">Static Stage</h4>
@@ -832,6 +889,10 @@ export function StagePage({
                   A global override that silences ambient animations and background transitions, providing a static environment
                   for viewers with motion sensitivity.
                 </p>
+                <p className="stage-feature-card-meta">Problem Solved</p>
+                <p className="feature-copy">Unexpected movement, parallax effects, and animated transitions can trigger vestibular discomfort or make interfaces inaccessible for motion-sensitive users.</p>
+                <p className="stage-feature-card-meta">User Impact</p>
+                <p className="feature-copy">Provides direct control over environmental motion, creating a safer, more predictable experience that remains fully functional regardless of sensory preferences.</p>
               </article>
             </div>
           </div>
@@ -846,6 +907,10 @@ export function StagePage({
                   Dynamic environment toggles that shift the experience between high-visibility utility and immersive
                   &quot;Misty&quot; or &quot;Midnight&quot; states.
                 </p>
+                <p className="stage-feature-card-meta">Problem Solved</p>
+                <p className="feature-copy">Static themes fail to account for changing environmental conditions and personal preferences, forcing users to adapt to interfaces that may become difficult to read across different lighting contexts.</p>
+                <p className="stage-feature-card-meta">User Impact</p>
+                <p className="feature-copy">Improves situational readability by adapting visual contrast and presentation to environmental needs. Users can prioritize clarity in high-visibility scenarios or shift toward more immersive viewing modes without sacrificing usability.</p>
               </article>
               <article className="feature-item portfolio-card">
                 <h4 className="spotlight-text feature-card-title">Production Show Cards</h4>
@@ -853,6 +918,10 @@ export function StagePage({
                 <p className="feature-copy">
                 Structured content modules that balance high-density metadata with a refined, premium visual system.
                 </p>
+                <p className="stage-feature-card-meta">Problem Solved</p>
+                <p className="feature-copy">Show listings often contain large amounts of essential information—dates, runtimes, pricing, accessibility details, and venue metadata—which can quickly become visually overwhelming.</p>
+                <p className="stage-feature-card-meta">User Impact</p>
+                <p className="feature-copy">Transforms dense information into clear decision-making surfaces. Strong hierarchy and modular grouping allow patrons to scan key details quickly, compare options efficiently, and make informed booking decisions with less cognitive effort.</p>
               </article>
             </div>
           </div>

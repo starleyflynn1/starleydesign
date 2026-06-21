@@ -22,7 +22,7 @@ export const SHOWS: Show[] = [
   {
     title: 'Salesforce',
     ...showPoster('salesforce'),
-    date: '2022 — 2026',
+    date: '2021 — 2026',
     scope: 'Digital Campus at Scale',
     stack: 'Javascript · GraphQL · Java',
     impact: 'Architectual Design',
@@ -31,7 +31,7 @@ export const SHOWS: Show[] = [
   {
     title: 'Google',
     ...showPoster('google'),
-    date: '2021 — 2022',
+    date: '2020 — 2021',
     scope: 'Lead Management Engine',
     stack: 'Javascript · LWC · Java',
     impact: 'High Performance Delivery',

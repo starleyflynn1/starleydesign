@@ -225,6 +225,17 @@
   border: 3px double var(--stage-base);
 }
 
+.theme-archive .line-prompter-root {
+  --lp-border-width: 3px;
+  --lp-border-style: double;
+  --lp-card-border-color: var(--stage-base);
+  --lp-control-border-color: var(--stage-base);
+  --lp-control-border-width: 2px;
+  --lp-card-border: var(--lp-border-width) var(--lp-border-style) var(--lp-card-border-color);
+  --lp-control-border: var(--lp-control-border-width) var(--lp-border-style)
+    var(--lp-control-border-color);
+}
+
 .theme-archive .segment-btn.segment-btn-active,
 .dark.theme-archive .segment-btn.segment-btn-active {
   border: 3px double color-mix(in oklab, var(--velvet) 80%, var(--stage-base) 20%) !important;

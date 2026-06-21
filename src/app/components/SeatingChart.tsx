@@ -297,32 +297,16 @@ export function SeatingChart({
       const quickInSidebar = !hideQuickControls && !hideSummary;
 
       /**
-       * Width budget: use the fit viewport column width. Do not max with `house.clientWidth` after the
-       * overview clip applies — the house shrinks with scale and would retrigger ResizeObserver with a
-       * smaller width, causing a post-paint “shrink” loop.
+       * Width budget: the house column only (`.seating-house-scroll`), never the full split row.
+       * Using `.seating-chart-body` width included the sidebar (~320–380px) and scaled the map too
+       * large, clipping the right edge until browser zoom accidentally triggered a height clamp.
        */
-      const padX = quickInSidebar ? 16 : 12;
-      const viewportW = Math.max(0, Math.floor(viewportRect.width) - padX);
-      /**
-       * Sidebar overview uses width from the fit column only. On the first frame after lazy mount /
-       * `isFitOverview` toggles, `viewportRect.width` can still be 0 — that produced `sx ≈ 0` and a
-       * clamped scale of 0.12 (“tiny stage”). Skip until the column has a real width.
-       */
-      if (quickInSidebar && viewportRect.width < 4) {
+      const padX = quickInSidebar ? 20 : 12;
+      const houseW = Math.max(0, Math.floor(houseRect.width) - padX);
+      if (houseW < 4) {
         return;
       }
-      let availableWidth = viewportW;
-      if (quickInSidebar) {
-        /** Prefer the chart split column rect — more stable than the inner fit viewport right after a tab switch / defer mount. */
-        const chartColumn =
-          house.closest('.seating-chart-body') ?? house.closest('.seating-main-column');
-        if (chartColumn instanceof HTMLElement) {
-          const colW = Math.max(0, Math.floor(chartColumn.getBoundingClientRect().width) - padX - 8);
-          availableWidth = Math.max(viewportW, colW);
-        }
-      } else {
-        availableWidth = Math.max(viewportW, Math.max(0, house.clientWidth - 8));
-      }
+      let availableWidth = houseW;
 
       const houseTop = houseRect.top;
       const heightFromWindow = window.innerHeight - houseTop - 20;
@@ -352,23 +336,20 @@ export function SeatingChart({
 
       const sx = availableWidth / cw;
       const sy = availableHeight / ch;
-      let next: number;
-      if (quickInSidebar) {
-        /** Fill the chart column width first (same box as the theater panel); shrink only if the scaled house would exceed the panel height. */
-        next = Math.min(1, sx * 0.98);
-        const scaledH = ch * next;
-        if (scaledH > availableHeight) {
-          next = Math.min(next, (availableHeight / ch) * 0.98);
-        }
-      } else {
-        next = Math.min(sx, sy) * 0.98;
-      }
+      const next = Math.min(sx, sy) * 0.98;
       if (!Number.isFinite(next) || next <= 0) {
         return;
       }
-      /** Sidebar “whole theater” overview: avoid postage-stamp scale on desktop; embed / non-sidebar keep a lower floor. */
+      /** Never upscale past 1; never apply a readability floor that would overflow the house column. */
+      let clamped = Math.min(1, next);
       const minOverviewScale = quickInSidebar ? 0.32 : 0.12;
-      const clamped = Math.max(minOverviewScale, Math.min(1, next));
+      if (clamped < minOverviewScale) {
+        const floorW = cw * minOverviewScale;
+        const floorH = ch * minOverviewScale;
+        if (floorW <= availableWidth && floorH <= availableHeight) {
+          clamped = minOverviewScale;
+        }
+      }
       setOverviewDims({ w: cw, h: ch });
       setFitScale((prev) => (Math.abs(prev - clamped) < 0.002 ? prev : clamped));
     };
@@ -395,11 +376,13 @@ export function SeatingChart({
     const vv = typeof window !== 'undefined' ? window.visualViewport : null;
     if (vv) {
       vv.addEventListener('resize', scheduleRecalc);
+      vv.addEventListener('scroll', scheduleRecalc);
     }
     return () => {
       cancelAnimationFrame(rafId);
       window.removeEventListener('resize', scheduleRecalc);
       vv?.removeEventListener('resize', scheduleRecalc);
+      vv?.removeEventListener('scroll', scheduleRecalc);
     };
   }, [isFitOverview, rowCount, seatsPerRow, compactMode, sectionTypes, hideQuickControls, hideSummary]);
   useEffect(() => {
@@ -741,7 +724,9 @@ try {
 
   return (
     <div
-      className={`seating-root ${compactMode ? 'seating-root-compact' : ''}`}
+      className={`seating-root ${compactMode ? 'seating-root-compact' : ''} ${
+        isFitOverview ? 'seating-root-overview' : ''
+      }`}
       onMouseUp={() => setIsDragSelecting(false)}
       onMouseLeave={() => setIsDragSelecting(false)}
     >

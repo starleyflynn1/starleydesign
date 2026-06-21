@@ -1532,6 +1532,9 @@
   }
 
   .seating-root { @apply relative; }
+  .seating-root-overview {
+    overflow: visible;
+  }
   .seating-main-column { @apply space-y-6; min-width: 0; }
   .seating-fit-viewport {
     width: 100%;
@@ -2012,7 +2015,7 @@
 
   @media (max-width: 768px) {
     .panel-header { @apply flex-col items-stretch gap-3 mb-6; }
-    .segment-control { @apply grid grid-cols-3 w-full; }
+    .segment-control { @apply grid grid-cols-2 w-full; }
     .segment-btn { @apply w-full text-sm px-2 py-2; }
 
     .component-panel { @apply p-4; }

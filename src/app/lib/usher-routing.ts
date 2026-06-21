@@ -22,6 +22,7 @@ const routeByTitle: Record<string, string> = {
   Preferences: '/backstage#accessibility-motion-control',
   'Venue Information': '/backstage#scalable-venue-logic',
   'Seating Chart': '/#seating-chart',
+  'Line Prompter': '/#line-prompter',
 };
 
 export const resolveUsherDestination = (action: UsherActionLike): string | undefined => {

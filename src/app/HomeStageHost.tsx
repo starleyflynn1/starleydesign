@@ -6,7 +6,7 @@ import { BOOKING_STEPS } from './data/booking-steps';
 import { buildUpcomingPerformances } from './lib/performances';
 import { Performance } from './data/types';
 
-type HomeView = 'home' | 'booking' | 'seating' | 'calendar';
+type HomeView = 'home' | 'booking' | 'seating' | 'calendar' | 'prompter';
 
 export interface HomeStageHostProps {
   currentView: HomeView;

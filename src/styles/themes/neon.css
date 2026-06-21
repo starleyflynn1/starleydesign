@@ -232,7 +232,7 @@
 }
 
 /* --- Buttons --- */
-.theme-neon :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-day-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn)) {
+.theme-neon :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-day-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn):not(.preview-line):not(.btn)) {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 500;
   text-transform: uppercase;
@@ -247,7 +247,7 @@
   overflow: hidden;
 }
 
-.theme-neon :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-day-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn):hover) {
+.theme-neon :where(button:not(.theater-icon-btn):not(.theater-mobile-search-btn):not(.theater-mobile-menu-btn):not(.style-picker-trigger):not(.style-picker-item):not(.segment-btn):not(.btn-prev):not(.btn-next):not(.show-card-btn):not(.calendar-day-btn):not(.calendar-time-btn):not(.calendar-nav-btn):not(.seating-seat-btn):not(.usher-action-btn):not(.usher-close-btn):not(.preview-line):not(.btn):hover) {
   border-color: var(--primary);
   box-shadow: 0 0 20px rgba(255, 0, 127, 0.3);
   transform: translateY(-2px);
@@ -293,6 +293,22 @@
   background: var(--card);
   backdrop-filter: blur(12px);
   border-radius: var(--radius);
+}
+
+.theme-neon .line-prompter-root {
+  --lp-control-border-width: 2px;
+  --lp-control-border: 2px solid var(--lp-control-border-color);
+}
+
+.theme-neon .line-prompter-root :is(
+  .upload-card,
+  .picker-card,
+  .settings-card,
+  .preview-details,
+  .missed-lines-report,
+  .prompter-stage
+) {
+  backdrop-filter: blur(12px);
 }
 
 /* Improve dark-mode readability while preserving neon outline style. */

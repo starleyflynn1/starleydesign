@@ -1,0 +1,158 @@
+/**
+ * Line Prompter tokens inherit from the active theater theme on :root
+ * (theme-stage, theme-coastal, etc.) and light/dark mode (.dark).
+ * Internal --color-* aliases keep component CSS stable while tracking parent tokens.
+ */
+.line-prompter-root {
+  font-family: var(--font-body, inherit);
+  line-height: 1.5;
+  font-weight: var(--font-weight-normal, 400);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  color-scheme: inherit;
+  color: var(--foreground);
+
+  --color-bg: var(--background);
+  --color-text: var(--foreground);
+  --color-text-muted: var(
+    --text-muted-aa,
+    color-mix(in oklab, var(--foreground) 72%, transparent)
+  );
+  --color-text-subtle: var(
+    --text-subtle-aa,
+    color-mix(in oklab, var(--foreground) 62%, transparent)
+  );
+  --color-text-secondary: color-mix(
+    in oklab,
+    var(--color-card-fg) 84%,
+    var(--spotlight, var(--accent)) 16%
+  );
+  --color-text-body: var(--color-card-fg);
+  --color-card: var(
+    --portfolio-card-bg,
+    color-mix(in oklab, var(--card) 92%, var(--background) 8%)
+  );
+  --color-card-bg: var(--card);
+  --color-card-fg: var(--card-foreground, var(--foreground));
+  --color-card-border: var(--border);
+
+  /* Shape & chrome — track active theme radius and panel borders */
+  --lp-radius-card: var(--radius-xl, var(--radius-lg, var(--radius, 0.625rem)));
+  --lp-radius-panel: var(--radius-lg, var(--radius, 0.625rem));
+  --lp-radius-control: var(--radius-md, var(--radius-lg, var(--radius, 0.625rem)));
+  --lp-radius-inner: var(--radius-sm, var(--radius-md, var(--radius, 0.625rem)));
+  --lp-border-width: 1px;
+  --lp-border-style: solid;
+  --lp-control-border-width: 1px;
+  --lp-emphasis-border-width: 2px;
+  --lp-card-border-color: var(
+    --portfolio-card-border,
+    var(--seating-panel-border, var(--color-card-border))
+  );
+  --lp-control-border-color: var(--seating-control-border, var(--color-border));
+  --lp-card-border: var(--lp-border-width) var(--lp-border-style) var(--lp-card-border-color);
+  --lp-control-border: var(--lp-control-border-width) var(--lp-border-style)
+    var(--lp-control-border-color);
+  /**
+   * Interactive surfaces (checkbox rows, script preview list, selects).
+   * Use seating-control tokens — not --input-background, which many dark themes
+   * leave at a light value and causes light-on-light text.
+   */
+  --color-surface: var(
+    --seating-control-bg,
+    color-mix(in oklab, var(--card) 92%, var(--foreground) 8%)
+  );
+  --color-surface-fg: var(
+    --seating-control-fg,
+    var(--card-foreground, var(--foreground))
+  );
+  --color-surface-hover: var(
+    --seating-control-hover-bg,
+    color-mix(in oklab, var(--card) 86%, var(--foreground) 14%)
+  );
+  --color-surface-hover-fg: var(
+    --seating-control-hover-fg,
+    var(--color-surface-fg)
+  );
+  --color-border: var(--border);
+  --color-border-hover: color-mix(
+    in oklab,
+    var(--border) 50%,
+    var(--foreground) 50%
+  );
+  --color-accent: var(--accent);
+  --color-accent-soft: color-mix(in oklab, var(--accent) 18%, var(--card) 82%);
+  --color-user-character: var(--selection-accent, var(--accent));
+  --color-prompter-from: color-mix(in oklab, var(--card) 90%, var(--background) 10%);
+  --color-prompter-to: color-mix(in oklab, var(--background) 92%, var(--card) 8%);
+  --color-stage-partner: color-mix(in oklab, var(--card) 88%, var(--background) 12%);
+  --color-stage-user: color-mix(
+    in oklab,
+    var(--seat-available, var(--accent)) 16%,
+    var(--card) 84%
+  );
+  --color-stage-user-border: var(--seat-available, var(--accent));
+  --color-stage-user-glow: color-mix(
+    in oklab,
+    var(--seat-available, var(--accent)) 38%,
+    transparent
+  );
+  --color-btn-secondary: var(
+    --seating-control-bg,
+    color-mix(in oklab, var(--foreground) 8%, var(--card) 92%)
+  );
+  --color-btn-secondary-hover: var(
+    --seating-control-hover-bg,
+    color-mix(in oklab, var(--foreground) 14%, var(--card) 86%)
+  );
+  --color-btn-ghost: var(
+    --text-muted-aa,
+    color-mix(in oklab, var(--foreground) 72%, transparent)
+  );
+  --color-warn-bg: color-mix(
+    in oklab,
+    var(--spotlight, var(--accent)) 24%,
+    var(--card) 76%
+  );
+  --color-warn-border: color-mix(
+    in oklab,
+    var(--spotlight, var(--accent)) 52%,
+    var(--border) 48%
+  );
+  --color-warn-text: var(--foreground);
+  --color-error-bg: color-mix(
+    in oklab,
+    var(--destructive, #d4183d) 20%,
+    var(--card) 80%
+  );
+  --color-error-border: color-mix(
+    in oklab,
+    var(--destructive, #d4183d) 58%,
+    var(--border) 42%
+  );
+  --color-error-text: var(--foreground);
+  --color-error-soft: var(--destructive, #d4183d);
+  --color-status-neutral-bg: color-mix(
+    in oklab,
+    var(--foreground) 10%,
+    var(--card) 90%
+  );
+  --color-status-neutral-text: var(--foreground);
+  --lp-status-speaking-bg: color-mix(in oklab, var(--primary) 24%, var(--card) 76%);
+  --lp-status-speaking-text: var(--foreground);
+  --lp-status-listening-bg: color-mix(
+    in oklab,
+    var(--seat-available, var(--accent)) 26%,
+    var(--card) 74%
+  );
+  --lp-status-listening-text: var(--foreground);
+  --lp-status-prompting-bg: color-mix(
+    in oklab,
+    var(--spotlight, var(--accent)) 30%,
+    var(--card) 70%
+  );
+  --lp-status-prompting-text: var(--foreground);
+  --lp-status-complete-bg: color-mix(in oklab, var(--accent) 22%, var(--card) 78%);
+  --lp-status-complete-text: var(--foreground);
+}

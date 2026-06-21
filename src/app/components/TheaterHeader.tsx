@@ -278,7 +278,7 @@ export function TheaterHeader({ onSearchClick, onNavigate }: TheaterHeaderProps)
           <div className="theater-live-pill theater-live-pill-flash">LIVE</div>
           <div className="banner-container">
             <span className={`banner-text ${!motionEnabled ? 'banner-text-static' : ''}`}>
-              Opening Night: "The Design Technologist" — May 2026 • Box Office: Open for Collaborative Innovation & Engineering Roles
+              Opening Night: "The Design Technologist" — June 2026 • Box Office: Open for Collaborative Innovation, Design & Engineering Roles
             </span>
           </div>
         </div>

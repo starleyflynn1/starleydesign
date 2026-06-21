@@ -1,4 +1,4 @@
-export type HomeView = 'home' | 'booking' | 'seating' | 'calendar';
+export type HomeView = 'home' | 'booking' | 'seating' | 'calendar' | 'prompter';
 
 /** Read home segment from the current URL hash (sync on first paint to avoid footer/view flash). */
 export function readHomeViewFromLocation(): HomeView {
@@ -12,5 +12,6 @@ export function readHomeViewFromLocation(): HomeView {
   if (hash === '#seating-chart' || hash === '#seating') return 'seating';
   if (hash === '#booking-flow' || hash === '#booking') return 'booking';
   if (hash === '#calendar') return 'calendar';
+  if (hash === '#line-prompter' || hash === '#prompter') return 'prompter';
   return 'seating';
 }

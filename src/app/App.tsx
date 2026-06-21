@@ -215,6 +215,21 @@ export default function App() {
           });
           return;
         }
+        if (href.includes('#line-prompter') || href.includes('#prompter')) {
+          flushSync(() => {
+            setCurrentView('prompter');
+          });
+          window.history.replaceState(null, '', '/#line-prompter');
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              document.getElementById('booking-flow')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              });
+            });
+          });
+          return;
+        }
         setCurrentView('home');
         window.location.assign(href);
       };
@@ -567,13 +582,19 @@ export default function App() {
                         setCurrentView('booking');
                       } else if (hash === '#calendar') {
                         setCurrentView('calendar');
+                      } else if (hash === '#line-prompter' || hash === '#prompter') {
+                        setCurrentView('prompter');
                       } else {
                         setCurrentView('home');
                       }
                     });
                     requestAnimationFrame(() => {
                       const usePanelTop =
-                        hash === '#seating-chart' || hash === '#seating' || hash === '#calendar';
+                        hash === '#seating-chart' ||
+                        hash === '#seating' ||
+                        hash === '#calendar' ||
+                        hash === '#line-prompter' ||
+                        hash === '#prompter';
                       const target = usePanelTop
                         ? document.getElementById('booking-flow')
                         : document.querySelector(hash);
@@ -589,6 +610,8 @@ export default function App() {
                       setCurrentView('booking');
                     } else if (hash === '#calendar') {
                       setCurrentView('calendar');
+                    } else if (hash === '#line-prompter' || hash === '#prompter') {
+                      setCurrentView('prompter');
                     } else {
                       setCurrentView('home');
                     }
