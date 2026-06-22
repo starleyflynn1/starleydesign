@@ -1,5 +1,5 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/ScriptResumeModal-DBQJDFLy.js","assets/index-DBt0pqXO.js","assets/lucide-DoOgLYQ3.js","assets/index-DOKs-f8A.css"])))=>i.map(i=>d[i]);
-import{j as e,_ as y}from"./index-DBt0pqXO.js";import{a,C as n,b as o,F as b,D as j}from"./lucide-DoOgLYQ3.js";const N=a.lazy(()=>y(()=>import("./ScriptResumeModal-DBQJDFLy.js"),__vite__mapDeps([0,1,2,3])).then(i=>({default:i.ScriptResumeModal}))),m=`function findSuggestedSeatIds(count) {
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/ScriptResumeModal-Cc5pgwW8.js","assets/index-FY1a11OZ.js","assets/lucide-DoOgLYQ3.js","assets/index-DOKs-f8A.css"])))=>i.map(i=>d[i]);
+import{j as e,_ as y}from"./index-FY1a11OZ.js";import{a,C as n,b as o,F as b,D as j}from"./lucide-DoOgLYQ3.js";const N=a.lazy(()=>y(()=>import("./ScriptResumeModal-Cc5pgwW8.js"),__vite__mapDeps([0,1,2,3])).then(i=>({default:i.ScriptResumeModal}))),m=`function findSuggestedSeatIds(count) {
   const centerSeat = (seatsPerRow + 1) / 2;
   const targetRowIndex = Math.round((rows.length - 1) * 0.35);
   let bestNonAisle = null;

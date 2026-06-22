@@ -1,3 +1,4 @@
+import { copyFileSync, writeFileSync } from 'fs'
 import { defineConfig } from 'vite'
 import type { Plugin } from 'vite'
 import path from 'path'
@@ -37,7 +38,19 @@ function figmaAssetResolver() {
   }
 }
 
+function ghPagesArtifacts(): Plugin {
+  return {
+    name: 'gh-pages-artifacts',
+    closeBundle() {
+      if (process.env.GITHUB_PAGES !== 'true') return
+      copyFileSync('dist/index.html', 'dist/404.html')
+      writeFileSync('dist/.nojekyll', '')
+    },
+  }
+}
+
 export default defineConfig({
+  base: process.env.GITHUB_PAGES === 'true' ? '/starleydesign/' : '/',
   build: {
     esbuild: {
       drop: ['console', 'debugger'],
@@ -56,6 +69,7 @@ export default defineConfig({
     deferMainCss(),
     criticalPathHtml(),
     figmaAssetResolver(),
+    ghPagesArtifacts(),
     // The React and Tailwind plugins are both required for Make, even if
     // Tailwind is not being actively used – do not remove them
     react(),

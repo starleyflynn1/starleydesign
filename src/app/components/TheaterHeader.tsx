@@ -1,5 +1,6 @@
 import React, { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import { CloseIcon, MenuIcon, MoonIcon, PauseIcon, PlayIcon, SearchIcon, SunIcon, TheaterIcon } from './AppIcons';
+import { stripAppBasePath, withAppBasePath } from '../lib/app-base';
 import { useTheme } from '../contexts/ThemeContext';
 
 const StylePicker = lazy(() =>
@@ -27,9 +28,8 @@ export function TheaterHeader({ onSearchClick, onNavigate }: TheaterHeaderProps)
     if (typeof window === 'undefined') return false;
     const current = new URL(window.location.href);
     const target = new URL(href, window.location.origin);
-    const normalizePath = (value: string) => value.replace(/\/+$/, '') || '/';
     return (
-      normalizePath(current.pathname) === normalizePath(target.pathname)
+      stripAppBasePath(current.pathname) === stripAppBasePath(target.pathname)
       && (current.hash || '') === (target.hash || '')
     );
   }, []);
@@ -117,10 +117,10 @@ export function TheaterHeader({ onSearchClick, onNavigate }: TheaterHeaderProps)
   };
 
   const navItems = [
-    { label: 'Stage', href: '/#stage' },
-    { label: 'Script', href: '/script' },
-    { label: 'Director', href: '/director' },
-    { label: 'Backstage', href: '/backstage' },
+    { label: 'Stage', href: `${withAppBasePath('/')}#stage` },
+    { label: 'Script', href: withAppBasePath('/script') },
+    { label: 'Director', href: withAppBasePath('/director') },
+    { label: 'Backstage', href: withAppBasePath('/backstage') },
   ];
 
   return (

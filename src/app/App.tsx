@@ -6,6 +6,7 @@ import { TheaterHeader } from './components/TheaterHeader';
 import { TheaterIcon } from './components/AppIcons';
 import { BOOKING_SHOWS_CATEGORY, BOOKING_STEP_COUNT } from './data/booking-constants';
 import { readHomeViewFromLocation } from './lib/home-view';
+import { stripAppBasePath, withAppBasePath } from './lib/app-base';
 import { BOOKING_SHOW_TITLES, resolveUsherDestination } from './lib/usher-routing';
 
 const HomeStageHost = lazy(() =>
@@ -28,10 +29,10 @@ export default function App() {
   const isPageTransitioningRef = useRef(false);
   /** Snapshot scroll when exit confirmation opens — restore in layout effect to avoid jump from scroll lock. */
   const exitDialogScrollYRef = useRef(0);
-  const resumeUrl = '/Starley-F-Resume.pdf';
+  const resumeUrl = withAppBasePath('/Starley-F-Resume.pdf');
 
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
-  const normalizedPath = pathname.replace(/\/+$/, '') || '/';
+  const normalizedPath = stripAppBasePath(pathname);
   const currentPage =
     normalizedPath === '/script'
       ? 'script'
@@ -63,17 +64,17 @@ export default function App() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (window.location.pathname !== '/') return;
+    if (stripAppBasePath(window.location.pathname) !== '/') return;
     if (window.location.hash) return;
 
     // Default entry section for the main page.
-    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#stage`);
+    window.history.replaceState(null, '', `${withAppBasePath('/')}#stage`);
     setCurrentView('home');
   }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (window.location.pathname !== '/') return;
+    if (stripAppBasePath(window.location.pathname) !== '/') return;
 
     const syncViewWithHash = () => {
       setCurrentView(readHomeViewFromLocation());
@@ -174,7 +175,7 @@ export default function App() {
           /** Keep viewport position: URL #stage + layout updates can trigger anchor scroll or scroll anchoring. */
           const prevScrollY = window.scrollY;
           setCurrentView('home');
-          window.history.replaceState(null, '', '/#stage');
+          window.history.replaceState(null, '', `${withAppBasePath('/')}#stage`);
           const restoreScroll = () => {
             window.scrollTo({ top: prevScrollY, left: 0, behavior: 'auto' });
           };
@@ -189,7 +190,7 @@ export default function App() {
           flushSync(() => {
             setCurrentView('seating');
           });
-          window.history.replaceState(null, '', '/#seating');
+          window.history.replaceState(null, '', `${withAppBasePath('/')}#seating`);
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
               document.getElementById('booking-flow')?.scrollIntoView({
@@ -204,7 +205,7 @@ export default function App() {
           flushSync(() => {
             setCurrentView('calendar');
           });
-          window.history.replaceState(null, '', '/#calendar');
+          window.history.replaceState(null, '', `${withAppBasePath('/')}#calendar`);
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
               document.getElementById('booking-flow')?.scrollIntoView({
@@ -219,7 +220,7 @@ export default function App() {
           flushSync(() => {
             setCurrentView('prompter');
           });
-          window.history.replaceState(null, '', '/#line-prompter');
+          window.history.replaceState(null, '', `${withAppBasePath('/')}#line-prompter`);
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
               document.getElementById('booking-flow')?.scrollIntoView({
@@ -461,7 +462,7 @@ export default function App() {
   useEffect(() => {
     if (typeof window === 'undefined' || typeof document === 'undefined') return;
 
-    const normalizePath = (value: string) => value.replace(/\/+$/, '') || '/';
+    const normalizePath = (value: string) => stripAppBasePath(value);
     const isAppPagePath = (value: string) =>
       value === '/' || value === '/script' || value === '/director' || value === '/backstage';
 
@@ -511,7 +512,7 @@ export default function App() {
         return;
       }
 
-      const destination = `${targetPath}${url.search}${url.hash}`;
+      const destination = `${withAppBasePath(targetPath)}${url.search}${url.hash}`;
       if (!confirmExitBooking(destination)) {
         event.preventDefault();
         return;
@@ -713,13 +714,13 @@ export default function App() {
               </p>
             </div>
             <div className="footer-links">
-              <a href="/#stage" className="footer-link" tabIndex={hideFooterForBooking ? -1 : undefined}>
+              <a href={`${withAppBasePath('/')}#stage`} className="footer-link" tabIndex={hideFooterForBooking ? -1 : undefined}>
                 Stage
               </a>
-              <a href="/script" className="footer-link" tabIndex={hideFooterForBooking ? -1 : undefined}>
+              <a href={withAppBasePath('/script')} className="footer-link" tabIndex={hideFooterForBooking ? -1 : undefined}>
                 Script
               </a>
-              <a href="/backstage" className="footer-link" tabIndex={hideFooterForBooking ? -1 : undefined}>
+              <a href={withAppBasePath('/backstage')} className="footer-link" tabIndex={hideFooterForBooking ? -1 : undefined}>
                 Backstage
               </a>
             </div>
